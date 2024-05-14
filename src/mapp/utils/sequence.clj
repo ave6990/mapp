@@ -1,4 +1,4 @@
-(ns metrology.utils.sequence)
+(ns mapp.utils.sequence)
 
 (defn in?
   "true if coll contains elm"

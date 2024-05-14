@@ -1,4 +1,4 @@
-(ns metrology.controller.main-menu
+(ns mapp.controller.main-menu
   (:require 
     [seesaw.core :refer :all]))
 

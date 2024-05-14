@@ -1,4 +1,4 @@
-(ns metrology.lib.calc
+(ns mapp.lib.calc
   (:require
     [clojure.math :as math]))
 

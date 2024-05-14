@@ -1,14 +1,13 @@
-(ns metrology.model.midb
+(ns mapp.model.midb
   (:require 
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
-    [metrology.lib.database :as db]
-    [metrology.lib.chemistry :as ch]
-    [metrology.lib.gs2000 :as gs]
-    [metrology.lib.metrology :as metr]
-    #_[metrology.lib.gen-html :refer :all]
-    [metrology.db.queries :as q]
-    #_[metrology.protocols.custom :as protocol]))
+    [mapp.lib.database :as db]
+    [mapp.lib.chemistry :as ch]
+    [mapp.lib.gs2000 :as gs]
+    [mapp.lib.metrology :as metr]
+    [mapp.db.queries :as q]
+    #_[mapp.protocols.custom :as protocol]))
 
 (def midb-path
   ;"/mnt/d/UserData/YandexDisk/Ermolaev/midb/"
@@ -173,7 +172,7 @@
         (map (fn [~id-to]
                  (dorun
                    (map (fn [~f ~args] (~f ~args))
-                        [~(symbol (str "metrology.model.midb/delete-" s "!"))
+                        [~(symbol (str "mapp.model.midb/delete-" s "!"))
                           (partial jdbc/execute! midb)]
                         [~id-to
                           [~(symbol (str "q/copy-" s))
@@ -670,14 +669,14 @@
 
 (require '[clojure.repl :refer :all])
 
-(require '[metrology.lib.midb-queries :as q] :reload)
+(require '[mapp.lib.midb-queries :as q] :reload)
 
-(require '[metrology.protocols.custom :as protocol] :reload)
+(require '[mapp.protocols.custom :as protocol] :reload)
 
 ;; example table-rows пример функции создания строк таблицы
 (spit
   (str midb-path "temp.html")
-    (html (table (metrology.protocols.custom/table-rows
+    (html (table (mapp.protocols.custom/table-rows
             (list
               (list "Детектор" "Значение уровня шумов" "Значение дрейфа")
               (list "действительное" "допускаемое" "ед. изм."
@@ -687,18 +686,18 @@
               (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1]))
             #_th))))
 
-(require '[metrology.lib.metrology :as metr] :reload)
+(require '[mapp.lib.metrology :as metr] :reload)
 
-(require '[metrology.lib.gen-html :refer :all] :reload)
+(require '[mapp.lib.gen-html :refer :all] :reload)
 
-(ns metrology.model.midb)
-(require '[metrology.utils.protocol :as pr] :reload)
-(require '[metrology.db.queries :as q] :reload)
+(ns mapp.model.midb)
+(require '[mapp.utils.protocol :as pr] :reload)
+(require '[mapp.db.queries :as q] :reload)
 
-(require '[metrology.lib.chemistry :as ch] :reload)
+(require '[mapp.lib.chemistry :as ch] :reload)
 
-(require '[metrology.view.gso-panel-settings] :reload)
-(require '[metrology.view.verifications-panel-settings :as v-panel-settings] :reload)
+(require '[mapp.view.gso-panel-settings] :reload)
+(require '[mapp.view.verifications-panel-settings :as v-panel-settings] :reload)
 
 (doc flatten)
 

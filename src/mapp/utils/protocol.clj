@@ -1,9 +1,9 @@
-(ns metrology.utils.protocol
+(ns mapp.utils.protocol
   (:require [clojure.math :as math]
             [clojure.string :as string]
             [clojure.pprint :refer [pprint]]
-            [metrology.lib.gen-html :refer :all]
-            [metrology.lib.metrology :as metr]))
+            [mapp.lib.gen-html :refer :all]
+            [mapp.lib.metrology :as metr]))
 
 (defn field
   "Возвращает html поле для вывода данных в протокол."
@@ -514,6 +514,6 @@ window.addEventListener('focus', (e) => {
 
 (require '[clojure.math :as math])
 
-(require '[metrology.lib.metrology :as metr])
+(require '[mapp.lib.metrology :as metr])
 
 )

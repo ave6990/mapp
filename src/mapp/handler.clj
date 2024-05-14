@@ -1,10 +1,14 @@
 (ns mapp.handler
-  (:require [compojure.core :refer :all]
-            [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
+  (:require
+    [clojure.string :as string]
+    [compojure.core :refer :all]
+    [compojure.route :as route]
+    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+    [mapp.model.midb :as midb]
+    [mapp.views.verifications :as v]))
 
 (defroutes app-routes
-  (GET "/" [] "Hello World")
+  (GET "/" [] (v/page))
   (route/not-found "Not Found"))
 
 (def app

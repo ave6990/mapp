@@ -1,4 +1,4 @@
-(ns metrology.lib.database
+(ns mapp.lib.database
   (:require 
     [clojure.java.jdbc :as jdbc]
     [clojure.string]))

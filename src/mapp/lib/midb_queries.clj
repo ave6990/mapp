@@ -1,4 +1,4 @@
-(ns metrology.lib.midb-queries
+(ns mapp.lib.midb-queries
   (:require [clojure.string :as string]))
 
 (defn last-id

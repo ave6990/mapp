@@ -1,5 +1,5 @@
-(ns metrology.lib.gs2000
-  (:require [metrology.lib.chemistry :as ch]))
+(ns mapp.lib.gs2000
+  (:require [mapp.lib.chemistry :as ch]))
 
 (def passports
   "Коэффициенты разбавления генераторов (паспортные значения)."

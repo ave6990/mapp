@@ -1,4 +1,4 @@
-(ns metrology.controller.controller
+(ns mapp.controller.controller
   (:require
     [clojure.string :as string]
     [seesaw.core :refer :all]
@@ -6,14 +6,14 @@
     [seesaw.keymap :refer :all]
     [seesaw.value :refer :all]
     [seesaw.table :refer [table-model value-at update-at!]]
-    [metrology.model.midb :as midb]
-    [metrology.view.main :as v]
-    [metrology.controller.main-menu :as m-menu]
-    [metrology.controller.table-context-menu :as table-c-menu]))
+    [mapp.model.midb :as midb]
+    [mapp.view.main :as v]
+    [mapp.controller.main-menu :as m-menu]
+    [mapp.controller.table-context-menu :as table-c-menu]))
 
 (defn make-table-model
   "external deps:
-    metrology.core.clj"
+    mapp.core.clj"
   [data column-settings]
   (table-model
     :columns (->> column-settings
@@ -311,9 +311,9 @@
 
 (comment
 
-(ns metrology.controller.controller)
-(require '[metrology.view.main :as v] :reload)
-(require '[metrology.controller.table-context-menu :as table-c-menu] :reload)
-(require '[metrology.model.midb :as midb] :reload)
+(ns mapp.controller.controller)
+(require '[mapp.view.main :as v] :reload)
+(require '[mapp.controller.table-context-menu :as table-c-menu] :reload)
+(require '[mapp.model.midb :as midb] :reload)
 
 )

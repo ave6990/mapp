@@ -1,8 +1,8 @@
-(ns metrology.utils.daily
+(ns mapp.utils.daily
   (:require
     [clojure.string :as string]
     [clojure.java.shell :refer [sh]]
-    [metrology.lib.gen-html :refer :all]))
+    [mapp.lib.gen-html :refer :all]))
 
 (def midb-path
   ;"/mnt/d/UserData/YandexDisk/Ermolaev/midb/"

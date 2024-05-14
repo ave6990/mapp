@@ -1,4 +1,4 @@
-(ns metrology.db.queries
+(ns mapp.db.queries
   (:require
     [clojure.string :as string]))
 

@@ -1,5 +1,9 @@
-(ns metrology.lib.gen-html
+(ns mapp.lib.gen-html
   (:require [clojure.string :as string]))
+
+(defn join
+  [& xs]
+  (string/join "\n" xs))
 
 (defn indent
   "Добавить отступ к строкам."
@@ -70,6 +74,7 @@
 (html-tag header)
 (html-tag main)
 (html-tag footer)
+(html-tag nav)
 (html-tag details)
 (html-tag summary)
 (html-tag table)
@@ -98,6 +103,58 @@
   "<!doctype html>"
   [& xs]
   (str "<!doctype html>\n" (string/join "\n" xs)))
+
+(defn table-cells
+  "args:
+    `vs   двумерное множество значений
+    `mask множество векторов значений [:rowspan :colspan] описывающих
+          структуру строки таблицы.
+   example:
+    (table-header
+      (list
+        (list \"Детектор\" \"Значение уровня шумов\" \"Значение дрейфа\")
+        (list \"действительное\" \"допускаемое\" \"ед. изм.\"
+              \"действительное\" \"допускаемое\" \"ед. изм.\"))
+      (list
+        (list [2 1] [1 3] [1 3])
+        (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1])))"
+  ([column-fn vs mask ]
+    (->>
+      (map (fn [row sp]
+               (->>
+                 (map (fn [v [rspan cspan]]
+                          (column-fn {:rowspan rspan
+                                      :colspan cspan}
+                                     v))
+                      row
+                      sp)
+                 (string/join "\n")
+                 tr))
+           vs
+           mask)
+      (string/join "\n")))
+  ([column-fn vs]
+    (table-cells
+      column-fn
+      vs
+      (doall
+        (map (fn [r]
+                 (map (fn [_]
+                          [1 1])
+                      r))
+             vs)))))
+
+(defn table-header
+  ([vs mask]
+    (table-cells th vs mask))
+  ([vs]
+    (table-cells th vs)))
+
+(defn table-rows
+  ([vs mask]
+    (table-cells td vs mask))
+  ([vs]
+    (table-cells td vs)))
 
 (comment
 

@@ -1,11 +1,11 @@
-(ns metrology.controller.table-context-menu
+(ns mapp.controller.table-context-menu
   (:require
     [clojure.string :as string]
     [seesaw.core :refer :all]
     [seesaw.table :refer [table-model value-at update-at!]]
-    [metrology.model.midb :as midb]
-    [metrology.utils.protocol :as pr]
-    [metrology.view.main :as v]))
+    [mapp.model.midb :as midb]
+    [mapp.utils.protocol :as pr]
+    [mapp.view.main :as v]))
 
 (defn get-selection-field-values
   [field tab]
@@ -130,9 +130,9 @@
 
 (comment
 
-(ns metrology.controller.table-context-menu)
-(require '[metrology.model.midb :as midb] :reload)
-(require '[metrology.view.main :as main] :reload)
-(require '[metrology.utils.protocol :as pr] :reload)
+(ns mapp.controller.table-context-menu)
+(require '[mapp.model.midb :as midb] :reload)
+(require '[mapp.view.main :as main] :reload)
+(require '[mapp.utils.protocol :as pr] :reload)
 
 )

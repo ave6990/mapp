@@ -1,4 +1,4 @@
-(ns metrology.lib.chemistry
+(ns mapp.lib.chemistry
   (:require
    [clojure.core :refer :all]))
 

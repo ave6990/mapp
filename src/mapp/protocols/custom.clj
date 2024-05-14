@@ -1,11 +1,11 @@
-(ns metrology.protocols.custom
+(ns mapp.protocols.custom
   (:require
     [clojure.string :as string]
     [clojure.math :as math]
     [clojure.pprint :refer [pprint]]  ; нужно на этапе отладки
-    [metrology.lib.metrology :as m]
-    [metrology.lib.gen-html :refer :all]
-    [metrology.utils.sequence :as sq]))
+    [mapp.lib.metrology :as m]
+    [mapp.lib.gen-html :refer :all]
+    [mapp.utils.sequence :as sq]))
 
 (defn point
   [name content]
