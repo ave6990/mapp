@@ -21,6 +21,10 @@
   [path name]
   (h/a {:href path} name))
 
+(defn table 
+  [model data]
+  ())
+
 (def main-menu
   (h/nav {:id "main-menu"}
     (href "/" "Журнал ПР")

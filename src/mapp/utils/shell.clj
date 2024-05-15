@@ -1,4 +1,4 @@
-(ns metrology.util.shell
+(ns mapp.utils.shell
   (:require 
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
@@ -150,7 +150,7 @@
       (doall
         (map (fn [~id-to]
                  (map (fn [~f ~args] (~f ~args))
-                      [~(symbol (str "mapp.lib.shell-midb/delete-" s "!"))
+                      [~(symbol (str "mapp.utils.shell/delete-" s "!"))
                         (partial jdbc/execute! midb)]
                       [~id-to
                         [~(symbol (str "q/copy-" s))

@@ -1,5 +1,5 @@
 ;; #gs2000
-(require '[metrology.lib.gs2000 :as gs])
+(require '[mapp.lib.gs2000 :as gs])
 (require '[clojure.java.shell :refer [sh]])
 
 (pprint (gs2000 2
@@ -718,7 +718,7 @@
 
 (doc some?)
 
-(dir metrology.lib.metrology)
+(dir mapp.lib.metrology)
 
 (doc metr/air-v->vnc)
 
@@ -730,15 +730,15 @@
 
 (dir clojure.core)
 
-(require '[metrology.view.report :as report] :reload)
+(require '[mapp.view.report :as report] :reload)
 
-(require '[metrology.lib.gs2000 :as gs] :reload)
+(require '[mapp.lib.gs2000 :as gs] :reload)
 
-(require '[metrology.lib.midb-queries :as q] :reload)
+(require '[mapp.lib.midb-queries :as q] :reload)
 
-(require '[metrology.lib.gen-html :refer :all] :reload)
+(require '[mapp.lib.gen-html :refer :all] :reload)
 
-(require '[metrology.lib.protocol :as pr] :reload)
+(require '[mapp.lib.protocol :as pr] :reload)
 
 (require '[clojure.repl :refer :all] :reload)
 

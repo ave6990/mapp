@@ -1,4 +1,4 @@
-(ns metrology.core
+(ns mapp.core
   (:gen-class)
   (:require 
     [clojure.string :as string]
@@ -8,20 +8,20 @@
     [seesaw.keymap :refer :all] ;;TOFIX delete, not use
     [seesaw.dev :refer :all]  ;;NB TOFIX delete before release!
     [clojure.pprint :refer [pprint]]  ;;NB TOFIX delete before release!
-    [metrology.lib.chemistry :as ch]
-    [metrology.lib.metrology :as m]
-    [metrology.lib.gs2000 :as gs]
-    [metrology.model.midb :as midb]
-    [metrology.view.main :as v]
-    [metrology.controller.controller :as control]
-    [metrology.controller.main-menu :as m-menu]
-    [metrology.controller.table-context-menu :as table-c-menu]))
+    [mapp.lib.chemistry :as ch]
+    [mapp.lib.metrology :as m]
+    [mapp.lib.gs2000 :as gs]
+    [mapp.model.midb :as midb]
+    [mapp.view.main :as v]
+    [mapp.controller.controller :as control]
+    [mapp.controller.main-menu :as m-menu]
+    [mapp.controller.table-context-menu :as table-c-menu]))
 
-(ns metrology.core)
-(require '[metrology.view.main :as v] :reload)
-(require '[metrology.model.midb :as midb] :reload)
-(require '[metrology.controller.controller :as control] :reload)
-(require '[metrology.controller.table-context-menu :as table-c-menu] :reload)
+(ns mapp.core)
+(require '[mapp.view.main :as v] :reload)
+(require '[mapp.model.midb :as midb] :reload)
+(require '[mapp.controller.controller :as control] :reload)
+(require '[mapp.controller.table-context-menu :as table-c-menu] :reload)
 (def main-frame
   (->>
     (v/make-frame
@@ -78,12 +78,12 @@
 
 (require '[seesaw.widget-options :as w-opt])
 
-(require '[metrology.controller.main-menu :as m-menu] :reload)
+(require '[mapp.controller.main-menu :as m-menu] :reload)
 
-(require '[metrology.model.midb :as midb] :reload)
+(require '[mapp.model.midb :as midb] :reload)
 
 (require '[clojure.string :as string])
 
-(require '[metrology.view.main :as v] :reload)
+(require '[mapp.view.main :as v] :reload)
 
 )

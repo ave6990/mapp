@@ -222,9 +222,9 @@
     (map (fn [item]
              (let [v-item (vec item)
                    ch-name (:channel_name (get v-item 0))
-                   t (vec (slice 3 5 v-item))
-                   s (vec (slice 8 5 v-item))
-                   h (vec (slice 13 5 v-item))
+                   t (vec (sq/slice 3 5 v-item))
+                   s (vec (sq/slice 8 5 v-item))
+                   h (vec (sq/slice 13 5 v-item))
                    t48 (get v-item 19)
                    s48 (get v-item 20)
                    h48 (get v-item 21)]
@@ -266,45 +266,6 @@
                     (td "Относительное СКО"))))))))
     doall
     (string/join "\n")))
-
-(defn table-cells
-  ([column-fn vs mask ]
-    (->>
-      (map (fn [row sp]
-               (->>
-                 (map (fn [v [rspan cspan]]
-                          (column-fn {:rowspan rspan
-                                      :colspan cspan}
-                                     v))
-                      row
-                      sp)
-                 (string/join "\n")
-                 tr))
-           vs
-           mask)
-      (string/join "\n")))
-  ([column-fn vs]
-    (table-cells
-      column-fn
-      vs
-      (doall
-        (map (fn [r]
-                 (map (fn [_]
-                          [1 1])
-                      r))
-             vs)))))
-
-(defn table-header
-  ([vs mask]
-    (table-cells th vs mask))
-  ([vs]
-    (table-cells th vs)))
-
-(defn table-rows
-  ([vs mask]
-    (table-cells td vs mask))
-  ([vs]
-    (table-cells td vs)))
 
 (defn pr-18482-08
   "Кристалл-5000 NB_edit"

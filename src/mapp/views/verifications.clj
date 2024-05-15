@@ -1,7 +1,6 @@
 (ns mapp.views.verifications
   (:require
     [mapp.lib.gen-html :as h]
-    [mapp.model.midb :as m]
     [mapp.views.view :as v]))
 
 (def content
@@ -9,11 +8,14 @@
     (h/header
       v/main-menu)
     (h/main
-      (h/p "Журнал поверочных работ изменен"))
-    (h/footer)))
+      (h/section {:id "toolbar-panel"})
+      (h/section {:id "table-panel"})
+      (h/section {:id "edit-panel"}))
+    (h/footer
+      (h/p "Mapp, версия 2024-05-15"))))
 
-(defn page
-  []
+(defn get-verifications
+  [query]
   (v/gen-page
     "Журнал ПР"
     content))

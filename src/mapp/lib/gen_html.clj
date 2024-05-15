@@ -1,5 +1,7 @@
 (ns mapp.lib.gen-html
-  (:require [clojure.string :as string]))
+  (:require
+    [clojure.string :as string]
+    [clojure.math :as math]))
 
 (defn join
   [& xs]
@@ -104,6 +106,14 @@
   [& xs]
   (str "<!doctype html>\n" (string/join "\n" xs)))
 
+(defn ^:private prepare-mask
+  [vs mask]
+  (let [c (->>
+           (/ (count vs) (count mask))
+           math/ceil
+           math/round)]
+    (repeat c mask)))
+
 (defn table-cells
   "args:
     `vs   двумерное множество значений
@@ -131,7 +141,7 @@
                  (string/join "\n")
                  tr))
            vs
-           mask)
+           (prepare-mask vs mask))
       (string/join "\n")))
   ([column-fn vs]
     (table-cells
