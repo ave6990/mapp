@@ -64,3 +64,4 @@
     (repeat c mask)))
 (prepare-mask '(1 2 3)
               '([[1 2] [1 1]]))
+(require '[mapp.lib.gen-html :as h] :reload)

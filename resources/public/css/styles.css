@@ -1,0 +1,44 @@
+:root {
+  --font-size: 10pt;
+  --sub-font-size: 8pt;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  background: #aaa;
+}
+
+body {
+  background: white;
+  font: var(--font-size) sans-serif;  
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  padding: 6px;
+}
+
+footer, header {
+  font-size: 12pt;
+  padding: 6px;
+}
+
+footer {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid;
+  font-size: 10pt;
+  line-height: 0.9;
+}
+
+td, th {
+  border: 1px solid;
+}

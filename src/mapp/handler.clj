@@ -8,7 +8,7 @@
     [mapp.views.verifications :as v]))
 
 (defroutes app-routes
-  (GET "/" [] (v/get-verifications ""))
+  (GET "/" [] v/verifications-page)
   (route/not-found "Not Found"))
 
 (def app

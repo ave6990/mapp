@@ -100,6 +100,7 @@
 (html-tag-unpaired img)
 (html-tag-unpaired input)
 (html-tag-unpaired hr)
+(html-tag-unpaired link)
 
 (defn doctype
   "<!doctype html>"
