@@ -1,7 +1,7 @@
-(ns metrology.view.report
-  (:require [metrology.lib.gen-html :refer :all]
-            [metrology.lib.protocol :as pr]
-            [metrology.lib.metrology :as metr]
+(ns mapp.views.report
+  (:require [mapp.lib.gen-html :refer :all]
+            [mapp.utils.protocol :as pr]
+            [mapp.lib.metrology :as metr]
             [clojure.string :as string]))
 
 (def styles
@@ -648,9 +648,9 @@ th, td {
 
 (require '[clojure.string :as string])
 
-(require '[metrology.lib.gen-html :refer :all])
+(require '[mapp.lib.gen-html :refer :all])
 
-(require '[metrology.lib.metrology :as metr])
+(require '[mapp.lib.metrology :as metr])
 
 (operations {:operations {:id 280 :section 3 :name "name" :result 0
              :unusability "text" :comment nil}})

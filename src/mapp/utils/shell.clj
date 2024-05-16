@@ -11,7 +11,7 @@
     [mapp.utils.protocol :as pr]
     [mapp.lib.gs2000 :as gs]
     [mapp.lib.metrology :as metr]
-    [mapp.view.report :as report]
+    [mapp.views.report :as report]
     [mapp.lib.gen-html :refer :all]
     [mapp.protocols.custom :as protocol]))
 

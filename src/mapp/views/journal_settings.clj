@@ -1,4 +1,4 @@
-(ns metrology.view.journal-panel-settings)
+(ns mapp.view.journal-settings)
 
 (def column-settings
   [[:id 50 nil]

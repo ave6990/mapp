@@ -5,7 +5,7 @@
 
 (defn join
   [& xs]
-  (string/join "\n" xs))
+  (string/join "\n " xs))
 
 (defn indent
   "Добавить отступ к строкам."
@@ -115,20 +115,61 @@
            math/round)]
     (repeat c mask)))
 
-(defn table-cells
+(defn create-table-header
+  [model]
+  (tr
+    (string/join "\n"
+      (map (fn [[id nm _]]
+               (th {:class (doall (str "col" id))}
+                   nm))
+           model))))
+
+(defn create-table-row
+  [model row-data]
+  (let [ids (map (fn [[id _ _]] id) model)
+        editables (map (fn [[_ _ editable]] editable) model)]
+    (tr 
+      (string/join "\n"
+        (map (fn [id editable]
+                 (td {:class (doall (str "col" id))
+                      :contenteditable editable}
+                   (id row-data)))
+             ids
+             editables)))))
+
+(defn create-table-rows
+  [model data]
+    (string/join "\n"
+      (map (fn [row]
+               (create-table-row model row))
+           data)))
+
+(defn create-table
+  "args: model [[id name visibility] [] ... []]"
+  [id model data]
+  (table {:id id}
+    (thead
+      (create-table-header model))
+    (tbody
+      (create-table-rows model data))))
+
+(defn formated-table-cells
   "args:
     `vs   двумерное множество значений
     `mask множество векторов значений [:rowspan :colspan] описывающих
           структуру строки таблицы.
    example:
-    (table-header
+    (table-cells
+      th
       (list
         (list \"Детектор\" \"Значение уровня шумов\" \"Значение дрейфа\")
         (list \"действительное\" \"допускаемое\" \"ед. изм.\"
               \"действительное\" \"допускаемое\" \"ед. изм.\"))
       (list
         (list [2 1] [1 3] [1 3])
-        (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1])))"
+        (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1])))
+    used:
+      mapp.protocols.custom"
   ([column-fn vs mask ]
     (->>
       (map (fn [row sp]
@@ -145,7 +186,7 @@
            (prepare-mask vs mask))
       (string/join "\n")))
   ([column-fn vs]
-    (table-cells
+    (formated-table-cells
       column-fn
       vs
       (doall
@@ -155,17 +196,21 @@
                       r))
              vs)))))
 
-(defn table-header
+(defn formated-table-header
+  "used:
+    mapp.protocols.custom"
   ([vs mask]
-    (table-cells th vs mask))
+    (formated-table-cells th vs mask))
   ([vs]
-    (table-cells th vs)))
+    (formated-table-cells th vs)))
 
-(defn table-rows
+(defn formated-table-rows
+  "used:
+    mapp.protocols.custom"
   ([vs mask]
-    (table-cells td vs mask))
+    (formated-table-cells td vs mask))
   ([vs]
-    (table-cells td vs)))
+    (formated-table-cells td vs)))
 
 (comment
 

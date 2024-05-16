@@ -5,10 +5,12 @@
     [compojure.route :as route]
     [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
     [mapp.model.midb :as midb]
-    [mapp.views.verifications :as v]))
+    [mapp.views.view :as v]
+    [mapp.controller.controller :as c]))
 
 (defroutes app-routes
-  (GET "/" [] v/verifications-page)
+  #_(GET "/" [] v/verifications-page)
+  (GET "/" [] (c/get-verifications ""))
   (route/not-found "Not Found"))
 
 (def app

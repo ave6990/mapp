@@ -1,4 +1,4 @@
-(ns metrology.view.gso-panel-settings)
+(ns mapp.view.gso-settings)
 
 (def column-settings
   [[:id 50 nil]

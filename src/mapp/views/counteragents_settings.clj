@@ -1,4 +1,4 @@
-(ns metrology.view.counteragents-panel-settings)
+(ns mapp.view.counteragents-settings)
 
 (def column-settings
   [[:id 50 nil]

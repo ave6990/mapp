@@ -66,3 +66,81 @@
               '([[1 2] [1 1]]))
 (require '[mapp.lib.gen-html :as h] :reload)
 exit
+(require '[enlive :as enl])
+(apropos "enlive")
+(apropos "jdbc")
+(require '[net.cgrand.enlive-html :as html])
+(defn get-verifications
+  [query]
+  (let [data (midb/get-verifications query 1 0)]
+    (println data)
+    v/verifications-page))
+(require '[net.cgrand.enlive-html :as html])
+(def page (html/html-resource (java.io.StringReader v/verifications-page)))
+(require '[mapp.views.view :as v])
+(def page (html/html-resource (java.io.StringReader v/verifications-page)))
+(def page (html/html-resource (java.io.StringReader. v/verifications-page)))
+(html/select page [:#table-panel])
+(html/select page [:#query])
+(dir html)
+(doc html/append)
+(html/append (html/select page [:#table-panel]) h/table)
+(require '[mapp.lib.gen-html :as h])
+(html/append (html/select page [:#table-panel]) h/table)
+(html/append h/table (html/select page [:#table-panel]))
+((html/append h/table) (html/select page [:#table-panel]))
+(html/select page [:#table-panel]) (html/append h/table)
+[:#table-panel] (html/append h/table)
+(at page
+  [#table-panel] (html/append h/table))
+(at page
+  [#table-panel] (html/append h/table))
+(at page
+  [:#table-panel] (html/append h/table))
+(html/at page
+  [:#table-panel] (html/append h/table))
+(html/at page
+  [:#table-panel] (html/append [:table]))
+(html/at page
+  [:#table-panel] (html/append "table"))
+(html/at page
+  [:#table-panel] (html/append (html/html-resource (java.io.StringReader. h/table)))
+(html/at page
+  [:#table-panel] (html/append (html/html-resource (java.io.StringReader. h/table)))
+(html/at page
+  [:#table-panel] (html/append (html/html-resource (java.io.StringReader. h/table)))
+(html/at page
+  [:#table-panel] (html/append (html/html-resource (java.io.StringReader. (h/table))))
+(html/at page
+  [:#table-panel] (html/append (h/table)))
+(html/at page
+  [:#table-panel] (html/append "llltablellll")))
+(html/at page
+  [:#table-panel] (html/append "llltablellll"))
+(html/at page
+  [:#table-panel] (html/append "llltablellll"))
+(html/at page
+  [:#table-panel] (html/append (html/html-resource (java.io.StringReader. (h/table)))))
+(doc string/replace)
+(doc string/repla)
+(require '[clojure.string :as string])
+(doc string/replace)
+(defn get-verifications
+  [query]
+  (let [res (midb/get-verifications query 1 0)]
+    (println res)
+    (string/replace
+      v/verifications-page
+      #"\{table\}"
+      (h/create-table
+        vs/fields-settings
+        (:data res)))))
+(join '("lsld" "skdjf" "lskdjf"))
+(defn join
+  [& xs]
+  (string/join "\n" xs))
+(join '("lsld" "skdjf" "lskdjf"))
+(defn join
+  [& xs]
+  (string/join "\n " xs))
+(join "lsld" "skdjf" "lskdjf")

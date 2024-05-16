@@ -1,4 +1,4 @@
-(ns metrology.view.operations-panel-settings)
+(ns mapp.view.operations-settings)
 
 (def column-settings
   [[:id 50 nil]

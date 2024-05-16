@@ -1,4 +1,4 @@
-(ns metrology.view.methodology-panel-settings)
+(ns mapp.view.methodology-settings)
 
 (def column-settings
   [[:id 75 nil]
