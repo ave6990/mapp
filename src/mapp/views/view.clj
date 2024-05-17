@@ -1,6 +1,6 @@
 (ns mapp.views.view
   (:require
-    [mapp.lib.gen-html :as h]
+    [hiccup2.core :as h]
     [mapp.views.templates :as tmpl]))
 
 (def verifications-page
