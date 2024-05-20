@@ -37,6 +37,20 @@ footer {
   flex-shrink: 0;
 }
 
+#query-panel {
+  display: flex;
+  flex-direction: row;
+  max-width: 100vw;
+}
+
+#query-panel * {
+  margin: 0 6px;
+}
+
+#query {
+  flex-grow: 1;
+}
+
 table {
   overflow: scroll;
   max-height: 80vh;

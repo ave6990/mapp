@@ -1,105 +1,3 @@
-(require '[clojure.string :as string])
-(doc string/replace)
-(defn get-verifications
-  [query]
-  (let [res (midb/get-verifications query 1 0)]
-    (println res)
-    (string/replace
-      v/verifications-page
-      #"\{table\}"
-      (h/create-table
-        vs/fields-settings
-        (:data res)))))
-(join '("lsld" "skdjf" "lskdjf"))
-(defn join
-  [& xs]
-  (string/join "\n" xs))
-(join '("lsld" "skdjf" "lskdjf"))
-(defn join
-  [& xs]
-  (string/join "\n " xs))
-(join "lsld" "skdjf" "lskdjf")
-(doc enl/snippets)
-(doc enl/snippet)
-(dir user)
-(apropos "snippet")
-(doc enl/defsnippet)
-(doc net.cgrand.enlive-html/defsnippet)
-(doc net.cgrand.enlive-html/snippet)
-(defn gen-page-head
-  [title]
-  (h/head
-    (h/meta {:charset "utf-8"})
-    (meta-tag "author" "Aleksandr Ermolaev")
-    (meta-tag "e-mail" "ave6990@ya.ru")
-    (meta-tag "version" "2024-05-14")
-    (h/title title)
-    (h/link {:rel "stylesheet"
-             :type "text/css"
-             :href "/css/styles.css"})
-    (h/script {:crossorigin "false"
-               :src "https://unpkg.com/react@17/umd/react.production.min.js"})
-    (h/script {:crossorigin "false"
-               :src "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"})
-    (h/script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.js"
-               :type "application/javascript"} "")
-    (h/script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.reagent.js"
-               :type "application/javascript"})
-    (h/script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
-               :type "application/javascript"})
-    (h/script {:src "/cljs/main.cljs"
-               :type "application/x-scittle"})))
-(defn meta-tag
-  [name content]
-  (h/meta {:name name :content content}))
-(defn gen-page-head
-  [title]
-  (h/head
-    (h/meta {:charset "utf-8"})
-    (meta-tag "author" "Aleksandr Ermolaev")
-    (meta-tag "e-mail" "ave6990@ya.ru")
-    (meta-tag "version" "2024-05-14")
-    (h/title title)
-    (h/link {:rel "stylesheet"
-             :type "text/css"
-             :href "/css/styles.css"})
-    (h/script {:crossorigin "false"
-               :src "https://unpkg.com/react@17/umd/react.production.min.js"})
-    (h/script {:crossorigin "false"
-               :src "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"})
-    (h/script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.js"
-               :type "application/javascript"} "")
-    (h/script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.reagent.js"
-               :type "application/javascript"})
-    (h/script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
-               :type "application/javascript"})
-    (h/script {:src "/cljs/main.cljs"
-               :type "application/x-scittle"})))
-(defn href
-  [path name]
-  (h/a {:href path} name))
-(defn ^:private extract-data
-  [ids data]
-  (vec
-    (map (fn [row]
-             (vec
-               (map (fn [id]
-                        (id row))
-                    ids)))
-         data)))
-(def main-menu
-  (h/nav {:id "main-menu"}
-    (href "/" "Журнал ПР")
-    (href "/gso" "ГСО")
-    (href "/refs" "Эталоны")
-    (href "/conditions" "Условия поверки")))
-(def query-panel
-  (h/div {:id "query-panel"}
-    (h/input {:type "number"
-              :id "page-number"
-              :value "1"
-              :min "1"})
-    (h/input {:type "text"
               :id "query"})))
 (defn gen-page
   [title content]
@@ -498,3 +396,105 @@ exit
        query "&limit="
        limit))
 (make-url "gso" 1 "" 20)
+exit
+(merge {:a 1 :b 2} {:c 3})
+(let [{:keys [a b]} {:a 1 :b 2 :c 3}]
+  [a b])
+(map (fn [k] (k)) {:a 1 :b 2 :c 3})
+(map (fn [k _] (k)) {:a 1 :b 2 :c 3})
+(map (fn [:kyes] (k)) {:a 1 :b 2 :c 3})
+(map (fn [[k _]] (k)) {:a 1 :b 2 :c 3})
+(map (fn [[k _]] k) {:a 1 :b 2 :c 3})
+(map (fn [[k v]] k) {:a 1 :b 2 :c 3})
+(keyword "th")
+(defn hello
+  [name]
+  (.log js/console (str "Hello, " name "!")))
+(for [id (range 3)]
+  id)
+(vec (for [id (range 3)]
+  id))
+("body" {"body" "html" "a" 1 "b" 2})
+(get "body" {"body" "html" "a" 1 "b" 2})
+(get-in "body" {"body" "html" "a" 1 "b" 2})
+(macroexpand-1 '(make-get-page "verifications"))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  `(let [req ~(symbol "req")]
+     (defn ~(symbol (str "get-" talbe-id "-page"))
+       [~req]
+       (get-page
+         ~title
+         ~talbe-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  `(let [req ~(symbol "req")]
+     (defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (get-page
+         ~title
+         ~talbe-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  `(let [req ~(gensym "req")]
+     (defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (get-page
+         ~title
+         ~talbe-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  `(let [req (gensym "req")]
+     (defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (get-page
+         ~title
+         ~talbe-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  (let [req (gensym "req")]
+    `(defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (get-page
+         ~title
+         ~talbe-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  (let [req (gensym "req")]
+    `(defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (get-page
+         ~title
+         ~table-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(macroexpand-1 '(make-get-page "verifications"))
+(macroexpand-1 '(make-get-page "Журнал ПР" "verifications" vs/fields-settings))
+(defmacro make-get-page
+  [title table-id fields-settings]
+  (let [req (gensym "req")]
+    `(defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (mapp.controller.controller/get-page
+         ~title
+         ~table-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+(macroexpand-1 '(make-get-page "Журнал ПР" "verifications" vs/fields-settings))

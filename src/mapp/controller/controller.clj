@@ -6,7 +6,11 @@
     [mapp.model.midb :as midb]
     [mapp.views.view :as v]
     [mapp.views.templates :as tmpl]
-    [mapp.views.verifications-settings :as vs]))
+    [mapp.views.verifications-settings :as vs]
+    [mapp.views.gso-settings :as gso]
+    [mapp.views.references-settings :as refs]
+    [mapp.views.counteragents-settings :as ca]
+    [mapp.views.conditions-settings :as cs]))
 
 (defn insert-string
   "Insert the string `s in `ss at the position `pos."
@@ -31,59 +35,86 @@
   (int (Math/ceil (/ records-count limit))))
 
 (defn parse-request
-  [req get-fn]
+  [req]
   (let [params (:params req)
         limit (read-string (:limit params))
         query (:q params)
-        offset (calc-offset (read-string (:id params)) limit)
-        recs (get-fn query limit offset)
-        res (if recs
-                recs
-                {:count 0 :data (repeat (vs/fields-settings) " ")})
-        pages (calc-pages (:count res) limit)]
+        page (read-string (:id params))
+        offset (calc-offset page limit)]
+    (println req)
     {:query query
      :limit limit
      :offset offset
-     :data (:data res)
-     :count (:count res)
-     :pages pages}))
+     :page page}))
 
-(defn get-verifications
-  [req]
-  (let [params (:params req)
-        limit (read-string (:limit params))
-        query (:q params)
-        offset (calc-offset (read-string (:id params)) limit)
-        recs (midb/get-verifications query limit offset)
-        res (if recs
-                recs
-                {:count 0 :data (repeat (vs/fields-settings) " ")})]
+(defn get-empty-record
+  [fields-settings]
+  [(reduce (fn [m [k _]] (merge m {k " "}))
+          {}
+          fields-settings)])
+
+(defn get-data
+  [req get-fn fields-settings]
+  (let [request (parse-request req)
+        b (println "###" request)
+        {:keys [query limit offset]} request
+        a (println "###" request)
+        records (get-fn
+                  query limit offset)
+        l (println "### " records)
+        {:keys [recs-count data]} records]
+    {:status 200
+     :body (merge request
+                  {:recs-count recs-count
+                   :pages (calc-pages recs-count limit)
+                   :data data
+                   :model fields-settings})}))
+
+(defn get-page
+  [title table-id req get-fn fields-settings]
+  (let [request (parse-request req)
+        {:keys [query limit offset]} request
+        records (get-fn
+                  query limit offset)
+        {:keys [recs-count data]} records
+        ]
     (str
       (h/html
         (tmpl/gen-page
-          "Журнал ПР"
+          title
           (tmpl/page-template
             nil
             (tmpl/query-panel
-              (calc-pages (:count res) limit)
-              (:count res))
+              (calc-pages recs-count limit)
+              recs-count)
             (tmpl/create-table
-              "verifications"
-              vs/fields-settings
-              (:data res))
+              table-id
+              fields-settings
+              data)
             nil))))))
 
-(defn get-verifications-table-panel
+(defmacro make-get-page
+  [title table-id fields-settings]
+  (let [req (gensym "req")]
+    `(defn ~(symbol (str "get-" table-id "-page"))
+       [~req]
+       (mapp.controller.controller/get-page
+         ~title
+         ~table-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings))))
+
+(make-get-page "Журнал ПР" "verifications" vs/fields-settings)
+(make-get-page "Условия поверки" "conditions" cs/fields-settings)
+#_(make-get-page "Эталоны" "references" refs/fields-settings)
+#_(make-get-page "ГСО" "gso" gso/fields-settings)
+#_(make-get-page "Контрагенты" "counteragents" ca/fields-settings)
+
+(defn get-verifications-data
   [req]
-  (let [data (parse-request req midb/get-verifications)]
-    {:status 200
-     :body "hello" #_{:pages (calc-pages (:count data) (:limit data))
-            :count (:count data)
-            :table
-              (->
-                (tmpl/create-table
-                  "verifications"
-                  vs/fields-settings
-                  (:data data))
-                h/html
-                str)}}))
+  (get-data req midb/get-verifications vs/fields-settings))
+
+(defn get-conditions-data
+  [req]
+  (get-data req midb/get-conditions cs/fields-settings))

@@ -1,4 +1,4 @@
-(ns mapp.view.counteragents-settings)
+(ns mapp.views.counteragents-settings)
 
 (def column-settings
   [[:id 50 nil]

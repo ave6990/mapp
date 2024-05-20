@@ -27,9 +27,9 @@
     [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.reagent.js"
               :type "application/javascript"}]
     [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
-               :type "application/javascript"}]
+              :type "application/javascript"}]
     [:script {:src "/cljs/main.cljs"
-               :type "application/x-scittle"}]])
+              :type "application/x-scittle"}]])
 
 (defn href
   [path name]
@@ -54,20 +54,20 @@
 
 (defn query-panel
   [pages records]
-  [:div {:id "query-panel"}
-    "стр. "
-    [:input {:type "number"
-              :id "page-number"
-              :value "1"
-              :min "1"
-              :max pages}]
-    " из "
-    [:span {:id "pages-count"} pages]
-    " ("
-    [:span {:id "records-count"} records]
-    ") "
-    [:input {:type "text"
-              :id "query"}]])
+  (println records pages)
+  (list [:label "стр. "]
+        [:input {:type "number"
+                  :id "page-number"
+                  :value "1"
+                  :min "1"
+                  :max pages}]
+        " из "
+        [:span {:id "pages-count"} pages]
+        " ("
+        [:span {:id "records-count"} records]
+        ") "
+        [:input {:type "text"
+                 :id "query"}]))
 
 (defn gen-page
   [title content]

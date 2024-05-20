@@ -1,4 +1,4 @@
-(ns mapp.view.gso-settings)
+(ns mapp.views.gso-settings)
 
 (def column-settings
   [[:id 50 nil]

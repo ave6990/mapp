@@ -1,4 +1,4 @@
-(ns mapp.view.references-settings)
+(ns mapp.views.references-settings)
 
 (def column-settings
   [[:id 50 nil]

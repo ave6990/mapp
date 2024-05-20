@@ -61,16 +61,16 @@
                (jdbc/query
                  midb
                  query-get)
-           :count
+           :recs-count
              (:count
                (first
                  (jdbc/query
                    midb
                    query-count)))}
-        (catch Exception e
-          (println "`get-records` query Exception!") 
-          (println query-get)
-          (println query-count))))))
+          (catch Exception e
+            (println "`get-records` query Exception!") 
+            (println query-get)
+            (println query-count))))))
 
 (defmacro ^:private make-get-fn
   [name]

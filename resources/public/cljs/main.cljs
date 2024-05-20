@@ -1,4 +1,4 @@
-(ns mapp.core
+(ns cljs.core
   (:require
     [clojure.string :as string]
     [reagent.core :as r]
@@ -6,10 +6,10 @@
     [ajax.core :refer [GET POST]]))
 
 (def records-limit
-  (atom 20))
+  (r/atom 20))
 
 (def current-page
-  (atom 1))
+  (r/atom 1))
 
 (def site "http://localhost:3000/")
 
@@ -34,22 +34,75 @@
   [id event fn]
   (.addEventListener (get-by-id id) event fn))
 
+(defn create-table-header
+  [model]
+  [:tr
+    (for [[id nm _] model]
+         [(keyword (str "th.col" (keyword id)))
+           nm])])
+
+(defn create-table-row
+  [model row-data]
+  (let [ids (for [[id _ _] model] id) 
+        editables (for [[_ _ editable] model] (str editable))]
+    [:tr 
+      (map (fn [id editable]
+               [(keyword (str "td.col" (keyword id)))
+                    {:contenteditable editable}
+                 ((keyword id) row-data)])
+           ids
+           editables)]))
+
+(defn create-table-rows
+  [model data]
+  (map (fn [row]
+           (create-table-row model row))
+       data))
+
+(defn create-table
+  "args: model [[id name visibility] [] ... []]"
+  [id model data]
+  [:table {:id id}
+    [:thead
+      (create-table-header model)]
+    [:tbody
+      (create-table-rows model data)]])
+
+(def html-tab
+  [:table [:thead [:tr [:th "col_1"] [:th "col_2"]]] [:tbody [:tr [:td 1] [:td 2]]]])
+
+(defn render-table
+  [resp]
+  (let [table-panel (get-by-id "table-panel")
+        id (-> table-panel .-firstChild .-id)
+        {:keys [model data]} (:body resp)]
+    (dom/render #(create-table id model data) table-panel)))
+
 (defn page-number-changed
   [event]
-  (let [p-num (-> event .-target .-value)]
+  (let [temp-p-num (-> event .-target .-value)
+        pages-count (read-string (-> (get-by-id "pages-count") .-innerHTML))
+        p-num (if (> temp-p-num pages-count)
+                  pages-count
+                  temp-p-num)
+        table-id (-> "table-panel"
+                     get-by-id
+                     .-firstChild
+                     .-id)]
     (reset! current-page p-num)
+    (set! (-> event .-target .-value) p-num)
     (->
       (js/fetch (make-url
-                "verifications"
+                table-id
                 p-num
                 (get-value "query")
                 @records-limit))
       (.then #(.json %))
-      (.then #(.log js/console %)))))
+      (.then #(render-table (js->clj % :keywordize-keys true))))))
 
 (defn add-behavior
   []
-  (add-event-listener "page-number" "click" page-number-changed))
+  (add-event-listener "page-number" "change" page-number-changed))
 
 (add-behavior)
 
