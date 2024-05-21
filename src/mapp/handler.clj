@@ -14,17 +14,19 @@
   {:params
     {:id "1"
      :q ""
-     :limit "20"}})
+     :limit "100"}})
 
 (defroutes app-routes
   (GET "/" [] (c/get-verifications-page empty-query))
   (GET "/verifications/:id" req (response (c/get-verifications-data req)))
   (GET "/conditions" [] (c/get-conditions-page empty-query))
   (GET "/conditions/:id" req (response (c/get-conditions-data req)))
-  #_(GET "/gso" [] (c/get-gso-page empty-query))
-  #_(GET "/gso/:id" req (response (c/get-conditions-data req)))
-  #_(GET "/references" [] (c/get-references-page empty-query))
-  #_(GET "/references/:id" req (response (c/get-references-data req)))
+  (GET "/gso" [] (c/get-gso-page empty-query))
+  (GET "/gso/:id" req (response (c/get-gso-data req)))
+  (GET "/references" [] (c/get-references-page empty-query))
+  (GET "/references/:id" req (response (c/get-references-data req)))
+  (GET "/counteragents" [] (c/get-counteragents-page empty-query))
+  (GET "/counteragents/:id" req (response (c/get-counteragents-data req)))
   (route/not-found "Not Found"))
 
 (def app

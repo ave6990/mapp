@@ -37,6 +37,16 @@ footer {
   flex-shrink: 0;
 }
 
+#toolbar-panel {
+  margin: 6px;
+}
+
+#toolbar-panel * {
+  margin: 0 6px;
+  background: #dddddd;
+  text-transform: uppercase;
+}
+
 #query-panel {
   display: flex;
   flex-direction: row;

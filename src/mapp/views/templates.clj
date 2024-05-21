@@ -48,13 +48,23 @@
 (def main-menu
   [:nav {:id "main-menu"}
     (href "/" "Журнал ПР")
+    (href "/conditions" "Условия поверки")
     (href "/gso" "ГСО")
-    (href "/refs" "Эталоны")
-    (href "/conditions" "Условия поверки")])
+    (href "/references" "Эталоны")
+    (href "/counteragents" "Контрагенты")])
+
+(defn toolbar-text-snippets
+  [fields-settings]
+  [:div {:class "toolbar"}
+    (map (fn [[text value]]
+             [:span {:class "text-snippets"
+                     :name value
+                     :draggable "true"}
+                    text])
+             fields-settings)])
 
 (defn query-panel
   [pages records]
-  (println records pages)
   (list [:label "стр. "]
         [:input {:type "number"
                   :id "page-number"

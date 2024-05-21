@@ -20,5 +20,17 @@
    ["отдел" " department "]
    ["рег. №" " registry_number "]
    ["срок годности" " expiration_date "]
-   ["тип СИ" " mi_type || ' ' || mi_name LIKE '%%' "]
+   ["тип СИ" " mi_type || ' ' || mi_name LIKE '**' "]
    ["№ ФИФ" " code_fif "]))
+
+(def fields-settings
+  [[:id "id" true]
+   [:number_1c "Номер 1С" true]
+   [:mi_type "Тип, мод. СИ" true]
+   [:mi_name "Наименование СИ" true]
+   [:serial_number "Заводской №" true]
+   [:manufacture_year "Год выпуска" true]
+   [:registry_number "Регистрационный №" true]
+   [:code_fif "Рег. № ФИФ (эталон)" true]
+   [:expiration_date "Действительно до" true]
+   [:metrology "Метрологические характеристики" true]])

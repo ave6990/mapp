@@ -1,7 +1,3 @@
-              :id "query"})))
-(defn gen-page
-  [title content]
-  (h/doctype
     (h/html
       (gen-page-head title)
       (h/body content))))
@@ -498,3 +494,7 @@ exit
          ~(symbol (str "midb/get-" table-id))
          ~fields-settings))))
 (macroexpand-1 '(make-get-page "Журнал ПР" "verifications" vs/fields-settings))
+(string/replace "lik '*361*'" #"\*" "%")
+(reuire '[clojure.string :as string])
+(require '[clojure.string :as string])
+(string/replace "lik '*361*'" #"\*" "%")

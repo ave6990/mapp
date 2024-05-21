@@ -10,14 +10,14 @@
 
 (def toolbar-fields-settings
   '(["id" " id "]
-    ["наименование" " (short_name || ' ' || name) LIKE '%%' "]
+    ["наименование" " (short_name || ' ' || name) LIKE '**' "]
     ["инн" " inn "]
     [" адрес " " address "]))
 
-(def edit-panel-settings
-  '(["id" :id ""]
-    ["Наименование" :name ""]
-    ["Краткое" :short_name ""]
-    ["Адрес" :address ""]
-    ["ИНН" :inn ""]
-    ["Тип" :type ""]))
+(def fields-settings
+  '([:id "id" true]
+    [:name "Наименование" true]
+    [:short_name "Краткое" true]
+    [:address "Адрес" true]
+    [:inn "ИНН" true]
+    [:type "Тип" true]))

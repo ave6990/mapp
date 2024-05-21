@@ -6,7 +6,7 @@
     [ajax.core :refer [GET POST]]))
 
 (def records-limit
-  (r/atom 20))
+  (r/atom 100))
 
 (def current-page
   (r/atom 1))
@@ -24,6 +24,10 @@
 (defn get-by-id
   [id]
   (.getElementById js/document id))
+
+(defn get-by-class
+  [class-name]
+  (seq (.getElementsByClassName js/document class-name)))
 
 (defn get-value
   [id]
@@ -75,8 +79,21 @@
   [resp]
   (let [table-panel (get-by-id "table-panel")
         id (-> table-panel .-firstChild .-id)
-        {:keys [model data]} (:body resp)]
+        {:keys [model data recs-count pages page]} (:body resp)]
+    (do
+      (reset! current-page page)
+      (set! (-> "page-number" get-by-id .-value) page)
+      (set! (-> "page-number" get-by-id .-max) pages)
+      (set! (-> "pages-count" get-by-id .-innerHTML) pages)
+      (set! (-> "records-count" get-by-id .-innerHTML) recs-count))
     (dom/render #(create-table id model data) table-panel)))
+
+(defn get-table-id
+  []
+  (-> "table-panel"
+      get-by-id
+      .-firstChild
+      .-id))
 
 (defn page-number-changed
   [event]
@@ -85,10 +102,7 @@
         p-num (if (> temp-p-num pages-count)
                   pages-count
                   temp-p-num)
-        table-id (-> "table-panel"
-                     get-by-id
-                     .-firstChild
-                     .-id)]
+        table-id (get-table-id)]
     (reset! current-page p-num)
     (set! (-> event .-target .-value) p-num)
     (->
@@ -100,9 +114,37 @@
       (.then #(.json %))
       (.then #(render-table (js->clj % :keywordize-keys true))))))
 
+(defn query-changed
+  [event]
+  (let [query (-> event .-target .-value)
+        table-id (get-table-id)]
+    (when (= "Enter" (-> event .-key))
+      (.log js/console query)
+      (reset! current-page 1)
+      (set! (-> "page-number" get-by-id .-value) 1)
+      (->
+        (js/fetch (make-url
+                   table-id
+                   1
+                   query
+                   @records-limit))
+        (.then #(.json %))
+        (.then #(render-table (js->clj % :keywordize-keys true)))))))
+
+(defn text-snippets-dragstart
+  [event]
+  (-> event
+      .-dataTransfer
+      (.setData "text/plain" (-> event .-target (.getAttribute "name")))))
+
 (defn add-behavior
   []
-  (add-event-listener "page-number" "change" page-number-changed))
+  (add-event-listener "page-number" "change" page-number-changed)
+  (add-event-listener "query" "keydown" query-changed)
+  (doall
+    (for [el (get-by-class "text-snippets")]
+         (do
+           (.addEventListener el "dragstart" text-snippets-dragstart)))))
 
 (add-behavior)
 
