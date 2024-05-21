@@ -30,7 +30,7 @@
   '([:id "id" true]
     [:number_1c "1С №" true]
     [:type "Тип" true]
-    [:number "Рег. №" true]
+    [:number "Регистрационный №" true]
     [:level "Разряд" true]
     [:available "Наличие" true]
     [:components "Компоненты" true]

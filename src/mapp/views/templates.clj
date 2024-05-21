@@ -51,6 +51,7 @@
     (href "/conditions" "Условия поверки")
     (href "/gso" "ГСО")
     (href "/references" "Эталоны")
+    (href "/methodology" "МП")
     (href "/counteragents" "Контрагенты")])
 
 (defn toolbar-text-snippets

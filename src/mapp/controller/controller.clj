@@ -10,6 +10,7 @@
     [mapp.views.gso-settings :as gso]
     [mapp.views.references-settings :as refs]
     [mapp.views.counteragents-settings :as ca]
+    [mapp.views.methodology-settings :as met]
     [mapp.views.conditions-settings :as cs]))
 
 (defn insert-string
@@ -109,6 +110,7 @@
 (make-get-page "Эталоны" "references" refs/fields-settings refs/toolbar-fields-settings)
 (make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings)
 (make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings)
+(make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings)
 
 (defn get-verifications-data
   [req]
@@ -129,3 +131,7 @@
 (defn get-counteragents-data
   [req]
   (get-data req midb/get-counteragents ca/fields-settings))
+
+(defn get-methodology-data
+  [req]
+  (get-data req midb/get-methodology met/fields-settings))

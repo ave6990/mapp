@@ -29,6 +29,10 @@
   [class-name]
   (seq (.getElementsByClassName js/document class-name)))
 
+(defn get-by-tag
+  [tag-name]
+  (seq (.getElementsByTagName js/document tag-name)))
+
 (defn get-value
   [id]
   (-> (get-by-id id)
@@ -37,6 +41,21 @@
 (defn add-event-listener
   [id event fn]
   (.addEventListener (get-by-id id) event fn))
+
+;;#table#event#listener
+(defn td-clicked
+  [event]
+  (let [tr (-> event .-target .-parentNode)]
+    (if (-> tr .-classList (.contains "selected"))
+        (-> tr .-classList (.remove "selected"))
+        (-> tr .-classList (.add "selected")))))
+
+(defn add-table-event-listeners
+  []
+  (doall
+    (for [el (get-by-tag "td")]
+         (do
+           (.addEventListener el "click" td-clicked)))))
 
 (defn create-table-header
   [model]
@@ -112,7 +131,8 @@
                 (get-value "query")
                 @records-limit))
       (.then #(.json %))
-      (.then #(render-table (js->clj % :keywordize-keys true))))))
+      (.then #(render-table (js->clj % :keywordize-keys true))))
+    (add-table-event-listeners)))
 
 (defn query-changed
   [event]
@@ -129,7 +149,8 @@
                    query
                    @records-limit))
         (.then #(.json %))
-        (.then #(render-table (js->clj % :keywordize-keys true)))))))
+        (.then #(render-table (js->clj % :keywordize-keys true))))
+      (add-table-event-listeners))))
 
 (defn text-snippets-dragstart
   [event]
@@ -144,7 +165,8 @@
   (doall
     (for [el (get-by-class "text-snippets")]
          (do
-           (.addEventListener el "dragstart" text-snippets-dragstart)))))
+           (.addEventListener el "dragstart" text-snippets-dragstart))))
+  (add-table-event-listeners))
 
 (add-behavior)
 

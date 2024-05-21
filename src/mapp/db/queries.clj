@@ -297,7 +297,9 @@
     methodology
   {where}
   order by
-    id desc;")
+    id desc
+  {limit}
+  {offset};")
 
 ;;#copy
 (def last-id

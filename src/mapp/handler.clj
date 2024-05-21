@@ -27,6 +27,8 @@
   (GET "/references/:id" req (response (c/get-references-data req)))
   (GET "/counteragents" [] (c/get-counteragents-page empty-query))
   (GET "/counteragents/:id" req (response (c/get-counteragents-data req)))
+  (GET "/methodology" [] (c/get-methodology-page empty-query))
+  (GET "/methodology/:id" req (response (c/get-methodology-data req)))
   (route/not-found "Not Found"))
 
 (def app

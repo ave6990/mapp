@@ -1,5 +1,5 @@
 :root {
-  --color-passive: #eeeeee;
+  --color-passive: rgba(0.1, 0.1, 0.1, 0.1);
   --color-background: white;
   --color-background-contrast: black;
   --color-text: black;
@@ -75,6 +75,10 @@ table {
 
 td, th {
   border: 1px solid;
+}
+
+table .selected {
+  background: #ddddff;
 }
 
 td[contenteditable^="false"] {
