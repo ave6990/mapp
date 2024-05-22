@@ -42,6 +42,11 @@
   [id event fn]
   (.addEventListener (get-by-id id) event fn))
 
+(defn get-position
+  [event]
+    {:x (-> event .-pageX) 
+     :y (-> event .-pageY)})
+
 ;;#table#event#listener
 (defn td-clicked
   [event]
@@ -50,12 +55,35 @@
         (-> tr .-classList (.remove "selected"))
         (-> tr .-classList (.add "selected")))))
 
+;;#context#menu
+(defn td-contextmenu
+  [event]
+  (let [menu (get-by-id "context-menu")
+        pos (get-position event)]
+    (-> event (.preventDefault))
+    (-> menu .-classList (.add "context-menu-active"))
+    (set! (-> menu .-style .-left) (:x pos))
+    (set! (-> menu .-style .-top) (:y pos))))
+
 (defn add-table-event-listeners
   []
   (doall
     (for [el (get-by-tag "td")]
          (do
-           (.addEventListener el "click" td-clicked)))))
+           (.addEventListener el "click" td-clicked)
+           (.addEventListener el "contextmenu" td-contextmenu)))))
+
+;;#context#menu#event#listener
+(defn context-menu-item-click
+  [event]
+  (let [menu (get-by-id "context-menu")]
+    (-> menu .-classList (.remove "context-menu-active"))))
+
+(defn add-context-menu-event-listener
+  []
+  (doall
+    (for [el (get-by-class "context-menu-item")]
+         (.addEventListener el "click" context-menu-item-click))))
 
 (defn create-table-header
   [model]
@@ -139,7 +167,6 @@
   (let [query (-> event .-target .-value)
         table-id (get-table-id)]
     (when (= "Enter" (-> event .-key))
-      (.log js/console query)
       (reset! current-page 1)
       (set! (-> "page-number" get-by-id .-value) 1)
       (->
@@ -166,7 +193,8 @@
     (for [el (get-by-class "text-snippets")]
          (do
            (.addEventListener el "dragstart" text-snippets-dragstart))))
-  (add-table-event-listeners))
+  (add-table-event-listeners)
+  (add-context-menu-event-listener))
 
 (add-behavior)
 

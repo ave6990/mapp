@@ -1,7 +1,7 @@
 (ns mapp.controller.controller
   (:require
     [clojure.string :as string]
-    [net.cgrand.enlive-html :as html]
+    [net.cgrand.enlive-html :as html] ;;DELETE not used
     [hiccup2.core :as h]
     [mapp.model.midb :as midb]
     [mapp.views.view :as v]

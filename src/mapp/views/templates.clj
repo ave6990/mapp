@@ -28,7 +28,7 @@
               :type "application/javascript"}]
     [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
               :type "application/javascript"}]
-    [:script {:src "/cljs/main.cljs"
+    [:script {:src "/cljs/core.cljs"
               :type "application/x-scittle"}]])
 
 (defn href
@@ -86,9 +86,33 @@
     (gen-page-head title)
     content])
 
+(defn context-menu-item
+  [text action]
+  (if (= "-" text) 
+    [:li {:class "context-menu-spliter"}
+         [:hr]]
+    [:li {:class "context-menu-item"}
+         [:a {:href "#"
+              :id action
+              :class "context-menu-link"} text]]))
+
+(defn context-menu
+  [xs]
+  [:nav {:id "context-menu" :class "context-menu"}
+     [:ul {:class "context-menu-items"}
+       (map (fn [[name action]]
+                (context-menu-item name action))
+            xs)]]) 
+
 (def footer
   [:footer
-      [:p "Mapp, версия 2024-05-15"]])
+      [:p "Mapp, версия 2024-05-15"]
+      (context-menu [["Копировать" "ctx-menu-action-copy"]
+                     ["Удалить" "ctx-menu-action-delete"]
+                     ["-" "-"]
+                     ["КСП" "ctx-menu-action-refs-set"]
+                     ["-" "-"]
+                     ["Создать протокол" "ctx-menu-action-protocol"]])])
 
 (defn page-template 
   [toolbar query-panel table edit-panel]
