@@ -62,7 +62,8 @@
 (defn td-clicked
   [event]
   (let [tr (-> event .-target .-parentNode)]
-    (toggle-select-row tr)
+    (when (-> event .-ctrlKey)
+          (toggle-select-row tr))
     (context-menu-off)))
 
 (defn add-table-event-listeners
@@ -115,7 +116,8 @@
       (set! (-> "page-number" get-by-id .-max) pages)
       (set! (-> "pages-count" get-by-id .-innerHTML) pages)
       (set! (-> "records-count" get-by-id .-innerHTML) recs-count))
-    (dom/render #(table/create id model data) table-panel)))
+    (dom/render #(table/create id model data) table-panel)
+    (add-table-event-listeners)))
 
 (defn get-table-id
   []
@@ -141,8 +143,7 @@
                 (get-value "query")
                 @records-limit))
       (.then #(.json %))
-      (.then #(render-table (js->clj % :keywordize-keys true))))
-    (add-table-event-listeners)))
+      (.then #(render-table (js->clj % :keywordize-keys true))))))
 
 (defn query-changed
   [event]
@@ -158,14 +159,24 @@
                    query
                    @records-limit))
         (.then #(.json %))
-        (.then #(render-table (js->clj % :keywordize-keys true))))
-      (add-table-event-listeners))))
+        (.then #(render-table (js->clj % :keywordize-keys true)))))))
 
 (defn text-snippets-dragstart
   [event]
   (-> event
       .-dataTransfer
       (.setData "text/plain" (-> event .-target (.getAttribute "name")))))
+
+(defn reload-pressed
+  [event]
+  (when (= "F5" (-> event .-key))
+        (-> event (.preventDefault))))
+
+(defn add-reload-event-listener
+  []
+  (-> js/document
+      .-body
+      (.addEventListener "keydown" reload-pressed)))
 
 (defn add-behavior
   []
@@ -175,6 +186,7 @@
     (for [el (get-by-class "text-snippets")]
          (do
            (.addEventListener el "dragstart" text-snippets-dragstart))))
+  (add-reload-event-listener)
   (add-table-event-listeners)
   (add-context-menu-event-listener))
 

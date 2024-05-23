@@ -73,6 +73,10 @@ table {
   line-height: 0.9;
 }
 
+thead {
+  position: sticky;
+}
+
 td, th {
   border: 1px solid;
 }
