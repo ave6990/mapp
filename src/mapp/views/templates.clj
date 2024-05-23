@@ -28,6 +28,10 @@
               :type "application/javascript"}]
     [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
               :type "application/javascript"}]
+    [:script {:src "/cljs/dom_functions.cljs"
+              :type "application/x-scittle"}]
+    [:script {:src "/cljs/table.cljs"
+              :type "application/x-scittle"}]
     [:script {:src "/cljs/core.cljs"
               :type "application/x-scittle"}]])
 
@@ -91,9 +95,10 @@
   (if (= "-" text) 
     [:li {:class "context-menu-spliter"}
          [:hr]]
-    [:li {:class "context-menu-item"}
+    [:li {:class "context-menu-item"
+          :name action}
          [:a {:href "#"
-              :id action
+              :name action
               :class "context-menu-link"} text]]))
 
 (defn context-menu
@@ -107,12 +112,10 @@
 (def footer
   [:footer
       [:p "Mapp, версия 2024-05-15"]
-      (context-menu [["Копировать" "ctx-menu-action-copy"]
-                     ["Удалить" "ctx-menu-action-delete"]
+      (context-menu [["Снять выделение" "ctx-menu-action-unselect"]
                      ["-" "-"]
-                     ["КСП" "ctx-menu-action-refs-set"]
-                     ["-" "-"]
-                     ["Создать протокол" "ctx-menu-action-protocol"]])])
+                     ["Копировать" "ctx-menu-action-copy"]
+                     ["Удалить" "ctx-menu-action-delete"]])])
 
 (defn page-template 
   [toolbar query-panel table edit-panel]

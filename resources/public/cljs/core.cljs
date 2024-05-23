@@ -3,6 +3,8 @@
     [clojure.string :as string]
     [reagent.core :as r]
     [reagent.dom :as dom]
+    [cljs.table :as table]
+    [cljs.dom-functions :refer :all]
     [ajax.core :refer [GET POST]]))
 
 (def records-limit
@@ -21,49 +23,47 @@
        query "&limit="
        limit))
 
-(defn get-by-id
-  [id]
-  (.getElementById js/document id))
-
-(defn get-by-class
-  [class-name]
-  (seq (.getElementsByClassName js/document class-name)))
-
-(defn get-by-tag
-  [tag-name]
-  (seq (.getElementsByTagName js/document tag-name)))
-
-(defn get-value
-  [id]
-  (-> (get-by-id id)
-      .-value))
-
-(defn add-event-listener
-  [id event fn]
-  (.addEventListener (get-by-id id) event fn))
-
 (defn get-position
   [event]
     {:x (-> event .-pageX) 
      :y (-> event .-pageY)})
 
-;;#table#event#listener
-(defn td-clicked
-  [event]
-  (let [tr (-> event .-target .-parentNode)]
-    (if (-> tr .-classList (.contains "selected"))
-        (-> tr .-classList (.remove "selected"))
-        (-> tr .-classList (.add "selected")))))
+(defn toggle-select-row
+  [tr]
+  (toggle-class tr "selected"))
+
+(defn unselect-rows
+  []
+  (doall
+    (for [el (get-by-tag "tr")]
+         (remove-class el "selected"))))
 
 ;;#context#menu
+(defn context-menu-on
+  []
+  (add-class (get-by-id "context-menu")
+             "context-menu-active"))
+
+(defn context-menu-off
+  []
+  (remove-class (get-by-id "context-menu")
+                "context-menu-active"))
+
 (defn td-contextmenu
   [event]
   (let [menu (get-by-id "context-menu")
         pos (get-position event)]
     (-> event (.preventDefault))
-    (-> menu .-classList (.add "context-menu-active"))
+    (context-menu-on)
     (set! (-> menu .-style .-left) (:x pos))
     (set! (-> menu .-style .-top) (:y pos))))
+
+;;## table event listener
+(defn td-clicked
+  [event]
+  (let [tr (-> event .-target .-parentNode)]
+    (toggle-select-row tr)
+    (context-menu-off)))
 
 (defn add-table-event-listeners
   []
@@ -73,54 +73,36 @@
            (.addEventListener el "click" td-clicked)
            (.addEventListener el "contextmenu" td-contextmenu)))))
 
-;;#context#menu#event#listener
+;;## context-menu event listener
+(defn ctx-action-unselect
+  [event]
+  (unselect-rows))
+
+(defn ctx-action-copy
+  [event]
+  (println "Copy"))
+
+(defn ctx-action-delete
+  [event]
+  (println "Delete"))
+
 (defn context-menu-item-click
   [event]
-  (let [menu (get-by-id "context-menu")]
-    (-> menu .-classList (.remove "context-menu-active"))))
+  (let [id (-> event
+               .-target
+               (.getAttribute "name"))
+        menu (get-by-id "context-menu")
+        menu-actions {"ctx-menu-action-copy" ctx-action-copy
+                      "ctx-menu-action-delete" ctx-action-delete
+                      "ctx-menu-action-unselect" ctx-action-unselect}]
+    (context-menu-off)
+    ((menu-actions id))))
 
 (defn add-context-menu-event-listener
   []
   (doall
     (for [el (get-by-class "context-menu-item")]
          (.addEventListener el "click" context-menu-item-click))))
-
-(defn create-table-header
-  [model]
-  [:tr
-    (for [[id nm _] model]
-         [(keyword (str "th.col" (keyword id)))
-           nm])])
-
-(defn create-table-row
-  [model row-data]
-  (let [ids (for [[id _ _] model] id) 
-        editables (for [[_ _ editable] model] (str editable))]
-    [:tr 
-      (map (fn [id editable]
-               [(keyword (str "td.col" (keyword id)))
-                    {:contenteditable editable}
-                 ((keyword id) row-data)])
-           ids
-           editables)]))
-
-(defn create-table-rows
-  [model data]
-  (map (fn [row]
-           (create-table-row model row))
-       data))
-
-(defn create-table
-  "args: model [[id name visibility] [] ... []]"
-  [id model data]
-  [:table {:id id}
-    [:thead
-      (create-table-header model)]
-    [:tbody
-      (create-table-rows model data)]])
-
-(def html-tab
-  [:table [:thead [:tr [:th "col_1"] [:th "col_2"]]] [:tbody [:tr [:td 1] [:td 2]]]])
 
 (defn render-table
   [resp]
@@ -133,7 +115,7 @@
       (set! (-> "page-number" get-by-id .-max) pages)
       (set! (-> "pages-count" get-by-id .-innerHTML) pages)
       (set! (-> "records-count" get-by-id .-innerHTML) recs-count))
-    (dom/render #(create-table id model data) table-panel)))
+    (dom/render #(table/create id model data) table-panel)))
 
 (defn get-table-id
   []
@@ -200,19 +182,10 @@
 
 (comment
 
-(defn page-number-changed
-  [event]
-  (js/console.log
-    (->
-      event 
-      .-target
-      .-value)))
-
-(make-url "gso" 1 "" 20)
-
 (.open js/window (make-url
                    "verifications"
                    p-num
                    (get-value "query")
                    @records-limit))
+
 )
