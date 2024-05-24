@@ -1,4 +1,6 @@
-(ns cljs.table)
+(ns cljs.table
+  (:require
+    [clojure.string :as string]))
 
 (defn create-header
   [model]
@@ -34,4 +36,32 @@
     [:tbody
       (create-rows model data)]])
 
+(defn get-field
+  [el]
+  (-> el
+      (.getAttribute "class")
+      (string/replace #"col:" "")
+      keyword))
 
+(defn get-data
+  [el]
+  (let [s (-> el .-innerHTML)]
+    (if (= "" s)
+        nil
+        s)))
+
+(defn get-cell-data
+  [el]
+  {(get-field el)
+   (get-data el)})
+
+(defn read-row
+  [row]
+  (let [cols (-> row .-childNodes seq)]
+    (reduce (fn [o el]
+                (let [editable (-> el (.getAttribute "contenteditable"))]
+                  (if (= "true" editable)
+                      (conj o (get-cell-data el))
+                      o)))
+            {}
+            cols)))

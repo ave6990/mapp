@@ -81,8 +81,11 @@
         (tmpl/gen-page
           title
           (tmpl/page-template
-            (tmpl/toolbar-text-snippets
-              toolbar-settings)
+            (list
+              (tmpl/toolbar-text-snippets
+                tmpl/symbols)
+              (tmpl/toolbar-text-snippets
+                toolbar-settings))
             (tmpl/query-panel
               (calc-pages recs-count limit)
               recs-count)

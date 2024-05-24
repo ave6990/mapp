@@ -32,6 +32,12 @@
               :type "application/x-scittle"}]
     [:script {:src "/cljs/table.cljs"
               :type "application/x-scittle"}]
+    [:script {:src "/cljs/context_menu.cljs"
+              :type "application/x-scittle"}]
+    [:script {:src "/cljs/table_handlers.cljs"
+              :type "application/x-scittle"}]
+    [:script {:src "/cljs/query_panel_handlers.cljs"
+              :type "application/x-scittle"}]
     [:script {:src "/cljs/core.cljs"
               :type "application/x-scittle"}]])
 
@@ -67,6 +73,13 @@
                      :draggable "true"}
                     text])
              fields-settings)])
+
+(def symbols
+  '(["млн⁻¹" "млн⁻¹"]
+    ["мг/м³" "мг/м³"]
+    ["«" "«"] ["»" "»"] ["±" "±"] ["÷" "÷"] ["°" "°"]
+    ["₁" "₁"] ["₂" "₂"] ["₃" "₃"] ["₄" "₄"] ["₅" "₅"]
+    ["₆" "₆"] ["₇" "₇"] ["₈" "₈"] ["₉" "₉"] ["₀" "₀"]))
 
 (defn query-panel
   [pages records]

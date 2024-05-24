@@ -1,5 +1,5 @@
 :root {
-  --color-passive: rgba(0.1, 0.1, 0.1, 0.1);
+  --color-passive: rgba(150, 150, 150, 0.3);
   --color-background: white;
   --color-background-contrast: black;
   --color-text: black;
@@ -42,7 +42,7 @@ footer {
 }
 
 #toolbar-panel * {
-  margin: 0 6px;
+  margin: 6px;
   background: #dddddd;
   text-transform: uppercase;
 }
@@ -83,6 +83,10 @@ td, th {
 
 table .selected {
   background: #ddddff;
+}
+
+table .data-changed {
+  background: rgba(200, 150, 150, 0.3);
 }
 
 td[contenteditable^="false"] {
