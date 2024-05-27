@@ -127,6 +127,7 @@
       [:p "Mapp, версия 2024-05-15"]
       (context-menu [["Снять выделение" "ctx-menu-action-unselect"]
                      ["-" "-"]
+                     ["Записать" "ctx-menu-action-write"]
                      ["Копировать" "ctx-menu-action-copy"]
                      ["Удалить" "ctx-menu-action-delete"]])])
 

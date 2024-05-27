@@ -36,8 +36,9 @@
   (int (Math/ceil (/ records-count limit))))
 
 (defn parse-request
-  [params]
-  (let [limit (read-string (:limit params))
+  [req]
+  (let [params (:params req)
+        limit (read-string (:limit params))
         query (:q params)
         page (read-string (:id params))
         offset (calc-offset page limit)]
@@ -53,8 +54,9 @@
           fields-settings)])
 
 (defn get-data
-  [params get-fn fields-settings]
-  (let [request (parse-request params)
+  [req get-fn fields-settings]
+  (println req)
+  (let [request (parse-request req)
         {:keys [query limit offset]} request
         records (get-fn
                   (string/replace query #"\*" "%") limit offset)
@@ -67,8 +69,8 @@
                    :model fields-settings})}))
 
 (defn get-page
-  [title table-id params get-fn fields-settings toolbar-settings]
-  (let [request (parse-request params)
+  [title table-id req get-fn fields-settings toolbar-settings]
+  (let [request (parse-request req)
         {:keys [query limit offset]} request
         records (get-fn
                   query limit offset)
@@ -95,22 +97,17 @@
 
 (defmacro make-get-page
   [title table-id fields-settings toolbar-settings]
-  (let [req (gensym "req")
-        params (gensym "params")]
+  (let [req (gensym "req")]
     `(defn ~(symbol (str "get-" table-id "-page"))
        [~req]
-       (let [~params (if (zero? (count ~req))
-                     {:id "1"
-                      :q ""
-                      :limit "100"}
-                     ~req)]
-         (mapp.controller.controller/get-page
-           ~title
-           ~table-id
-           ~params
-           ~(symbol (str "midb/get-" table-id))
-           ~fields-settings
-           ~toolbar-settings)))))
+       (println ~req)
+       (mapp.controller.controller/get-page
+         ~title
+         ~table-id
+         ~req
+         ~(symbol (str "midb/get-" table-id))
+         ~fields-settings
+         ~toolbar-settings))))
 
 (make-get-page "Журнал ПР" "verifications" vs/fields-settings vs/toolbar-fields-settings)
 (make-get-page "Условия поверки" "conditions" cs/fields-settings cs/toolbar-fields-settings)
@@ -118,7 +115,6 @@
 (make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings)
 (make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings)
 (make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings)
-
 (defn get-verifications-data
   [req]
   (get-data req midb/get-verifications vs/fields-settings))
@@ -142,7 +138,3 @@
 (defn get-methodology-data
   [req]
   (get-data req midb/get-methodology met/fields-settings))
-
-(defn write-verifications
-  [body]
-  (println body))

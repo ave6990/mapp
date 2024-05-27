@@ -3,16 +3,34 @@
     [clojure.string :as string]
     [reagent.core :as r]
     [reagent.dom :as dom]
+    [ajax.core :refer [GET POST PUT]]
     [cljs.dom-functions :refer :all]
     [cljs.table :as table]
     [cljs.table-handlers :as table-handlers]
     [cljs.query-panel-handlers :as query-handlers]
     [cljs.context-menu :as ctx-menu]))
 
+(defn read-selected-rows
+  []
+  (let [rows (get-by-class "selected")]
+    (vec
+      (for [row rows]
+           (table/read-row row)))))
+
 ;;## context-menu event listener functions
 (defn ctx-action-unselect
   [event]
   (table-handlers/unselect-rows))
+
+(defn ctx-action-write
+  [event]
+  (let [data (read-selected-rows)
+        sdata (.stringify js/JSON (clj->js data))]
+    (println (.stringify js/JSON (clj->js data)))
+    (js/fetch "/add-verifications"
+      (clj->js {:method "POST"
+       :headers {"Content-type" "application/json;charset=utf-8"}
+       :body sdata}))))
 
 (defn ctx-action-copy
   [event]
@@ -25,7 +43,8 @@
   (println "Delete"))
 
 (def menu-actions
-  {"ctx-menu-action-copy" ctx-action-copy
+  {"ctx-menu-action-write" ctx-action-write
+   "ctx-menu-action-copy" ctx-action-copy
    "ctx-menu-action-delete" ctx-action-delete
    "ctx-menu-action-unselect" ctx-action-unselect})
 

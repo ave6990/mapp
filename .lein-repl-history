@@ -1,25 +1,3 @@
-(h/html (meta-tag "author" "ave6990"))
-(str (h/html (meta-tag "author" "ave6990")))
-(ns mapp.views.templates
-  (:require
-    [hiccup2.core :as h]
-    [mapp.views.verifications-settings :as vs]))
-(defn meta-tag
-  [name content]
-  [:meta {:name name :content content}])
-(defn gen-page-head
-  [title]
-  [:head
-    [:meta {:charset "utf-8"}]
-    (meta-tag "author" "Aleksandr Ermolaev")
-    (meta-tag "e-mail" "ave6990@ya.ru")
-    (meta-tag "version" "2024-05-14")
-    [:title title]
-    [link {:rel "stylesheet"
-             :type "text/css"
-             :href "/css/styles.css"}]
-    [:script {:crossorigin "false"
-              :src "https://unpkg.com/react@17/umd/react.production.min.js"}]
     [:script {:crossorigin "false"
               :src "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"}]
     [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.js"
@@ -498,3 +476,25 @@ exit
       (add-class tr "data-changed"))))
 (conj {} {:a 1})
 (conj {} {:a 1} {:b 2})
+exit
+(defn f
+  [& a]
+  (println a))
+(f "hello")
+(defn f
+  [& a]
+  (println a))
+(f "hello" "cljs")
+(defn f
+  [a]
+  (println a))
+(f)
+exit
+(seq? '(1 12 3 4))
+(seq? [1 12 3 4])
+(vec? [1 12 3 4])
+(vector? [1 12 3 4])
+(vector? {:a 21 :b 23})
+(vec [1 23 34])
+(vec '(1 23 34))
+(vec {:a 1 :b 23})

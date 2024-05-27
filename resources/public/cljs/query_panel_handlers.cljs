@@ -50,10 +50,10 @@
     (set! (-> event .-target .-value) p-num)
     (->
       (js/fetch (make-url
-                table-id
-                p-num
-                (get-value "query")
-                @records-limit))
+                  table-id
+                  p-num
+                  (get-value "query")
+                  @records-limit))
       (.then #(.json %))
       (.then #(render-table (js->clj % :keywordize-keys true))))))
 
