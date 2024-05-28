@@ -15,6 +15,10 @@
   [event]
   (table-handlers/unselect-rows))
 
+(defn ctx-action-select-all
+  [event]
+  (table-handlers/select-all-rows))
+
 (defn ctx-action-save
   [event]
   (let [sdata (stringify (table/read-selected-rows))]
@@ -41,7 +45,8 @@
   {"ctx-menu-action-save" ctx-action-save
    "ctx-menu-action-copy" ctx-action-copy
    "ctx-menu-action-delete" ctx-action-delete
-   "ctx-menu-action-unselect" ctx-action-unselect})
+   "ctx-menu-action-unselect" ctx-action-unselect
+   "ctx-menu-action-select-all" ctx-action-select-all})
 
 (defn add-context-menu-event-listener
   []

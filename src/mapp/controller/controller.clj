@@ -12,6 +12,7 @@
     [mapp.views.references-settings :as refs]
     [mapp.views.counteragents-settings :as ca]
     [mapp.views.methodology-settings :as met]
+    [mapp.views.refs-set-settings :as refs-set]
     [mapp.views.conditions-settings :as cs]))
 
 (defn keywordize
@@ -106,6 +107,7 @@
               (tmpl/toolbar-text-snippets
                 toolbar-settings))
             (tmpl/query-panel
+              query
               (calc-pages recs-count limit)
               recs-count)
             (tmpl/create-table
@@ -136,12 +138,13 @@
            ~toolbar-settings
            ~context-menu-settings)))))
 
-(make-get-page "Журнал ПР" "verifications" vs/fields-settings vs/toolbar-fields-settings [])
+(make-get-page "Журнал ПР" "verifications" vs/fields-settings vs/toolbar-fields-settings vs/context-menu-settings)
 (make-get-page "Условия поверки" "conditions" cs/fields-settings cs/toolbar-fields-settings [])
 (make-get-page "Эталоны" "references" refs/fields-settings refs/toolbar-fields-settings [])
 (make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings [])
 (make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings [])
 (make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings [])
+(make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
 
 (defn get-verifications-data
   [req]

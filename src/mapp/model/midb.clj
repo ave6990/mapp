@@ -111,7 +111,7 @@
 (make-get-fn "measurements")
 (make-get-fn "methodology")
 (make-get-fn "journal")
-(make-get-fn "set-verification-tools")
+(make-get-fn "refs-set")
 
 ;;#copy
 (defn last-id

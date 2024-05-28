@@ -271,13 +271,13 @@
   {limit}
   {offset};")
 
-(def get-set-verification-tools-records-count
+(def get-refs-set-records-count
   "select count(*) as count
   from
     verification_refs
   {where};")
 
-(def get-set-verification-tools
+(def get-refs-set
   "select *
   from
     verification_refs

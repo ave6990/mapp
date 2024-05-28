@@ -13,6 +13,13 @@
     (for [el (get-by-tag "tr")]
          (remove-class el "selected"))))
 
+(defn select-all-rows
+  []
+  (doall
+    (for [el (get-by-tag "tr")]
+         (when (not (contains-class el "headers-row"))
+               (add-class el "selected")))))
+
 (defn td-click
   [event]
   (when (= "TD" (-> event .-target .-tagName))

@@ -5,7 +5,7 @@
 
 (defn create-header
   [model]
-  [:tr
+  [:tr.headers-row
     (for [[id nm _] model]
          [(keyword (str "th.col" (keyword id)))
            nm])])

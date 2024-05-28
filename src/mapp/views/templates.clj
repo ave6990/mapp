@@ -84,7 +84,7 @@
     ["₆" "₆"] ["₇" "₇"] ["₈" "₈"] ["₉" "₉"] ["₀" "₀"]))
 
 (defn query-panel
-  [pages records]
+  [query pages records]
   (list [:label "стр. "]
         [:input {:type "number"
                   :id "page-number"
@@ -97,7 +97,8 @@
         [:span {:id "records-count"} records]
         ") "
         [:input {:type "text"
-                 :id "query"}]))
+                 :id "query"
+                 :value query}]))
 
 (defn gen-page
   [title content]
@@ -107,6 +108,7 @@
 
 (def default-context-menu
   [["Снять выделение" "ctx-menu-action-unselect"]
+   ["Выделить все" "ctx-menu-action-select-all"]
    ["-" "-"]
    ["Записать" "ctx-menu-action-save"]
    ["Копировать" "ctx-menu-action-copy"]
@@ -207,7 +209,7 @@
 
 (defn create-table-header
   [model]
-  [:tr
+  [:tr {:class "headers-row"}
     (for [[id nm _] model]
       [:th {:class (str "col" id)}
                  nm])])

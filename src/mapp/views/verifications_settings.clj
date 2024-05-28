@@ -83,5 +83,6 @@
     [:comment "Комментарий" true]))
 
 (def context-menu-settings
-  '(["КСП" "ctx-menu-action-refs-set"]
+  '(["-" "-"]
+    ["КСП" "ctx-menu-action-refs-set"]
     ["Операции поверки" "ctx-menu-action-operations"]))
