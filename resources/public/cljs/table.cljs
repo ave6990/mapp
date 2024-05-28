@@ -1,6 +1,7 @@
 (ns cljs.table
   (:require
-    [clojure.string :as string]))
+    [clojure.string :as string]
+    [cljs.dom-functions :refer :all]))
 
 (defn create-header
   [model]
@@ -65,3 +66,11 @@
                       o)))
             {}
             cols)))
+
+(defn read-selected-rows
+  []
+  (let [rows (get-by-class "selected")]
+    (vec
+      (for [row rows]
+           (read-row row)))))
+

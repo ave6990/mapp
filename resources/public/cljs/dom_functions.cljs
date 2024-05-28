@@ -49,3 +49,10 @@
   (if (contains-class el cls)
       (remove-class el cls)
       (add-class el cls)))
+
+(defn stringify
+  [data]
+  (.stringify js/JSON
+              (clj->js data)))
+
+

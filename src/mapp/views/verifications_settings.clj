@@ -81,3 +81,7 @@
     [:sign_pass "Клеймо паспорт" true]
     [:protocol "Протокол" true]
     [:comment "Комментарий" true]))
+
+(def context-menu-settings
+  '(["КСП" "ctx-menu-action-refs-set"]
+    ["Операции поверки" "ctx-menu-action-operations"]))

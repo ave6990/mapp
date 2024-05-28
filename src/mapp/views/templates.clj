@@ -38,6 +38,8 @@
               :type "application/x-scittle"}]
     [:script {:src "/cljs/query_panel_handlers.cljs"
               :type "application/x-scittle"}]
+    [:script {:src "/cljs/popups.cljs"
+              :type "application/x-scittle"}]
     [:script {:src "/cljs/core.cljs"
               :type "application/x-scittle"}]])
 
