@@ -122,6 +122,53 @@
                 (context-menu-item name action))
             xs)]]) 
 
+(defn popup
+  [id content]
+  [:div {:id id
+         :class "popup"}
+    content])
+
+(defn save-popup
+  []
+  (popup "save-popup"
+         '([:h3 "Сохранить выбранные строки?"]
+           [:input {:type "button"
+                    :id "save-popup-yes"
+                    :value "Да"}]
+           [:input {:type "button"
+                    :class "popup-no"
+                    :value "Нет"}])))
+
+(defn copy-popup
+  []
+  (popup "copy-popup"
+         '([:h3 "Скопировать запись № "
+             [:span {:id "copy-record-number"} "-"] " ?"]
+           [:p "Количество копий: "
+             [:input {:type "number"
+                      :id "copy-count"
+                      :value 1
+                      :min 1
+                      :max 200}]]
+           [:input {:type "button"
+                    :id "copy-popup-yes"
+                    :value "Да"}]
+           [:input {:type "button"
+                    :class  "popup-no"
+                    :value "Нет"}])))
+
+(defn delete-popup
+  []
+  (popup "delete-popup"
+         '([:h3 "Удалить записи №№: "
+             [:span {:id "delete-record-numbers"} "-"] " ?"]
+           [:input {:type "button"
+                    :id "delete-popup-yes"
+                    :value "Да"}]
+           [:input {:type "button"
+                    :class  "popup-no"
+                    :value "Нет"}])))
+
 (def footer
   [:footer
       [:p "Mapp, версия 2024-05-15"]
@@ -129,7 +176,10 @@
                      ["-" "-"]
                      ["Записать" "ctx-menu-action-write"]
                      ["Копировать" "ctx-menu-action-copy"]
-                     ["Удалить" "ctx-menu-action-delete"]])])
+                     ["Удалить" "ctx-menu-action-delete"]])
+      (save-popup)
+      (copy-popup)
+      (delete-popup)])
 
 (defn page-template 
   [toolbar query-panel table edit-panel]

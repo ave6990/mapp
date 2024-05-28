@@ -14,6 +14,12 @@
     [mapp.views.methodology-settings :as met]
     [mapp.views.conditions-settings :as cs]))
 
+(defn keywordize
+  [m]
+  (into {}
+        (for [[k v] m]
+             [(keyword k) v])))
+
 (defn insert-string
   "Insert the string `s in `ss at the position `pos."
   [ss s pos]
@@ -150,7 +156,10 @@
 
 (defn copy-verifications
   [body]
-  (pprint body))
+  (let [{:keys [id cnt]} (keywordize body)]
+    (midb/copy-record! id
+                       cnt)
+    (println "Copy complete! " id cnt)))
 
 (defn delete-verifications
   [body]

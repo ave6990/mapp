@@ -65,10 +65,10 @@
       (set! (-> "page-number" get-by-id .-value) 1)
       (->
         (js/fetch (make-url
-                   table-id
-                   1
-                   query
-                   @records-limit))
+                    (str table-id "/get")
+                    1
+                    query
+                    @records-limit))
         (.then #(.json %))
         (.then #(render-table (js->clj % :keywordize-keys true)))))))
 

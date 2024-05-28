@@ -143,3 +143,29 @@ td[contenteditable^="false"] {
   text-decoration: none;
   color: var(--color-text);
 }
+
+.popup {
+  display: none;
+  position: absolute;
+  background: white;
+  max-width: 400px;
+  max-height: 150px;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.show-popup {
+  display: block;
+  top: calc(50vh - 75px);
+  left: calc(50vw - 200px);
+}
+
+.popup h3 {
+  margin: 6px;
+}
+
+.popup input {
+  width: 75px;
+  margin: 0 10px;
+}

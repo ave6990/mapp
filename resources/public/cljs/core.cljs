@@ -30,6 +30,7 @@
 (defn ctx-action-write
   [event]
   (let [sdata (stringify (read-selected-rows))]
+    (add-class (get-by-id "save-popup") "show-popup")
     (table-handlers/unselect-rows)
     (js/fetch "/verifications/save"
       (clj->js {:method "POST"
@@ -38,13 +39,42 @@
 
 (defn ctx-action-copy
   [event]
-  (let [row (first (get-by-class "selected"))]
+  (let [row (first (get-by-class "selected"))
+        data (table/read-row row)]
     (println "Copy")
-    (println (table/read-row row))))
+    (set-html "copy-record-number" (:id data))
+    (add-class (get-by-id "copy-popup") "show-popup")))
 
 (defn ctx-action-delete
   [event]
-  (println "Delete"))
+  (println "Delete")
+  (add-class (get-by-id "delete-popup") "show-popup"))
+
+(defn popup-no-click
+  [event]
+  (dorun
+    (for [popup (get-by-class "popup")]
+         (remove-class popup "show-popup"))))
+
+(defn copy-popup-yes-click
+  [event]
+  (let [rec-num (read-string (get-html "copy-record-number"))
+        cnt (read-string (get-value "copy-count"))]
+    (println rec-num (type rec-num) cnt (type cnt))
+    (table-handlers/unselect-rows)
+    (remove-class (get-by-id "copy-popup") "show-popup")
+    (js/fetch "/verifications/copy"
+      (clj->js {:method "POST"
+                :headers {"Content-type" "application/json;charset=utf-8"}
+                :body (stringify {:id rec-num
+                                  :cnt cnt})}))))
+
+(defn add-popup-event-listeners
+  []
+  (doall
+    (for [but (get-by-class "popup-no")]
+         (.addEventListener but "click" popup-no-click)))
+  (.addEventListener (get-by-id "copy-popup-yes") "click" copy-popup-yes-click))
 
 (def menu-actions
   {"ctx-menu-action-write" ctx-action-write
@@ -84,7 +114,8 @@
            (.addEventListener el "dragstart" text-snippets-dragstart))))
   (add-reload-event-listener)
   (table-handlers/add-event-listeners)
-  (add-context-menu-event-listener))
+  (add-context-menu-event-listener)
+  (add-popup-event-listeners))
 
 (add-behavior)
 
