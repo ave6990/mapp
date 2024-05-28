@@ -49,9 +49,9 @@
     v.manufacture_year, v.channels, v.area, v.interval, v.components,
     v.scope, v.sw_name, v.sw_version, v.sw_version_real,
     v.sw_checksum, v.sw_algorithm, v.protocol,
-    v.protolang, v.voltage as v_voltage, v.other_conditions as v_other_conditions
+    v.protolang, v.voltage as voltage, v.other_conditions as v_other_conditions
     , v.upload, v.comment, v.copy_from,
-    v.hash_refs, c.date, c.temperature, c.humidity, c.pressure, c.voltage, c.frequency,
+    v.hash_refs, c.date, c.temperature, c.humidity, c.pressure, c.voltage as c_voltage, c.frequency,
     c.other, c.location, c.comment as c_comment, ca.id as ca_id,
     ca.name as ca_name, ca.short_name as ca_short_name, ca.address, ca.inn,
     ca.type as ca_type, met.registry_number as registry_number, met.name as met_name,

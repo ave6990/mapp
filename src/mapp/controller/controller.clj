@@ -92,6 +92,8 @@
         records (get-fn
                   query limit offset)
         {:keys [recs-count data]} records
+        l (println query limit offset recs-count)
+        k (pprint data)
         ]
     (str
       (h/html
@@ -199,7 +201,6 @@
 
 (defn copy-record
   [body]
-  (println "**********COPY**********")
   (let [{:keys [table id cnt]} (keywordize body)]
     (dorun
       (for [_ (range cnt)]
