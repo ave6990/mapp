@@ -152,7 +152,14 @@
 
 (defn write-verifications
   [body]
-  (pprint body))
+  (let [data (vec (map keywordize
+                       body))]
+    (dorun
+      (for [rec data]
+           (midb/write!
+             :verification
+             rec)))
+    (println "Save complete! ")))
 
 (defn copy-verifications
   [body]
@@ -163,4 +170,8 @@
 
 (defn delete-verifications
   [body]
-  (pprint body))
+  (let [ids (:ids (keywordize body))]
+    (dorun
+      (for [id ids]
+           (midb/delete-record! id)))
+    (println "Delete compplete! " ids)))

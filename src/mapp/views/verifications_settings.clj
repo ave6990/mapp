@@ -76,7 +76,7 @@
     [:sw_checksum "Контрольная сумма" true]
     [:sw_algorithm "Алгоритм" true]
     [:voltage "Напряжение" true]
-    [:other "Прочие" true]
+    [:other_conditions "Прочие" true]
     [:sign_mi "Клеймо СИ" true]
     [:sign_pass "Клеймо паспорт" true]
     [:protocol "Протокол" true]

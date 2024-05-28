@@ -27,15 +27,11 @@
   [event]
   (table-handlers/unselect-rows))
 
-(defn ctx-action-write
+(defn ctx-action-save
   [event]
   (let [sdata (stringify (read-selected-rows))]
-    (add-class (get-by-id "save-popup") "show-popup")
-    (table-handlers/unselect-rows)
-    (js/fetch "/verifications/save"
-      (clj->js {:method "POST"
-                :headers {"Content-type" "application/json;charset=utf-8"}
-                :body sdata}))))
+    (println "Save")
+    (add-class (get-by-id "save-popup") "show-popup")))
 
 (defn ctx-action-copy
   [event]
@@ -47,8 +43,11 @@
 
 (defn ctx-action-delete
   [event]
-  (println "Delete")
-  (add-class (get-by-id "delete-popup") "show-popup"))
+  (let [ids (map :id
+                 (read-selected-rows))]
+    (println "Delete")
+    (set-html "delete-record-numbers" (string/join ", " ids))
+    (add-class (get-by-id "delete-popup") "show-popup")))
 
 (defn popup-no-click
   [event]
@@ -56,11 +55,21 @@
     (for [popup (get-by-class "popup")]
          (remove-class popup "show-popup"))))
 
+(defn save-popup-yes-click
+  [event]
+  (let [records (read-selected-rows)]
+    (table-handlers/unselect-rows)
+    (remove-class (get-by-id "save-popup") "show-popup")
+    (js/fetch "/verifications/save"
+      (clj->js {:method "POST"
+                :headers {"Content-type" "application/json;charset=utf-8"}
+                :body (stringify records)}))))
+
 (defn copy-popup-yes-click
   [event]
   (let [rec-num (read-string (get-html "copy-record-number"))
         cnt (read-string (get-value "copy-count"))]
-    (println rec-num (type rec-num) cnt (type cnt))
+    (.log js/console "Copy record " rec-num cnt " times")
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "copy-popup") "show-popup")
     (js/fetch "/verifications/copy"
@@ -69,15 +78,32 @@
                 :body (stringify {:id rec-num
                                   :cnt cnt})}))))
 
+(defn delete-popup-yes-click
+  [event]
+  (let [data (read-selected-rows)
+        ids (map :id
+                 data)
+        rec-nums (map read-string
+                      ids)]
+    (table-handlers/unselect-rows)
+    (remove-class (get-by-id "delete-popup") "show-popup")
+    (println ids)
+    (js/fetch "/verifications/delete"
+      (clj->js {:method "DELETE"
+                :headers {"Content-type" "application/json;charset=utf-8"}
+                :body (stringify {:ids rec-nums})}))))
+
 (defn add-popup-event-listeners
   []
   (doall
     (for [but (get-by-class "popup-no")]
          (.addEventListener but "click" popup-no-click)))
-  (.addEventListener (get-by-id "copy-popup-yes") "click" copy-popup-yes-click))
+  (.addEventListener (get-by-id "copy-popup-yes") "click" copy-popup-yes-click)
+  (.addEventListener (get-by-id "delete-popup-yes") "click" delete-popup-yes-click)
+  (.addEventListener (get-by-id "save-popup-yes") "click" save-popup-yes-click))
 
 (def menu-actions
-  {"ctx-menu-action-write" ctx-action-write
+  {"ctx-menu-action-save" ctx-action-save
    "ctx-menu-action-copy" ctx-action-copy
    "ctx-menu-action-delete" ctx-action-delete
    "ctx-menu-action-unselect" ctx-action-unselect})
