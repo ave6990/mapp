@@ -15,10 +15,22 @@
     [mapp.views.conditions-settings :as cs]))
 
 (defn keywordize
+  "Функция преобразующая ключи входящего JSON в keyword"
   [m]
   (into {}
         (for [[k v] m]
-             [(keyword k) v])))
+             (do
+               [(keyword k) 
+                (cond
+                  (vector? v)
+                    (vec
+                      (map (fn [vl]
+                               (if (map? vl)
+                                   (keywordize vl)
+                                   vl))
+                           v))
+                  (map? v) (keywordize v)
+                  :else v)]))))
 
 (defn insert-string
   "Insert the string `s in `ss at the position `pos."
@@ -152,21 +164,20 @@
 
 (defn write-verifications
   [body]
-  (let [data (vec (map keywordize
-                       body))]
+  (let [data (-> body keywordize :data)]
     (dorun
       (for [rec data]
            (midb/write!
              :verification
              rec)))
-    (println "Save complete! ")))
+    (println "Save verification records complete! ")))
 
 (defn copy-verifications
   [body]
   (let [{:keys [id cnt]} (keywordize body)]
     (midb/copy-record! id
                        cnt)
-    (println "Copy complete! " id cnt)))
+    (println "Copy verification record complete! " id cnt)))
 
 (defn delete-verifications
   [body]
@@ -174,4 +185,35 @@
     (dorun
       (for [id ids]
            (midb/delete-record! id)))
-    (println "Delete compplete! " ids)))
+    (println "Delete verification records compplete! " ids)))
+
+(defn save-records
+  [body]
+  (let [{:keys [table data]} (keywordize body)]
+    (dorun
+      (for [rec data]
+        (midb/write!
+          (keyword table)
+          rec)))
+        (println (str "Save data to " table " table complete"))))
+
+(defn copy-record
+  [body]
+  (println "**********COPY**********")
+  (let [{:keys [table id cnt]} (keywordize body)]
+    (dorun
+      (for [_ (range cnt)]
+           (midb/copy!
+             (keyword table)
+             id)))
+    (println (str "Copy data to " table " table complete"))))
+
+(defn delete-records
+  [body]
+  (let [{:keys [table ids]} (keywordize body)]
+    (dorun
+      (for [id ids]
+           (midb/delete!
+             (keyword table)
+             id)))
+    (println (str "Delete data from " table " table complete"))))

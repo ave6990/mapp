@@ -57,26 +57,30 @@
 
 (defn save-popup-yes-click
   [event]
-  (let [records (read-selected-rows)]
+  (let [records (read-selected-rows)
+        tab-id (query-handlers/get-table-id)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "save-popup") "show-popup")
-    (js/fetch "/verifications/save"
+    (js/fetch (str "/" tab-id "/save")
       (clj->js {:method "POST"
                 :headers {"Content-type" "application/json;charset=utf-8"}
-                :body (stringify records)}))))
+                :body (stringify {:data records
+                                  :table tab-id})}))))
 
 (defn copy-popup-yes-click
   [event]
   (let [rec-num (read-string (get-html "copy-record-number"))
-        cnt (read-string (get-value "copy-count"))]
+        cnt (read-string (get-value "copy-count"))
+        tab-id (query-handlers/get-table-id)]
     (.log js/console "Copy record " rec-num cnt " times")
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "copy-popup") "show-popup")
-    (js/fetch "/verifications/copy"
+    (js/fetch (str "/" tab-id "/copy")
       (clj->js {:method "POST"
                 :headers {"Content-type" "application/json;charset=utf-8"}
                 :body (stringify {:id rec-num
-                                  :cnt cnt})}))))
+                                  :cnt cnt
+                                  :table tab-id})}))))
 
 (defn delete-popup-yes-click
   [event]
@@ -84,14 +88,16 @@
         ids (map :id
                  data)
         rec-nums (map read-string
-                      ids)]
+                      ids)
+        tab-id (query-handlers/get-table-id)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "delete-popup") "show-popup")
     (println ids)
-    (js/fetch "/verifications/delete"
+    (js/fetch (str "/" tab-id "/delete")
       (clj->js {:method "DELETE"
                 :headers {"Content-type" "application/json;charset=utf-8"}
-                :body (stringify {:ids rec-nums})}))))
+                :body (stringify {:table tab-id
+                                  :ids rec-nums})}))))
 
 (defn add-popup-event-listeners
   []
@@ -123,7 +129,8 @@
 (defn reload-pressed
   [event]
   (when (= "F5" (-> event .-key))
-        (-> event (.preventDefault))))
+        (-> event (.preventDefault))
+        (query-handlers/execute-query)))
 
 (defn add-reload-event-listener
   []

@@ -39,38 +39,38 @@
     (dom/render #(table/create id model data) table-panel)
     (table-handlers/add-event-listeners)))
 
+(defn execute-query
+  []
+  (let [table-id (get-table-id)
+        query (get-value "query")
+        page-number (read-string
+                      (get-value "page-number"))]
+    (println table-id query page-number)
+    (->
+      (js/fetch (make-url
+                  (str table-id "/get")
+                  page-number
+                  query
+                  @records-limit))
+      (.then #(.json %))
+      (.then #(render-table (js->clj % :keywordize-keys true))))))
+
 (defn page-number-changed
   [event]
   (let [temp-p-num (-> event .-target .-value)
         pages-count (read-string (-> (get-by-id "pages-count") .-innerHTML))
         p-num (if (> temp-p-num pages-count)
                   pages-count
-                  temp-p-num)
-        table-id (get-table-id)]
+                  temp-p-num)]
     (set! (-> event .-target .-value) p-num)
-    (->
-      (js/fetch (make-url
-                  (str table-id "/get")
-                  p-num
-                  (get-value "query")
-                  @records-limit))
-      (.then #(.json %))
-      (.then #(render-table (js->clj % :keywordize-keys true))))))
+    (execute-query)))
 
 (defn query-changed
   [event]
-  (let [query (-> event .-target .-value)
-        table-id (get-table-id)]
+  (let [query (-> event .-target .-value)]
     (when (= "Enter" (-> event .-key))
       (set! (-> "page-number" get-by-id .-value) 1)
-      (->
-        (js/fetch (make-url
-                    (str table-id "/get")
-                    1
-                    query
-                    @records-limit))
-        (.then #(.json %))
-        (.then #(render-table (js->clj % :keywordize-keys true)))))))
+      (execute-query))))
 
 (defn add-event-listeners
   []

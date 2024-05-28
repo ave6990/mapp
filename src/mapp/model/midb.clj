@@ -16,17 +16,40 @@
 (db/defdb midb)
 
 (defn write!
-  [id data]
+  [tab-id data]
   (if (:id data)
       (jdbc/update!
         midb
-        id
+        tab-id
         data
         ["id = ?" (:id data)])
       (jdbc/insert!
         midb
-        id
+        tab-id
         data)))
+
+(defn delete!
+  [tab-id id]
+  (jdbc/delete!
+    midb
+    tab-id
+    ["id = ?" id]))
+
+(defn copy!
+  [tab-id id]
+  (let [table (string/replace (str tab-id) #":" "")
+        data (first (jdbc/query
+                midb
+                (str
+                  "select *
+                   from " table
+                   " where
+                     id = " id)))]
+    (println table data)
+    (jdbc/insert!
+      midb
+      tab-id
+      (assoc-in data [:id] nil))))
 
 (defmacro ^:private q-replace
   "The macros expand to:
