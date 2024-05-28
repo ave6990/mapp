@@ -1,33 +1,3 @@
-  [model]
-  [:tr
-    (for [[id nm _] model]
-      [:th {:class (str "col" id)}
-                 nm])
-    #_(map (fn [[id nm _]]
-             [:th {:class (str "col" id)}
-                 nm])
-         model)])
-(create-table-header
-          '([:id "id" nil]
-            [:name "name" nil]))
-(defn create-table-row
-  [model row-data]
-  (let [ids (for [[id _ _] model] id) 
-        editables (for [[_ _ editable] model] editable)]
-    [:tr 
-      (map (fn [id editable]
-               [:td {:class (str "col" id)
-                    :contenteditable editable}
-                 (id row-data)])
-           ids
-           editables)]))
-(create-table-row
-  '([:id "id" nil]
-    [:name "name" nil])
-  '({:id 123 :name "peter"}
-    {:id 456 :name "petra"}))
-(defn create-table-row
-  [model row-data]
   (let [ids (for [[id _ _] model] id) 
         editables (for [[_ _ editable] model] editable)]
     (println ids)
@@ -498,3 +468,33 @@ kkkj
                   (map? v) (keywordize v)
                   :else v)]))))
 (keywordize m)
+(conj [1 2 3 4] 3)
+(conj [1 2 34 45] [23 3454])
+(cons [1 2 34 45] [23 3454])
+(cons (flatten [1 2 34 45]) [23 3454])
+(merge [1 2 34 45] [23 3454])
+(merge '(1 2 34 45) '(23 3454))
+(join '(1 2 34 45) '(23 3454))
+(def default-context-menu
+  [["Снять выделение" "ctx-menu-action-unselect"]
+   ["-" "-"]
+   ["Записать" "ctx-menu-action-save"]
+   ["Копировать" "ctx-menu-action-copy"]
+   ["Удалить" "ctx-menu-action-delete"]])
+(defn add-context-menu-items
+  [xs]
+  (reduce (fn [menu item]
+              (conj menu item))
+          default-context-menu
+          xs))
+(add-context-menu-items
+  [["КСП" "ctx-menu-action-refs-set"]
+   ["Операции" "ctx-menu-action-ops"]])
+(add-context-menu-items
+  [["-" "-"]
+   ["КСП" "ctx-menu-action-refs-set"]
+   ["Операции" "ctx-menu-action-ops"]])
+(add-context-menu-items
+  []#_[["-" "-"]
+   ["КСП" "ctx-menu-action-refs-set"]
+   ["Операции" "ctx-menu-action-ops"]])

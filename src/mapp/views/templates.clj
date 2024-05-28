@@ -103,6 +103,20 @@
     (gen-page-head title)
     content])
 
+(def default-context-menu
+  [["Снять выделение" "ctx-menu-action-unselect"]
+   ["-" "-"]
+   ["Записать" "ctx-menu-action-save"]
+   ["Копировать" "ctx-menu-action-copy"]
+   ["Удалить" "ctx-menu-action-delete"]])
+
+(defn ^:private add-context-menu-items
+  [xs]
+  (reduce (fn [menu item]
+              (conj menu item))
+          default-context-menu
+          xs))
+
 (defn context-menu-item
   [text action]
   (if (= "-" text) 
@@ -120,7 +134,7 @@
      [:ul {:class "context-menu-items"}
        (map (fn [[name action]]
                 (context-menu-item name action))
-            xs)]]) 
+            (add-context-menu-items xs))]]) 
 
 (defn popup
   [id content]
@@ -172,17 +186,12 @@
 (def footer
   [:footer
       [:p "Mapp, версия 2024-05-15"]
-      (context-menu [["Снять выделение" "ctx-menu-action-unselect"]
-                     ["-" "-"]
-                     ["Записать" "ctx-menu-action-save"]
-                     ["Копировать" "ctx-menu-action-copy"]
-                     ["Удалить" "ctx-menu-action-delete"]])
       (save-popup)
       (copy-popup)
       (delete-popup)])
 
 (defn page-template 
-  [toolbar query-panel table edit-panel]
+  [toolbar query-panel table edit-panel context-menu]
   [:body
     [:header
       main-menu]
@@ -190,7 +199,8 @@
       [:section {:id "toolbar-panel"} toolbar]
       [:section {:id "query-panel"} query-panel]
       [:section {:id "table-panel"} table]
-      [:section {:id "edit-panel"} edit-panel]]
+      [:section {:id "edit-panel"} edit-panel]
+      context-menu]
     footer])
 
 (defn create-table-header

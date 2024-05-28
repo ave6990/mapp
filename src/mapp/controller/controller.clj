@@ -86,7 +86,7 @@
                    :model fields-settings})}))
 
 (defn get-page
-  [title table-id params get-fn fields-settings toolbar-settings]
+  [title table-id params get-fn fields-settings toolbar-settings context-menu-settings]
   (let [request (parse-request params)
         {:keys [query limit offset]} request
         records (get-fn
@@ -112,10 +112,12 @@
               table-id
               fields-settings
               data)
-            nil))))))
+            nil
+            (tmpl/context-menu
+              context-menu-settings)))))))
 
 (defmacro make-get-page
-  [title table-id fields-settings toolbar-settings]
+  [title table-id fields-settings toolbar-settings context-menu-settings]
   (let [req (gensym "req")
         params (gensym "params")]
     `(defn ~(symbol (str "get-" table-id "-page"))
@@ -131,14 +133,15 @@
            ~params
            ~(symbol (str "midb/get-" table-id))
            ~fields-settings
-           ~toolbar-settings)))))
+           ~toolbar-settings
+           ~context-menu-settings)))))
 
-(make-get-page "Журнал ПР" "verifications" vs/fields-settings vs/toolbar-fields-settings)
-(make-get-page "Условия поверки" "conditions" cs/fields-settings cs/toolbar-fields-settings)
-(make-get-page "Эталоны" "references" refs/fields-settings refs/toolbar-fields-settings)
-(make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings)
-(make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings)
-(make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings)
+(make-get-page "Журнал ПР" "verifications" vs/fields-settings vs/toolbar-fields-settings [])
+(make-get-page "Условия поверки" "conditions" cs/fields-settings cs/toolbar-fields-settings [])
+(make-get-page "Эталоны" "references" refs/fields-settings refs/toolbar-fields-settings [])
+(make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings [])
+(make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings [])
+(make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings [])
 
 (defn get-verifications-data
   [req]
