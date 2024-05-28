@@ -14,9 +14,9 @@
 (defn make-url
   [section page query limit]
   (str site 
-       section "/"
-       page "?q="
-       query "&limit="
+       section "?q="
+       query "&page="
+       page "&limit="
        limit))
 
 (defn get-table-id
@@ -50,7 +50,7 @@
     (set! (-> event .-target .-value) p-num)
     (->
       (js/fetch (make-url
-                  table-id
+                  (str table-id "/get")
                   p-num
                   (get-value "query")
                   @records-limit))

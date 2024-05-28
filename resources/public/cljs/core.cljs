@@ -10,6 +10,11 @@
     [cljs.query-panel-handlers :as query-handlers]
     [cljs.context-menu :as ctx-menu]))
 
+(defn stringify
+  [data]
+  (.stringify js/JSON
+              (clj->js data)))
+
 (defn read-selected-rows
   []
   (let [rows (get-by-class "selected")]
@@ -24,13 +29,12 @@
 
 (defn ctx-action-write
   [event]
-  (let [data (read-selected-rows)
-        sdata (.stringify js/JSON (clj->js data))]
-    (println (.stringify js/JSON (clj->js data)))
-    (js/fetch "/add-verifications"
+  (let [sdata (stringify (read-selected-rows))]
+    (table-handlers/unselect-rows)
+    (js/fetch "/verifications/save"
       (clj->js {:method "POST"
-       :headers {"Content-type" "application/json;charset=utf-8"}
-       :body sdata}))))
+                :headers {"Content-type" "application/json;charset=utf-8"}
+                :body sdata}))))
 
 (defn ctx-action-copy
   [event]

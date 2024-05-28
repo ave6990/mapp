@@ -1,6 +1,7 @@
 (ns mapp.controller.controller
   (:require
     [clojure.string :as string]
+    [clojure.pprint :refer [pprint]]
     [net.cgrand.enlive-html :as html] ;;DELETE not used
     [hiccup2.core :as h]
     [mapp.model.midb :as midb]
@@ -39,7 +40,7 @@
   [params]
   (let [limit (read-string (:limit params))
         query (:q params)
-        page (read-string (:id params))
+        page (read-string (:page params))
         offset (calc-offset page limit)]
     {:query query
      :limit limit
@@ -100,7 +101,7 @@
     `(defn ~(symbol (str "get-" table-id "-page"))
        [~req]
        (let [~params (if (zero? (count ~req))
-                     {:id "1"
+                     {:page "1"
                       :q ""
                       :limit "100"}
                      ~req)]
@@ -145,4 +146,12 @@
 
 (defn write-verifications
   [body]
-  (println body))
+  (pprint body))
+
+(defn copy-verifications
+  [body]
+  (pprint body))
+
+(defn delete-verifications
+  [body]
+  (pprint body))

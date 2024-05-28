@@ -13,18 +13,20 @@
 
 (defroutes app-routes
   (GET "/" req (c/get-verifications-page (:params req)))
-  (GET "/verifications/:id" req (response (c/get-verifications-data (:params req))))
-  (POST "/add-verifications" req (response (pprint req)) #_(c/write-verifications (:body req)))
+  (GET "/verifications/get" req (response (c/get-verifications-data (:params req))))
+  (POST "/verifications/save" req (response (c/write-verifications (:body req))))
+  (POST "/verifications/copy" req (response (c/copy-verifications (:body req))))
+  (DELETE "/verifications/delete" req (response (c/delete-verifications (:body req))))
   (GET "/conditions" req (c/get-conditions-page (:params req)))
-  (GET "/conditions/:id" req (response (c/get-conditions-data (:params req))))
+  (GET "/conditions/get" req (response (c/get-conditions-data (:params req))))
   (GET "/gso" req (c/get-gso-page (:params req)))
-  (GET "/gso/:id" req (response (c/get-gso-data (:params req))))
+  (GET "/gso/get" req (response (c/get-gso-data (:params req))))
   (GET "/references" req (c/get-references-page (:params req)))
-  (GET "/references/:id" req (response (c/get-references-data (:params req))))
+  (GET "/references/get" req (response (c/get-references-data (:params req))))
   (GET "/counteragents" req (c/get-counteragents-page (:params req)))
-  (GET "/counteragents/:id" req (response (c/get-counteragents-data req)))
+  (GET "/counteragents/get" req (response (c/get-counteragents-data req)))
   (GET "/methodology" req (c/get-methodology-page (:params req)))
-  (GET "/methodology/:id" req (response (c/get-methodology-data (:params req))))
+  (GET "/methodology/get" req (response (c/get-methodology-data (:params req))))
   (route/not-found "Not Found"))
 
 (def app
