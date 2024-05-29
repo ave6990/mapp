@@ -28,6 +28,12 @@
         tab-id
         data)))
 
+(defn write-multi!
+  [tab-id data]
+  (dorun
+    (for [rec data]
+         (write! tab-id rec))))
+
 (defn delete!
   [tab-id id]
   (jdbc/delete!

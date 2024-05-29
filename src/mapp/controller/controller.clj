@@ -205,6 +205,63 @@
              rec)))
     (println "Save verification records complete! ")))
 
+(defn filter-refs
+  [data type-id]
+  (filter (fn [rec]
+              (= type-id (:type_id rec)))
+          data))
+
+(defn change-field
+  [data k]
+  (map (fn [{:keys [id v_id ref_id]}]
+           {:id id :v_id v_id k ref_id})
+       data))
+
+(defn prepare-data
+  [data type-id field]
+  (-> data
+      (filter-refs type-id)
+      (change-field field)))
+
+(defn write-gso
+  [data]
+  (midb/write-multi!
+    :v_gso
+    data))
+
+(defn write-refs
+  [data]
+  (midb/write-multi!
+    :v_refs
+    data))
+
+(defn write-opt-refs
+  [data]
+  (midb/write-multi!
+    :v_opt_refs
+    data))
+
+(defn write-refs-set
+  [body]
+  (let [data (-> body keywordize :data)
+        gso (prepare-data data "3" :gso_id)
+        refs (prepare-data data "1" :ref_id)
+        opt-refs (prepare-data data "2" :ref_id)]
+    (when (not (empty? gso))
+          (write-gso gso))
+    (when (not (empty? refs))
+          (write-refs refs))
+    (when (not (empty? opt-refs))
+          (write-opt-refs opt-refs))))
+
+(defn copy-refs-set
+  [body]
+  ())
+
+(defn delete-refs-set
+  [body]
+  ())
+
 (defn copy-verifications
   [body]
   (let [{:keys [id cnt]} (keywordize body)]
