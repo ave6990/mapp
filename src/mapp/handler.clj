@@ -27,7 +27,7 @@
   (GET "/references" req (c/get-references-page (:params req)))
   (GET "/references/get" req (response (c/get-references-data (:params req))))
   (GET "/counteragents" req (c/get-counteragents-page (:params req)))
-  (GET "/counteragents/get" req (response (c/get-counteragents-data req)))
+  (GET "/counteragents/get" req (response (c/get-counteragents-data (:params req))))
   (GET "/methodology" req (c/get-methodology-page (:params req)))
   (GET "/methodology/get" req (response (c/get-methodology-data (:params req))))
   (GET "/operations" req (c/get-operations-page (:params req)))

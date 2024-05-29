@@ -12,7 +12,7 @@
   '(["id" " id "]
     ["наименование" " (short_name || ' ' || name) LIKE '**' "]
     ["инн" " inn "]
-    [" адрес " " address "]))
+    ["адрес" " address "]))
 
 (def fields-settings
   '([:id "id" true]
