@@ -74,6 +74,18 @@
     (.open js/window
       (make-url "measurements" "v_id = " ids))))
 
+(defn ctx-action-channels
+  [event]
+  (let [ids (->> (table/read-selected-rows) (map :methodology_id) set)]
+    (.open js/window
+      (make-url "channels" "methodology_id = " ids))))
+
+(defn ctx-action-metrology
+  [event]
+  (let [ids (->> (table/read-selected-rows) (map :id) set)]
+    (.open js/window
+      (make-url "metrology" "channel_id = " ids))))
+
 (def menu-actions
   {"ctx-menu-action-save" ctx-action-save
    "ctx-menu-action-copy" ctx-action-copy
@@ -83,6 +95,8 @@
    "ctx-menu-action-methodology" ctx-action-methodology
    "ctx-menu-action-operations" ctx-action-operations
    "ctx-menu-action-measurements" ctx-action-measurements
+   "ctx-menu-action-channels" ctx-action-channels
+   "ctx-menu-action-metrology" ctx-action-metrology
    "ctx-menu-action-refs-set" ctx-action-refs-set})
 
 (defn add-event-listeners

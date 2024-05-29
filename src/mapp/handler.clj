@@ -42,6 +42,16 @@
   (POST "/measurements/save" req (response (c/save-records (:body req))))
   (POST "/measurements/copy" req (response (c/copy-record (:body req))))
   (DELETE "/measurements/delete" req (response (c/delete-records (:body req))))
+  (GET "/channels" req (c/get-channels-page (:params req)))
+  (GET "/channels/get" req (response (c/get-channels-data (:params req))))
+  (POST "/channels/save" req (response (c/save-records (:body req))))
+  (POST "/channels/copy" req (response (c/copy-record (:body req))))
+  (DELETE "/channels/delete" req (response (c/delete-records (:body req))))
+  (GET "/metrology" req (c/get-metrology-page (:params req)))
+  (GET "/metrology/get" req (response (c/get-metrology-data (:params req))))
+  (POST "/metrology/save" req (response (c/save-records (:body req))))
+  (POST "/metrology/copy" req (response (c/copy-record (:body req))))
+  (DELETE "/metrology/delete" req (response (c/delete-records (:body req))))
   (route/not-found "Not Found"))
 
 (def app

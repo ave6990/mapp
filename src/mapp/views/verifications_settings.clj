@@ -86,4 +86,5 @@
     ["КСП" "ctx-menu-action-refs-set"]
     ["Операции поверки" "ctx-menu-action-operations"]
     ["Измерения" "ctx-menu-action-measurements"]
+    ["Каналы измерений" "ctx-menu-action-channels"]
     ["Методика" "ctx-menu-action-methodology"]))

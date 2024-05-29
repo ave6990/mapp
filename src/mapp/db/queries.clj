@@ -175,6 +175,40 @@
   {limit}
   {offset};")
 
+(def get-channels-records-count
+  "select
+    count(*) as count
+  from
+  (select *
+  from
+    channels
+  {where});")
+
+(def get-channels
+  "select *
+  from
+    channels
+  {where}
+  {limit}
+  {offset};")
+
+(def get-metrology-records-count
+  "select
+    count(*) as count
+  from
+  (select *
+  from
+    metrology
+  {where});")
+
+(def get-metrology
+  "select *
+  from
+    metrology
+  {where}
+  {limit}
+  {offset};")
+
 (def get-operations-records-count
   "select
     count(*) as count

@@ -15,6 +15,8 @@
     [mapp.views.operations-settings :as ops]
     [mapp.views.refs-set-settings :as refs-set]
     [mapp.views.measurements-settings :as meas]
+    [mapp.views.channels-settings :as ch]
+    [mapp.views.metrology-settings :as metr]
     [mapp.views.conditions-settings :as cs]))
 
 (defn keywordize
@@ -146,6 +148,8 @@
 (make-get-page "Операции поверки" "operations" ops/fields-settings ops/toolbar-fields-settings [])
 (make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
 (make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings [])
+(make-get-page "Каналы измерений" "channels" ch/fields-settings ch/toolbar-fields-settings ch/context-menu-settings)
+(make-get-page "Метрологические характеристики" "metrology" metr/fields-settings metr/toolbar-fields-settings [])
 
 (defn get-verifications-data
   [req]
@@ -174,6 +178,14 @@
 (defn get-operations-data
   [req]
   (get-data req midb/get-operations ops/fields-settings))
+
+(defn get-channels-data
+  [req]
+  (get-data req midb/get-channels ch/fields-settings))
+
+(defn get-metrology-data
+  [req]
+  (get-data req midb/get-metrology metr/fields-settings))
 
 (defn get-refs-set-data
   [req]

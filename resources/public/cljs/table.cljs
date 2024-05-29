@@ -46,7 +46,7 @@
 
 (defn get-data
   [el]
-  (let [s (-> el .-innerHTML)]
+  (let [s (-> el .-textContent)]
     (if (= "" s)
         nil
         s)))
