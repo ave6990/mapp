@@ -1,29 +1,3 @@
-(create-table-header
-          '([:id "id" true]
-            [:name "name" true]))
-(create-table-row
-  '([:id "id" nil]
-    [:name "name" nil])
-  '({:id 123 :name "peter"}
-    {:id 456 :name "petra"}))
-(create-table-row
-  '([:id "id" true]
-    [:name "name" true])
-  '({:id 123 :name "peter"}
-    {:id 456 :name "petra"}))
-(create-table-row
-  '([:id "id" true]
-    [:name "name" true])
-  {:id 123 :name "peter"})
-(str (h/html
-(create-table-row
-  '([:id "id" true]
-    [:name "name" true])
-  {:id 123 :name "peter"})))
-(str (h/html
-(create-table-rows
-  '([:id "id" true]
-    [:name "name" true])
   '({:id 123 :name "peter"}
     {:id 456 :name "petra"})))
 (str (h/html
@@ -498,3 +472,29 @@ kkkj
   '(["id поверки" " v_id "]
     ["id эталона" " ref_id "]
     ["номер 1C" " number_1c "]))
+(defn make-filter-query
+  [where ids]
+  (str where
+       (string/join (str "or " where) ids)))
+(make-filter-query "id = " [1 2 3 4])
+(defn make-filter-query
+  [where ids]
+  (str where
+       (string/join (str " or " where) ids)))
+(make-filter-query "id = " [1 2 3 4])
+(make-filter-query "id = " '(1 2 3 4))
+(defn f
+  [a b]
+  (+ a b))
+(f 1 4)
+(defn make-filter-query
+  [where ids]
+  (str where
+       (string/join (str " or " where) ids)))
+(make-filter-query "id = " '(1 2 3 4))
+(require '[clojure.string :as string])
+(defn make-filter-query
+  [where ids]
+  (str where
+       (string/join (str " or " where) ids)))
+(make-filter-query "id = " '(1 2 3 4))

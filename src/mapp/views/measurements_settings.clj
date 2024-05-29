@@ -1,4 +1,4 @@
-(ns mapp.view.measurements-settings)
+(ns mapp.views.measurements-settings)
 
 (def column-settings
   [[:id 50 nil]
@@ -22,15 +22,15 @@
     ["v_id" " v.id "]
     ["зав. №" " v.serial_number "]))
 
-(def edit-panel-settings
-  '(["id" :id true]
-    ["id поверки" :v_id true]
-    ["Зав. №" :serial_number false]
-    ["Имя канала" :channel_name false]
-    ["Канал" :channel false]
-    ["id МХ" :metrology_id true]
-    ["Изм. значение" :value true]
-    ["Знач. (вариация)" :value_2 true]
-    ["Действ. знач." :ref_value true]
-    ["Текст" :text true]
-    ["Комментарий" :comment true]))
+(def fields-settings
+  '([:id "id" true]
+    [:v_id "id поверки" true]
+    [:serial_number "Зав. №" false]
+    [:channel_name "Имя канала" false]
+    [:channel "Канал" false]
+    [:metrology_id "id МХ" true]
+    [:value "Изм. значение" true]
+    [:value_2 "Знач. (вариация)" true]
+    [:ref_value "Действ. знач." true]
+    [:text "Текст" true]
+    [:comment "Комментарий" true]))

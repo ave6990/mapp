@@ -2,8 +2,7 @@
 
 (def column-settings
   [[:id 50 nil]
-   [:upload 25 nil]
-   [:count 100 nil]
+   [:upload 25 nil] [:count 100 nil]
    [:counteragent 50 nil]
    [:ca_short_name 350 nil]
    [:conditions 50 nil]
@@ -85,4 +84,6 @@
 (def context-menu-settings
   '(["-" "-"]
     ["КСП" "ctx-menu-action-refs-set"]
-    ["Операции поверки" "ctx-menu-action-operations"]))
+    ["Операции поверки" "ctx-menu-action-operations"]
+    ["Измерения" "ctx-menu-action-measurements"]
+    ["Методика" "ctx-menu-action-methodology"]))

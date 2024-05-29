@@ -2,9 +2,8 @@
   (:require
     [clojure.string :as string]
     [cljs.dom-functions :refer :all]
-    [cljs.table :refer [read-selected-rows]]
-    [cljs.table-handlers :as table-handlers]
-    [cljs.query-panel-handlers :as query-handlers]))
+    [cljs.table :as table]
+    [cljs.table-handlers :as table-handlers]))
 
 (defn popup-no-click
   [event]
@@ -14,8 +13,8 @@
 
 (defn save-popup-yes-click
   [event]
-  (let [records (read-selected-rows)
-        tab-id (query-handlers/get-table-id)]
+  (let [records (table/read-selected-rows)
+        tab-id (table/get-table-id)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "save-popup") "show-popup")
     (js/fetch (str "/" tab-id "/save")
@@ -28,7 +27,7 @@
   [event]
   (let [rec-num (read-string (get-html "copy-record-number"))
         cnt (read-string (get-value "copy-count"))
-        tab-id (query-handlers/get-table-id)]
+        tab-id (table/get-table-id)]
     (.log js/console "Copy record " rec-num cnt " times")
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "copy-popup") "show-popup")
@@ -41,12 +40,12 @@
 
 (defn delete-popup-yes-click
   [event]
-  (let [data (read-selected-rows)
+  (let [data (table/read-selected-rows)
         ids (map :id
                  data)
         rec-nums (map read-string
                       ids)
-        tab-id (query-handlers/get-table-id)]
+        tab-id (table/get-table-id)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "delete-popup") "show-popup")
     (println ids)

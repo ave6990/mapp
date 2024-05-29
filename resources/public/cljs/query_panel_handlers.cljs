@@ -2,29 +2,17 @@
   (:require
     [reagent.core :as r]
     [reagent.dom :as dom]
+    [cljs.config :as cnfg]
     [cljs.dom-functions :refer :all]
     [cljs.table :as table]
     [cljs.table-handlers :as table-handlers]))
 
-(def records-limit
-  (r/atom 100))
-
-(def site "http://localhost:3000/")
-
 (defn make-url
   [section page query limit]
-  (str site 
-       section "?q="
-       query "&page="
-       page "&limit="
-       limit))
-
-(defn get-table-id
-  []
-  (-> "table-panel"
-      get-by-id
-      .-firstChild
-      .-id))
+  (str cnfg/site section 
+       "?q=" query
+       "&page=" page
+       "&limit=" limit))
 
 (defn render-table
   [resp]
@@ -41,7 +29,7 @@
 
 (defn execute-query
   []
-  (let [table-id (get-table-id)
+  (let [table-id (table/get-table-id)
         query (get-value "query")
         page-number (read-string
                       (get-value "page-number"))]
@@ -51,7 +39,7 @@
                   (str table-id "/get")
                   page-number
                   query
-                  @records-limit))
+                  @cnfg/records-limit))
       (.then #(.json %))
       (.then #(render-table (js->clj % :keywordize-keys true))))))
 

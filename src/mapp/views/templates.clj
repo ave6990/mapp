@@ -19,22 +19,31 @@
              :type "text/css"
              :href "/css/styles.css"}]
     [:script {:crossorigin "false"
-              :src "https://unpkg.com/react@17/umd/react.production.min.js"}]
+              ;:src "https://unpkg.com/react@17/umd/react.production.min.js"}]
+              :src "/libs/react.production.min.js"}]
     [:script {:crossorigin "false"
-              :src "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"}]
-    [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.js"
+              ;:src "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"}]
+              :src "/libs/react-dom.production.min.js"}]
+    [:script {;:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.js"
+              :src "/libs/scittle.js"
               :type "application/javascript"}]
-    [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.reagent.js"
+    [:script {;:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.reagent.js"
+              :src "/libs/scittle.reagent.js"
               :type "application/javascript"}]
-    [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
+    [:script {;:src "https://cdn.jsdelivr.net/npm/scittle@0.6.17/dist/scittle.cljs-ajax.js"
+              :src "/libs/scittle.cljs-ajax.js"
               :type "application/javascript"}]
     [:script {:src "/cljs/dom_functions.cljs"
+              :type "application/x-scittle"}]
+    [:script {:src "/cljs/config.cljs"
               :type "application/x-scittle"}]
     [:script {:src "/cljs/table.cljs"
               :type "application/x-scittle"}]
     [:script {:src "/cljs/context_menu.cljs"
               :type "application/x-scittle"}]
     [:script {:src "/cljs/table_handlers.cljs"
+              :type "application/x-scittle"}]
+    [:script {:src "/cljs/context_menu_handlers.cljs"
               :type "application/x-scittle"}]
     [:script {:src "/cljs/query_panel_handlers.cljs"
               :type "application/x-scittle"}]

@@ -30,6 +30,18 @@
   (GET "/counteragents/get" req (response (c/get-counteragents-data req)))
   (GET "/methodology" req (c/get-methodology-page (:params req)))
   (GET "/methodology/get" req (response (c/get-methodology-data (:params req))))
+  (GET "/operations" req (c/get-operations-page (:params req)))
+  (GET "/operations/get" req (response (c/get-operations-data (:params req))))
+  (POST "/operations/save" req (response (c/save-records (:body req))))
+  (POST "/operations/copy" req (response (c/copy-record (:body req))))
+  (DELETE "/operations/delete" req (response (c/delete-records (:body req))))
+  (GET "/refs-set" req (c/get-refs-set-page (:params req)))
+  (GET "/refs-set/get" req (response (c/get-refs-set-data (:params req))))
+  (GET "/measurements" req (c/get-measurements-page (:params req)))
+  (GET "/measurements/get" req (response (c/get-measurements-data (:params req))))
+  (POST "/measurements/save" req (response (c/save-records (:body req))))
+  (POST "/measurements/copy" req (response (c/copy-record (:body req))))
+  (DELETE "/measurements/delete" req (response (c/delete-records (:body req))))
   (route/not-found "Not Found"))
 
 (def app

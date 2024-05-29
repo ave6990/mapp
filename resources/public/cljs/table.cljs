@@ -74,3 +74,9 @@
       (for [row rows]
            (read-row row)))))
 
+(defn get-table-id
+  []
+  (-> "table-panel"
+      get-by-id
+      .-firstChild
+      .-id))

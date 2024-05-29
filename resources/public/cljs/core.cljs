@@ -8,51 +8,8 @@
     [cljs.table-handlers :as table-handlers]
     [cljs.query-panel-handlers :as query-handlers]
     [cljs.popups :as popups]
-    [cljs.context-menu :as ctx-menu]))
-
-;;## context-menu event listener functions
-(defn ctx-action-unselect
-  [event]
-  (table-handlers/unselect-rows))
-
-(defn ctx-action-select-all
-  [event]
-  (table-handlers/select-all-rows))
-
-(defn ctx-action-save
-  [event]
-  (let [sdata (stringify (table/read-selected-rows))]
-    (println "Save")
-    (add-class (get-by-id "save-popup") "show-popup")))
-
-(defn ctx-action-copy
-  [event]
-  (let [row (first (get-by-class "selected"))
-        data (table/read-row row)]
-    (println "Copy")
-    (set-html "copy-record-number" (:id data))
-    (add-class (get-by-id "copy-popup") "show-popup")))
-
-(defn ctx-action-delete
-  [event]
-  (let [ids (map :id
-                 (table/read-selected-rows))]
-    (println "Delete")
-    (set-html "delete-record-numbers" (string/join ", " ids))
-    (add-class (get-by-id "delete-popup") "show-popup")))
-
-(def menu-actions
-  {"ctx-menu-action-save" ctx-action-save
-   "ctx-menu-action-copy" ctx-action-copy
-   "ctx-menu-action-delete" ctx-action-delete
-   "ctx-menu-action-unselect" ctx-action-unselect
-   "ctx-menu-action-select-all" ctx-action-select-all})
-
-(defn add-context-menu-event-listener
-  []
-  (doall
-    (for [el (get-by-class "context-menu-item")]
-         (.addEventListener el "click" (ctx-menu/item-click menu-actions)))))
+    [cljs.context-menu :as ctx-menu]
+    [cljs.context-menu-handlers :as ctx-menu-handlers]))
 
 (defn text-snippets-dragstart
   [event]
@@ -81,7 +38,7 @@
            (.addEventListener el "dragstart" text-snippets-dragstart))))
   (add-reload-event-listener)
   (table-handlers/add-event-listeners)
-  (add-context-menu-event-listener)
+  (ctx-menu-handlers/add-event-listeners)
   (popups/add-popup-event-listeners))
 
 (add-behavior)

@@ -12,7 +12,9 @@
     [mapp.views.references-settings :as refs]
     [mapp.views.counteragents-settings :as ca]
     [mapp.views.methodology-settings :as met]
+    [mapp.views.operations-settings :as ops]
     [mapp.views.refs-set-settings :as refs-set]
+    [mapp.views.measurements-settings :as meas]
     [mapp.views.conditions-settings :as cs]))
 
 (defn keywordize
@@ -92,10 +94,7 @@
         {:keys [query limit offset]} request
         records (get-fn
                   query limit offset)
-        {:keys [recs-count data]} records
-        l (println query limit offset recs-count)
-        k (pprint data)
-        ]
+        {:keys [recs-count data]} records]
     (str
       (h/html
         (tmpl/gen-page
@@ -144,7 +143,9 @@
 (make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings [])
 (make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings [])
 (make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings [])
+(make-get-page "Операции поверки" "operations" ops/fields-settings ops/toolbar-fields-settings [])
 (make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
+(make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings [])
 
 (defn get-verifications-data
   [req]
@@ -169,6 +170,18 @@
 (defn get-methodology-data
   [req]
   (get-data req midb/get-methodology met/fields-settings))
+
+(defn get-operations-data
+  [req]
+  (get-data req midb/get-operations ops/fields-settings))
+
+(defn get-refs-set-data
+  [req]
+  (get-data req midb/get-refs-set refs-set/fields-settings))
+
+(defn get-measurements-data
+  [req]
+  (get-data req midb/get-measurements meas/fields-settings))
 
 (defn write-verifications
   [body]

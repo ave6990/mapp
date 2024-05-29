@@ -2,8 +2,8 @@
 
 (def fields-settings
   [[:expiration "Срок годности" false]
-   [:v_id "ID поверки" true]
-   [:ref_id "ID эталона" true]
+   [:v_id "ID поверки" false]
+   [:ref_id "ID эталона" false]
    [:mi_name "Наименование СИ" false]
    [:mi_type "Тип, модификация СИ" false]
    [:components "Состав" false]

@@ -1,4 +1,4 @@
-(ns mapp.view.operations-settings)
+(ns mapp.views.operations-settings)
 
 (def column-settings
   [[:id 50 nil]
@@ -16,12 +16,12 @@
     ["v_id" " v_op.v_id "]
     ["МП" " op.methodology_id "]))
 
-(def edit-panel-settings
-  '(["id" :id true]
-    ["id операции" :op_id true]
-    ["id поверки" :v_id true]
-    ["Соответствует" :result true]
-    ["Операция" :name false]
-    ["Причина" :unusability true]
-    ["Тип поверки" :verification_type false]
-    ["Комментарий" :comment false]))
+(def fields-settings
+  '([:id "id" true]
+    [:op_id "id операции" true]
+    [:v_id "id поверки" true]
+    [:result "Соответствует" true]
+    [:name "Операция" false]
+    [:unusability "Причина непригодности" true]
+    [:verification_type "Тип поверки" false]
+    [:comment "Комментарий" false]))
