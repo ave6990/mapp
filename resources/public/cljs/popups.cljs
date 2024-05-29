@@ -3,7 +3,8 @@
     [clojure.string :as string]
     [cljs.dom-functions :refer :all]
     [cljs.table :as table]
-    [cljs.table-handlers :as table-handlers]))
+    [cljs.table-handlers :as table-handlers]
+    [cljs.query-panel-handlers :as query-handler])) ;;TOFIX for autorefreshing page after data changing
 
 (defn popup-no-click
   [event]

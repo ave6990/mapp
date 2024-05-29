@@ -130,6 +130,7 @@
                       :q ""
                       :limit "100"}
                      ~req)]
+         (println ~params)
          (mapp.controller.controller/get-page
            ~title
            ~table-id
