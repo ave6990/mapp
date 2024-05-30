@@ -1,3 +1,6 @@
 #vim
 *.swp
 *.swo
+
+#signs images
+/resources/public/img/signs

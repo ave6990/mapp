@@ -92,7 +92,9 @@
 
 (defn ctx-action-protocols
   [event]
-  ())
+  (let [ids (->> (table/read-selected-rows) (map :id) set)]
+    (.open js/window
+      (make-url "protocols" " id = " ids))))
 
 (def menu-actions
   {"ctx-menu-action-save" ctx-action-save

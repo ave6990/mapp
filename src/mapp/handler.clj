@@ -88,6 +88,7 @@
     query-save
     query-copy
     query-delete)
+  (GET "/protocols" req (c/get-protocols (:params req)))
   (route/not-found "Not Found"))
 
 (def app

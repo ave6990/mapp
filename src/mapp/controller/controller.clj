@@ -17,7 +17,8 @@
     [mapp.views.measurements-settings :as meas]
     [mapp.views.channels-settings :as ch]
     [mapp.views.metrology-settings :as metr]
-    [mapp.views.conditions-settings :as cs]))
+    [mapp.views.conditions-settings :as cs]
+    [mapp.utils.protocol :as pr]))
 
 (defn keywordize
   "Функция преобразующая ключи входящего JSON в keyword"
@@ -150,6 +151,11 @@
 (make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings [])
 (make-get-page "Каналы измерений" "channels" ch/fields-settings ch/toolbar-fields-settings ch/context-menu-settings)
 (make-get-page "Метрологические характеристики" "metrology" metr/fields-settings metr/toolbar-fields-settings [])
+
+(defn get-protocols
+  [req]
+  (let [data (midb/get-protocols-data (:q req))]
+    (pr/protocols data)))
 
 (defn get-verifications-data
   [req]

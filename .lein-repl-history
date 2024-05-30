@@ -1,31 +1,3 @@
-(keywordize m)
-(defn keywordize
-  [m]
-  (into {}
-        (for [[k v] m]
-             (do
-               (println k (type v) (map? v))
-               [(keyword k) (if (vector? v)
-                                ()
-                                (if ()
-                                    ()
-                                    ()))]))))
-(keywordize m)
-(defn keywordize
-  [m]
-  (into {}
-        (for [[k v] m]
-             (do
-               (println k (type v) (map? v))
-               [(keyword k) 
-                (cond
-                  (vector? v) (vec (map keywordize v)
-                  (map? v) (keywordize v)
-                  :else v))
-                #_(if (vector? v)
-                                (vec (map keywordize v))
-                                (if ()
-                                    ()
                                     ()))]))))
 (keywordize m)
 (defn keywordize
@@ -498,3 +470,31 @@
 )
 (f [1.116 1.806])
 (f [1.116 2.15])
+kkkjjj(require '[hiccup2.core :as h])
+(h/html [:td {:class "centered-cells"} "0,0"])
+(require '[net.cgrand.enlive-html :as enlive])
+(reuire '[clojure.repl :refer :all])
+(require '[clojure.repl :refer :all])
+(dir enlive)
+(doc keep)
+(doc identity)
+(defn enlive->hiccup
+   [el]
+   (if-not (string? el)
+     (->> (map enlive->hiccup (:content el))
+       (concat [(:tag el) (:attrs el)])
+       (keep identity)
+       vec)
+     el))
+(defn html->enlive 
+  [html]
+  (first (enlive/html-resource (StringReader. html))))
+(require '[java.io.StringReader :refer [StringReader]] :reload)
+(defn html->enlive 
+  [html]
+  (first (enlive/html-resource (java.io.StringReader. html))))
+(defn html->hiccup [html]
+  (-> html
+      html->enlive
+      enlive->hiccup))
+(html->hiccup "<html><ol></ol></html>")
