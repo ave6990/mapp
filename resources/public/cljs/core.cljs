@@ -21,7 +21,8 @@
   [event]
   (when (= "F5" (-> event .-key))
         (-> event (.preventDefault))
-        (query-handlers/execute-query)))
+        (query-handlers/execute-query)
+        (table-handlers/unselect-rows)))
 
 (defn add-reload-event-listener
   []

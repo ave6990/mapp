@@ -53,8 +53,8 @@
     query-copy
     query-delete)
   (context "/methodology" []
-    (GET "/methodology" req (c/get-methodology-page (:params req)))
-    (GET "/methodology/get" req (response (c/get-methodology-data (:params req))))
+    (GET "/" req (c/get-methodology-page (:params req)))
+    (GET "/get" req (response (c/get-methodology-data (:params req))))
     query-save
     query-copy
     query-delete)
