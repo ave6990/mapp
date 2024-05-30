@@ -15,8 +15,8 @@
 (def toolbar-fields-settings
   '(["id" " id "]
     ["дата" " date "]
-    ["локация" " location "]
-    ["комментарий" " comment "]))
+    ["локация" " location LIKE '**'"]
+    ["комментарий" " comment LIKE '**'"]))
 
 (def fields-settings
   '([:id "id" true]

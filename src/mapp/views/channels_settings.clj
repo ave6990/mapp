@@ -3,8 +3,8 @@
 (def toolbar-fields-settings
   '(["id" " id "]
    ["МП" " methodology_id "]
-   ["компонент" " component "]
-   ["ед._изм." " units "]))
+   ["компонент" " component LIKE '**'"]
+   ["ед._изм." " units LIKE '**'"]))
 
 (def fields-settings
   '([:id "ID" true]

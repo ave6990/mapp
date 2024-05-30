@@ -130,7 +130,6 @@
                       :q ""
                       :limit "100"}
                      ~req)]
-         (println ~params)
          (mapp.controller.controller/get-page
            ~title
            ~table-id
@@ -155,6 +154,16 @@
 (defn get-verifications-data
   [req]
   (get-data req midb/get-verifications vs/fields-settings))
+
+(defn gen-value-verifications
+  [body]
+  (let [ids (:ids (keywordize body))
+        query (str "id = " 
+                   (string/join " or id = " ids))
+        protocols-data (seq (midb/get-protocols-data query))]
+    (println "\n\n\n\n" query)
+    (pprint (midb/gen-values! protocols-data))
+    #_(midb/gen-values! query)))
 
 (defn get-conditions-data
   [req]

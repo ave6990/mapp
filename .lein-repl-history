@@ -1,4 +1,3 @@
-                                ())]))))
 (keywordize m)
 (defn keywordize
   [m]
@@ -498,3 +497,4 @@
 (defn f [xs] (map #(/ % 4.4 0.01) xs)
 )
 (f [1.116 1.806])
+(f [1.116 2.15])

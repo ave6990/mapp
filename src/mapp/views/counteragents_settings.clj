@@ -11,8 +11,8 @@
 (def toolbar-fields-settings
   '(["id" " id "]
     ["наименование" " (short_name || ' ' || name) LIKE '**' "]
-    ["инн" " inn "]
-    ["адрес" " address "]))
+    ["инн" " inn LIKE '**'"]
+    ["адрес" " address LIKE '**'"]))
 
 (def fields-settings
   '([:id "id" true]

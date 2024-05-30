@@ -18,4 +18,4 @@
 (def toolbar-fields-settings
   '(["id поверки" " v_id "]
     ["id эталона" " ref_id "]
-    ["номер 1C" " number_1c "]))
+    ["номер 1C" " number_1c LIKE '**'"]))

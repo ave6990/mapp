@@ -86,6 +86,14 @@
     (.open js/window
       (make-url "metrology" "channel_id = " ids))))
 
+(defn ctx-action-gen-value
+  [event]
+  (add-class (get-by-id "gen-value-popup") "show-popup"))
+
+(defn ctx-action-protocols
+  [event]
+  ())
+
 (def menu-actions
   {"ctx-menu-action-save" ctx-action-save
    "ctx-menu-action-copy" ctx-action-copy
@@ -97,7 +105,9 @@
    "ctx-menu-action-measurements" ctx-action-measurements
    "ctx-menu-action-channels" ctx-action-channels
    "ctx-menu-action-metrology" ctx-action-metrology
-   "ctx-menu-action-refs-set" ctx-action-refs-set})
+   "ctx-menu-action-refs-set" ctx-action-refs-set
+   "ctx-menu-action-gen-value" ctx-action-gen-value
+   "ctx-menu-action-protocols" ctx-action-protocols})
 
 (defn add-event-listeners
   []

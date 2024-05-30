@@ -11,50 +11,83 @@
     [mapp.views.view :as v]
     [mapp.controller.controller :as c]))
 
+(def query-save
+  (POST "/save" req (response (c/save-records (:body req)))))
+
+(def query-copy
+  (POST "/copy" req (response (c/copy-record (:body req)))))
+
+(def query-delete
+  (DELETE "/delete" req (response (c/delete-records (:body req)))))
+
 (defroutes app-routes
   (GET "/" req (c/get-verifications-page (:params req)))
-  (GET "/verifications/get" req (response (c/get-verifications-data (:params req))))
-  (POST "/verifications/save" req (response (c/write-verifications (:body req))))
-  (POST "/verifications/copy" req (response (c/copy-verifications (:body req))))
-  (DELETE "/verifications/delete" req (response (c/delete-verifications (:body req))))
-  (GET "/conditions" req (c/get-conditions-page (:params req)))
-  (GET "/conditions/get" req (response (c/get-conditions-data (:params req))))
-  (POST "/conditions/save" req (response (c/save-records (:body req))))
-  (POST "/conditions/copy" req (response (c/copy-record (:body req))))
-  (DELETE "/conditions/delete" req (response (c/delete-records (:body req))))
-  (GET "/gso" req (c/get-gso-page (:params req)))
-  (GET "/gso/get" req (response (c/get-gso-data (:params req))))
-  (GET "/references" req (c/get-references-page (:params req)))
-  (GET "/references/get" req (response (c/get-references-data (:params req))))
-  (GET "/counteragents" req (c/get-counteragents-page (:params req)))
-  (GET "/counteragents/get" req (response (c/get-counteragents-data (:params req))))
-  (GET "/methodology" req (c/get-methodology-page (:params req)))
-  (GET "/methodology/get" req (response (c/get-methodology-data (:params req))))
-  (GET "/operations" req (c/get-operations-page (:params req)))
-  (GET "/operations/get" req (response (c/get-operations-data (:params req))))
-  (POST "/operations/save" req (response (c/save-records (:body req))))
-  (POST "/operations/copy" req (response (c/copy-record (:body req))))
-  (DELETE "/operations/delete" req (response (c/delete-records (:body req))))
-  (GET "/refs-set" req (c/get-refs-set-page (:params req)))
-  (GET "/refs-set/get" req (response (c/get-refs-set-data (:params req))))
-  (POST "/refs-set/save" req (response (c/write-refs-set (:body req))))
-  (POST "/refs-set/copy" req (response (c/copy-refs-set (:body req))))
-  (DELETE "/refs-set/delete" req (response (c/delete-refs-set (:body req))))
-  (GET "/measurements" req (c/get-measurements-page (:params req)))
-  (GET "/measurements/get" req (response (c/get-measurements-data (:params req))))
-  (POST "/measurements/save" req (response (c/save-records (:body req))))
-  (POST "/measurements/copy" req (response (c/copy-record (:body req))))
-  (DELETE "/measurements/delete" req (response (c/delete-records (:body req))))
-  (GET "/channels" req (c/get-channels-page (:params req)))
-  (GET "/channels/get" req (response (c/get-channels-data (:params req))))
-  (POST "/channels/save" req (response (c/save-records (:body req))))
-  (POST "/channels/copy" req (response (c/copy-record (:body req))))
-  (DELETE "/channels/delete" req (response (c/delete-records (:body req))))
-  (GET "/metrology" req (c/get-metrology-page (:params req)))
-  (GET "/metrology/get" req (response (c/get-metrology-data (:params req))))
-  (POST "/metrology/save" req (response (c/save-records (:body req))))
-  (POST "/metrology/copy" req (response (c/copy-record (:body req))))
-  (DELETE "/metrology/delete" req (response (c/delete-records (:body req))))
+  (context "/verifications" []
+    (GET "/get" req (response (c/get-verifications-data (:params req))))
+    (POST "/save" req (response (c/write-verifications (:body req))))
+    (POST "/copy" req (response (c/copy-verifications (:body req))))
+    (POST "/gen-value" req (response (c/gen-value-verifications (:body req))))
+    (DELETE "/verifications/delete" req (response (c/delete-verifications (:body req)))))
+  (context "/conditions" []
+    (GET "/" req (c/get-conditions-page (:params req)))
+    (GET "/get" req (response (c/get-conditions-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/gso" []
+    (GET "/" req (c/get-gso-page (:params req)))
+    (GET "/get" req (response (c/get-gso-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/references" []
+    (GET "/" req (c/get-references-page (:params req)))
+    (GET "/get" req (response (c/get-references-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/counteragents" []
+    (GET "/" req (c/get-counteragents-page (:params req)))
+    (GET "/get" req (response (c/get-counteragents-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/methodology" []
+    (GET "/methodology" req (c/get-methodology-page (:params req)))
+    (GET "/methodology/get" req (response (c/get-methodology-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/operations" []
+    (GET "/" req (c/get-operations-page (:params req)))
+    (GET "/get" req (response (c/get-operations-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/refs-set" []
+    (GET "/" req (c/get-refs-set-page (:params req)))
+    (GET "/get" req (response (c/get-refs-set-data (:params req))))
+    (POST "/save" req (response (c/write-refs-set (:body req))))
+    query-copy
+    query-delete)
+  (context "/measurements" []
+    (GET "/" req (c/get-measurements-page (:params req)))
+    (GET "/get" req (response (c/get-measurements-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/channels" []
+    (GET "/" req (c/get-channels-page (:params req)))
+    (GET "/get" req (response (c/get-channels-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+  (context "/metrology" []
+    (GET "/" req (c/get-metrology-page (:params req)))
+    (GET "/get" req (response (c/get-metrology-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
   (route/not-found "Not Found"))
 
 (def app

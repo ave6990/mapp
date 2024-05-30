@@ -196,12 +196,24 @@
                     :class  "popup-no"
                     :value "Нет"}])))
 
+(defn gen-value-popup
+  []
+  (popup "gen-value-popup"
+         '([:h3 "Генерировать значения для выбранных записей?"]
+           [:input {:type "button"
+                    :id "gen-value-popup-yes"
+                    :value "Да"}]
+           [:input {:type "button"
+                    :id "gen-value-popup-no"
+                    :value "Нет"}])))
+
 (def footer
   [:footer
       [:p "Mapp, версия 2024-05-15"]
       (save-popup)
       (copy-popup)
-      (delete-popup)])
+      (delete-popup)
+      (gen-value-popup)])
 
 (defn page-template 
   [toolbar query-panel table edit-panel context-menu]

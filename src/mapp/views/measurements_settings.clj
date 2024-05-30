@@ -20,7 +20,7 @@
 (def toolbar-fields-settings
   '(["id" " meas.id "]
     ["v_id" " v.id "]
-    ["зав. №" " v.serial_number "]))
+    ["зав. №" " v.serial_number LIKE '**'"]))
 
 (def fields-settings
   '([:id "id" true]

@@ -35,18 +35,18 @@
 
 (def toolbar-fields-settings
   '(["id" " id "]
-   ["выгрузка" " upload "]
+   ["не выгружено" " upload IS NULL"]
    ["год" " manufacture_year "]
    ["дата" " date "]
-   ["зав. №" " serial_number "]
+   ["зав. №" " serial_number LIKE '**'"]
    ["количество" " channels "]
-   ["контрагент" " short_name "]
-   ["объем" " scope "]
+   ["контрагент" " short_name LIKE '**'"]
+   ["объем" " scope LIKE '**'"]
    ["протокол" " protocol_number "]
-   ["рег. №" " registry_number "]
-   ["состав" " components "]
-   ["счет" " count "]
-   ["тип СИ" " mi_type "]))
+   ["рег. №" " registry_number LIKE '**'"]
+   ["состав" " components LIKE '**'"]
+   ["счет" " count LIKE '**'"]
+   ["тип СИ" " mi_type LIKE '**'"]))
 
 (def fields-settings
   '([:id "id" true]
@@ -87,4 +87,7 @@
     ["Операции поверки" "ctx-menu-action-operations"]
     ["Измерения" "ctx-menu-action-measurements"]
     ["Каналы измерений" "ctx-menu-action-channels"]
-    ["Методика" "ctx-menu-action-methodology"]))
+    ["Методика" "ctx-menu-action-methodology"]
+    ["-" "-"]
+    ["Тестовые значения" "ctx-menu-action-gen-value"]
+    ["Протоколы" "ctx-menu-action-protocols"]))

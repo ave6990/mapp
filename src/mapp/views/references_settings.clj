@@ -15,10 +15,10 @@
 (def toolbar-fields-settings
   '(["id" " id "]
    ["дата_изготовления" " manufacture_year "]
-   ["зав. №" " serial_number "]
-   ["номер 1С" " number_1c "]
+   ["зав. №" " serial_number LIKE '**'"]
+   ["номер 1С" " number_1c LIKE '**'"]
    ["отдел" " department "]
-   ["рег. №" " registry_number "]
+   ["рег. №" " registry_number LIKE '**'"]
    ["срок годности" " expiration_date "]
    ["тип СИ" " mi_type || ' ' || mi_name LIKE '**' "]
    ["№ ФИФ" " code_fif "]))

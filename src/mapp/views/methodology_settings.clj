@@ -21,8 +21,8 @@
 
 (def toolbar-fields-settings
   '(["id" " id "]
-    ["Рег. №" " registry_number "]
-    ["Тип СИ" " mi_name || ' ' || mi_types like '**'"]))
+    ["Рег. №" " registry_number LIKE '**'"]
+    ["Тип СИ" " mi_name || ' ' || mi_types LIKE '**'"]))
 
 (def fields-settings
   '([:id "id" true]

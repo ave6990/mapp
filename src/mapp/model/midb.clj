@@ -282,6 +282,25 @@
                               html))))
          data)))
 
+(defn update-measurements-value
+  [r]
+  (println r)
+  (jdbc/update!
+    midb
+    :measurements
+    {:value (:value r)}
+    ["id = ?"
+      (:measurement_id r)]))
+
+(defn gen-values!
+  "Записывает в БД случайные значения результатов измерений в пределах
+   основной погрешности."
+  [protocols-data]
+  (for [prot protocols-data]
+    (for [m (list (:measurements prot))]
+         (for [v (metr/gen-values m)]
+              (update-measurements-value v)))))
+
 ;;#legacy
 (comment
 
@@ -585,27 +604,6 @@
      (report/verification-report (get-report-data coll))))
   ([from to]
    (gen-report (range from (inc to)))))
-
-;; TOIFX added `dorun functions.
-(defn gen-values!
-  "Записывает в БД случайные значения результатов измерений в пределах
-   основной погрешности."
-  [where]
-  (dorun
-    (map (fn [prot] 
-             (dorun
-               (map (fn [m]
-                        (dorun
-                          (map (fn [r]
-                                   (jdbc/update!
-                                     midb
-                                     :measurements
-                                     {:value (:value r)}
-                                     ["id = ?"
-                                       (:measurement_id r)]))
-                               (metr/gen-values m)))
-                    (list (:measurements prot)))))
-         (get-protocols-data where)))))
 
 (defn insert-measurements
   [id ch-name coll cmnt]

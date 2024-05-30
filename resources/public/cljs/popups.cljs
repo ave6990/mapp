@@ -42,10 +42,8 @@
 (defn delete-popup-yes-click
   [event]
   (let [data (table/read-selected-rows)
-        ids (map :id
-                 data)
-        rec-nums (map read-string
-                      ids)
+        ids (map :id data)
+        rec-nums (map read-string ids)
         tab-id (table/get-table-id)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "delete-popup") "show-popup")
@@ -56,6 +54,18 @@
                 :body (stringify {:table tab-id
                                   :ids rec-nums})}))))
 
+(defn gen-value-popup-yes-click
+  [event]
+  (let [data (table/read-selected-rows)
+        ids (map :id data)
+        rec-nums (map read-string ids)]
+    (table-handlers/unselect-rows)
+    (remove-class (get-by-id "gen-value-popup") "show-popup")
+    (js/fetch (str "/verifications/gen-value")
+      (clj->js {:method "POST"
+                :headers {"Content-type" "application/json;charset=utf-8"}
+                :body (stringify {:ids rec-nums})}))))
+
 (defn add-popup-event-listeners
   []
   (doall
@@ -63,6 +73,7 @@
          (.addEventListener but "click" popup-no-click)))
   (.addEventListener (get-by-id "copy-popup-yes") "click" copy-popup-yes-click)
   (.addEventListener (get-by-id "delete-popup-yes") "click" delete-popup-yes-click)
-  (.addEventListener (get-by-id "save-popup-yes") "click" save-popup-yes-click))
+  (.addEventListener (get-by-id "save-popup-yes") "click" save-popup-yes-click)
+  (.addEventListener (get-by-id "gen-value-popup-yes") "click" gen-value-popup-yes-click))
 
 

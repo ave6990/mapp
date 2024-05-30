@@ -18,12 +18,12 @@
 
 (def toolbar-fields-settings
   '(["id" " id "]
-   ["№ паспорта" " pass_number "]
+   ["№ паспорта" " pass_number LIKE '**'"]
    ["дата" " date "]
-   ["компонент" " components "]
+   ["компонент" " components LIKE '**'"]
    ["концентрация %" " conc "]
-   ["номер 1С" " number_1c "]
-   ["рег. №" " number "]
+   ["номер 1С" " number_1c LIKE '**'"]
+   ["рег. №" " number LIKE '**'"]
    ["срок годности" " expiration_date "]))
 
 (def fields-settings
