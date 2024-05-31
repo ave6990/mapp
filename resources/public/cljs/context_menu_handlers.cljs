@@ -60,7 +60,7 @@
   [event]
   (let [ids (->> (table/read-selected-rows) (map :id) set)]
     (.open js/window
-      (make-url "operations" "v_op.v_id = " ids))))
+      (make-url "v-operations" "v_op.v_id = " ids))))
 
 (defn ctx-action-refs-set
   [event]

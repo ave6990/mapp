@@ -281,6 +281,9 @@
   inner join
     verification_operations as op
     on op.id = v_op.op_id
+  inner join
+    methodology as met
+    on met.id = op.methodology_id
   {where});")
 
 (def get-v-operations
@@ -290,6 +293,7 @@
     v_op.v_id,
     v_op.result,
     v_op.unusability,
+    met.registry_number,
     op.section,
     op.name,
     op.verification_type,
@@ -299,6 +303,9 @@
   inner join
     verification_operations as op
     on op.id = v_op.op_id
+  inner join
+    methodology as met
+    on met.id = op.methodology_id
   {where}
   {limit}
   {offset};")

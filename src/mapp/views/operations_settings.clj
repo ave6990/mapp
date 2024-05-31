@@ -21,6 +21,8 @@
     [:op_id "id операции" true]
     [:v_id "id поверки" true]
     [:result "Соответствует" true]
+    [:registry_number "Регистрационный номер" false]
+    [:section "Пункт МП" false]
     [:name "Операция" false]
     [:unusability "Причина непригодности" true]
     [:verification_type "Тип поверки" false]
