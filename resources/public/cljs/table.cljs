@@ -11,10 +11,10 @@
            nm])])
 
 (defn create-row
-  [model row-data]
+  [model row-data i]
   (let [ids (for [[id _ _] model] id) 
         editables (for [[_ _ editable] model] (str editable))]
-    [:tr 
+    [(keyword (str "tr#row_" i)) 
       (map (fn [id editable]
                [(keyword (str "td.col" (keyword id)))
                     {:contenteditable editable}
@@ -24,9 +24,10 @@
 
 (defn create-rows
   [model data]
-  (map (fn [row]
-           (create-row model row))
-       data))
+  (map (fn [row i]
+           (create-row model row i))
+       data
+       (range (count data))))
 
 (defn create
   "args: model [[id name visibility] [] ... []]"

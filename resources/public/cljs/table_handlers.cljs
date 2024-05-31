@@ -1,5 +1,6 @@
 (ns cljs.table-handlers
   (:require
+    [clojure.string :as string]
     [cljs.dom-functions :refer :all]
     [cljs.context-menu :as ctx-menu]))
 
@@ -20,13 +21,46 @@
          (when (not (contains-class el "headers-row"))
                (add-class el "selected")))))
 
+(defn get-row-number
+  [tr]
+  (when tr
+    (-> tr
+        (.getAttribute "id")
+        (string/replace #"row_" "")
+        read-string)))
+
+(defn select-row-by-number
+  [n]
+  (-> "row_"
+      (str n)
+      get-by-id
+      (add-class "selected")))
+
+(defn select-rows-group
+  [event]
+  (let [id (-> event
+               .-target
+               .-parentNode
+               get-row-number)
+        last-id (-> "selected"
+                  get-by-class
+                  last
+                  get-row-number)
+        direction (if (> id last-id) 1 -1)]
+    (when last-id
+      (dorun
+        (for [i (range last-id (+ id direction) direction)]
+             (select-row-by-number i))))))
+
 (defn td-click
   [event]
   (when (= "TD" (-> event .-target .-tagName))
     (let [tr (-> event .-target .-parentNode)]
+      (ctx-menu/hide)
       (when (-> event .-ctrlKey)
             (toggle-select-row tr))
-      (ctx-menu/hide))))
+      (when (-> event .-shiftKey)
+            (select-rows-group event)))))
 
 (defn td-change
   [event]
