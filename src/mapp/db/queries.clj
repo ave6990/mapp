@@ -198,18 +198,80 @@
   from
   (select *
   from
-    metrology
+    metrology as metr
+  inner join
+    channels as ch
+    on ch.id = metr.channel_id
+  inner join
+    methodology as met
+    on met.id = ch.methodology_id
   {where});")
 
 (def get-metrology
-  "select *
+  "select 
+    metr.id
+    , met.registry_number
+    , ch.id as channel_id
+    , ch.component || ' (' || ch.range_from || ' - ' || ch.range_to
+      || ') ' || ch.units as channel
+    , metr.r_from
+    , metr.r_to
+    , metr.value
+    , metr.fraction
+    , metr.type_id
+    , metr.name
+    , metr.units
+    , metr.operation_id
+    , metr.text
+    , metr.comment
   from
-    metrology
+    metrology as metr
+  inner join
+    channels as ch
+    on ch.id = metr.channel_id
+  inner join
+    methodology as met
+    on met.id = ch.methodology_id
   {where}
+  order by ch.id
   {limit}
   {offset};")
 
-(def get-operations-records-count
+(def get-verification-operations-records-count
+  "select
+    count(*) as count
+  from
+  (select *
+  from
+    verification_operations as op
+  inner join
+    methodology as met
+    on met.id = op.methodology_id
+  {where});")
+
+(def get-verification-operations
+  "select
+    op.id,
+    op.methodology_id,
+    met.registry_number,
+    met.short_name,
+    op.section,
+    op.name,
+    op.verification_type,
+    op.comment,
+    op.info,
+    met.mi_types
+  from
+    verification_operations as op
+  inner join
+    methodology as met
+    on met.id = op.methodology_id
+  {where}
+  order by met.id
+  {limit}
+  {offset};")
+
+(def get-v-operations-records-count
   "select
     count(*) as count
   from
@@ -221,7 +283,7 @@
     on op.id = v_op.op_id
   {where});")
 
-(def get-operations
+(def get-v-operations
   "select
     v_op.id,
     v_op.op_id,
@@ -317,7 +379,9 @@
     verification_refs
   {where}
   order by
-    v_id desc;")
+    v_id desc
+  {limit}
+  {offset};")
 
 (def get-methodology-records-count
   "select count(*) as count

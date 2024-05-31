@@ -1,12 +1,16 @@
 (ns mapp.views.metrology-settings)
 
 (def toolbar-fields-settings
-  '(["id" " id "]
-   ["Канал" " channel_id "]))
+  '(["id" " metr.id "]
+   ["id канала" " ch.id "]
+   ["Канал" " (ch.channel || ' ' || ch.component) LIKE '**'"]
+   ["Рег. №" " met.registry_number LIKE '**'"]))
 
 (def fields-settings
   '([:id "ID" true]
+    [:registry_number "Регистрационный номер" false]
     [:channel_id "ID канала" true]
+    [:channel "Наименование канала" false]
     [:r_from "Диапазон от" true]
     [:r_to "Диапазон до" true]
     [:value "Значение" true]

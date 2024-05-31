@@ -17,7 +17,7 @@
     ["МП" " op.methodology_id "]))
 
 (def fields-settings
-  '([:id "id" true]
+  '([:id "ID" true]
     [:op_id "id операции" true]
     [:v_id "id поверки" true]
     [:result "Соответствует" true]

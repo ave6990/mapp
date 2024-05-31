@@ -51,6 +51,7 @@
 (def fields-settings
   '([:id "id" true]
     [:upload "Выгрузка" true]
+    [:engineer "Поверитель" true]
     [:count "Счет" true]
     [:counteragent "id контрагента" true]
     [:ca_short_name "Контрагент" false]

@@ -34,6 +34,12 @@
     query-save
     query-copy
     query-delete)
+  (context "/verification-operations" []
+    (GET "/" req (c/get-verification-operations-page (:params req)))
+    (GET "/get" req (response (c/get-verification-operations-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
   (context "/gso" []
     (GET "/" req (c/get-gso-page (:params req)))
     (GET "/get" req (response (c/get-gso-data (:params req))))
@@ -58,8 +64,8 @@
     query-save
     query-copy
     query-delete)
-  (context "/operations" []
-    (GET "/" req (c/get-operations-page (:params req)))
+  (context "/v-operations" []
+    (GET "/" req (c/get-v-operations-page (:params req)))
     (GET "/get" req (response (c/get-operations-data (:params req))))
     query-save
     query-copy

@@ -43,3 +43,6 @@
     [:mi_types "Типы СИ" true]
     [:comment "Комментарии" true]))
 
+(def context-menu-settings
+  '(["-" "-"]
+    ["Операции поверки" "ctx-menu-action-verification-operations"]))

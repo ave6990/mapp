@@ -13,6 +13,7 @@
     [mapp.views.counteragents-settings :as ca]
     [mapp.views.methodology-settings :as met]
     [mapp.views.operations-settings :as ops]
+    [mapp.views.verification-operations-settings :as v-ops]
     [mapp.views.refs-set-settings :as refs-set]
     [mapp.views.measurements-settings :as meas]
     [mapp.views.channels-settings :as ch]
@@ -145,8 +146,9 @@
 (make-get-page "Эталоны" "references" refs/fields-settings refs/toolbar-fields-settings [])
 (make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings [])
 (make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings [])
-(make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings [])
-(make-get-page "Операции поверки" "operations" ops/fields-settings ops/toolbar-fields-settings [])
+(make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings met/context-menu-settings)
+(make-get-page "Операции поверки" "v-operations" ops/fields-settings ops/toolbar-fields-settings [])
+(make-get-page "Операции поверки по НД" "verification-operations" v-ops/fields-settings v-ops/toolbar-fields-settings [])
 (make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
 (make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings [])
 (make-get-page "Каналы измерений" "channels" ch/fields-settings ch/toolbar-fields-settings ch/context-menu-settings)
@@ -167,9 +169,8 @@
         query (str "id = " 
                    (string/join " or id = " ids))
         protocols-data (seq (midb/get-protocols-data query))]
-    (println "\n\n\n\n" query)
-    (pprint (midb/gen-values! protocols-data))
-    #_(midb/gen-values! query)))
+    (println "gen-values! for records" query)
+    (midb/gen-values! protocols-data)))
 
 (defn get-conditions-data
   [req]
@@ -193,7 +194,7 @@
 
 (defn get-operations-data
   [req]
-  (get-data req midb/get-operations ops/fields-settings))
+  (get-data req midb/get-v-operations ops/fields-settings))
 
 (defn get-channels-data
   [req]
@@ -206,6 +207,10 @@
 (defn get-refs-set-data
   [req]
   (get-data req midb/get-refs-set refs-set/fields-settings))
+
+(defn get-verification-operations-data
+  [req]
+  (get-data req midb/get-verification-operations v-ops/fields-settings))
 
 (defn get-measurements-data
   [req]
@@ -299,7 +304,7 @@
     (dorun
       (for [rec data]
         (midb/write!
-          (keyword table)
+          (keyword (string/replace table #"-" "_"))
           rec)))
         (println (str "Save data to " table " table complete"))))
 
@@ -309,7 +314,7 @@
     (dorun
       (for [_ (range cnt)]
            (midb/copy!
-             (keyword table)
+             (keyword (string/replace table #"-" "_"))
              id)))
     (println (str "Copy data to " table " table complete"))))
 
@@ -319,6 +324,6 @@
     (dorun
       (for [id ids]
            (midb/delete!
-             (keyword table)
+             (keyword (string/replace table #"-" "_"))
              id)))
     (println (str "Delete data from " table " table complete"))))

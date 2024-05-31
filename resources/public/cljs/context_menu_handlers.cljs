@@ -84,7 +84,7 @@
   [event]
   (let [ids (->> (table/read-selected-rows) (map :id) set)]
     (.open js/window
-      (make-url "metrology" "channel_id = " ids))))
+      (make-url "metrology" "ch.id = " ids))))
 
 (defn ctx-action-gen-value
   [event]
@@ -95,6 +95,12 @@
   (let [ids (->> (table/read-selected-rows) (map :id) set)]
     (.open js/window
       (make-url "protocols" " id = " ids))))
+
+(defn ctx-action-verification-operations
+  [event]
+  (let [ids (->> (table/read-selected-rows) (map :id) set)]
+    (.open js/window
+      (make-url "verification-operations" " methodology_id = " ids))))
 
 (def menu-actions
   {"ctx-menu-action-save" ctx-action-save
@@ -109,6 +115,7 @@
    "ctx-menu-action-metrology" ctx-action-metrology
    "ctx-menu-action-refs-set" ctx-action-refs-set
    "ctx-menu-action-gen-value" ctx-action-gen-value
+   "ctx-menu-action-verification-operations" ctx-action-verification-operations
    "ctx-menu-action-protocols" ctx-action-protocols})
 
 (defn add-event-listeners
