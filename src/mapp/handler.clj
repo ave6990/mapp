@@ -74,8 +74,8 @@
     (GET "/" req (c/get-refs-set-page (:params req)))
     (GET "/get" req (response (c/get-refs-set-data (:params req))))
     (POST "/save" req (response (c/write-refs-set (:body req))))
-    query-copy
-    query-delete)
+    (POST "/copy" req (response (c/copy-refs-set (:body req))))
+    (DELETE "/delete" req (response (c/delete-refs-set (:body req)))))
   (context "/measurements" []
     (GET "/" req (c/get-measurements-page (:params req)))
     (GET "/get" req (response (c/get-measurements-data (:params req))))

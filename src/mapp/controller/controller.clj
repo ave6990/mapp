@@ -298,6 +298,14 @@
            (midb/delete-record! id)))
     (println "Delete verification records compplete! " ids)))
 
+(defn copy-refs-set ;;TODO
+  [body]
+  ())
+
+(defn delete-refs-set ;;TODO
+  [body]
+  ())
+
 (defn save-records
   [body]
   (let [{:keys [table data]} (keywordize body)]

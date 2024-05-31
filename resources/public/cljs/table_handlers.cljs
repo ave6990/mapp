@@ -47,10 +47,11 @@
                   last
                   get-row-number)
         direction (if (> id last-id) 1 -1)]
-    (when last-id
-      (dorun
-        (for [i (range last-id (+ id direction) direction)]
-             (select-row-by-number i))))))
+    (if last-id
+        (dorun
+          (for [i (range last-id (+ id direction) direction)]
+               (select-row-by-number i)))
+        (select-row-by-number id))))
 
 (defn td-click
   [event]
