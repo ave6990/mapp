@@ -1,4 +1,4 @@
-(ns mapp.utils.shell
+(ns mapp.user
   (:require 
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
@@ -23,7 +23,7 @@
 (db/defdb auto)
 
 (defn load-icu
-  ;; {TOFIX} не работает.
+  ;; TOFIX не работает.
   []
   (try
     (jdbc/query
@@ -150,7 +150,7 @@
       (doall
         (map (fn [~id-to]
                  (map (fn [~f ~args] (~f ~args))
-                      [~(symbol (str "mapp.utils.shell/delete-" s "!"))
+                      [~(symbol (str "mapp.user/delete-" s "!"))
                         (partial jdbc/execute! midb)]
                       [~id-to
                         [~(symbol (str "q/copy-" s))

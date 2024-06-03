@@ -52,7 +52,8 @@
       (clj->js {:method "DELETE"
                 :headers {"Content-type" "application/json;charset=utf-8"}
                 :body (stringify {:table tab-id
-                                  :ids rec-nums})}))))
+                                  :ids rec-nums
+                                  :data data})}))))
 
 (defn gen-value-popup-yes-click
   [event]

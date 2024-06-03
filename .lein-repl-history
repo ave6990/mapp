@@ -1,500 +1,500 @@
-             (do
-               (println k (type v) (map? v))
-               [(keyword k) 
-                (cond
-                  (vector? v) (vec (map keywordize v))
-                  (map? v) (keywordize v)
-                  :else v)
-                #_(if (vector? v)
-                                (vec (map keywordize v))
-                                (if ()
-                                    ()
-                                    ()))]))))
-(keywordize m)
-(def m
-  {"id" 1
-   "table" "ver"
-   "data" [1 12 32]
-   "obj" {"a" 1 "b" 2}})
-(defn keywordize
-  [m]
-  (into {}
-        (for [[k v] m]
-             (do
-               (println k (type v) (map? v))
-               [(keyword k) 
-                (cond
-                  (vector? v) (vec (map keywordize v))
-                  (map? v) (keywordize v)
-                  :else v)
-                #_(if (vector? v)
-                                (vec (map keywordize v))
-                                (if ()
-                                    ()
-                                    ()))]))))
-(keywordize m)
-(defn keywordize
-  [m]
-  (into {}
-        (for [[k v] m]
-             (do
-               (println k (type v) (map? v))
-               [(keyword k) 
-                (cond
-                  (vector? v) (vec (map (fn [vl]
-                                            (if (map? vl)
-                                                (keywordize vl)
-                                                vl))
-                                        v))
-                  (map? v) (keywordize v)
-                  :else v)
-                #_(if (vector? v)
-                                (vec (map keywordize v))
-                                (if ()
-                                    ()
-                                    ()))]))))
-(keywordize m)
-(def m
-  {"id" 1
-   "table" "ver"
-   "data" [1 12 32]
-   "data2" [{"s" 4 "b" 4} {"l" 1 "lk" 45}]
-   "obj" {"a" 1 "b" 2}})
-(defn keywordize
-  [m]
-  (into {}
-        (for [[k v] m]
-             (do
-               (println k (type v) (map? v))
-               [(keyword k) 
-                (cond
-                  (vector? v)
-                    (vec
-                      (map (fn [vl]
-                               (if (map? vl)
-                                   (keywordize vl)
-                                   vl))
-                           v))
-                  (map? v) (keywordize v)
-                  :else v)]))))
-(keywordize m)
-(conj [1 2 3 4] 3)
-(conj [1 2 34 45] [23 3454])
-(cons [1 2 34 45] [23 3454])
-(cons (flatten [1 2 34 45]) [23 3454])
-(merge [1 2 34 45] [23 3454])
-(merge '(1 2 34 45) '(23 3454))
-(join '(1 2 34 45) '(23 3454))
-(def default-context-menu
-  [["Снять выделение" "ctx-menu-action-unselect"]
-   ["-" "-"]
-   ["Записать" "ctx-menu-action-save"]
-   ["Копировать" "ctx-menu-action-copy"]
-   ["Удалить" "ctx-menu-action-delete"]])
-(defn add-context-menu-items
-  [xs]
-  (reduce (fn [menu item]
-              (conj menu item))
-          default-context-menu
-          xs))
-(add-context-menu-items
-  [["КСП" "ctx-menu-action-refs-set"]
-   ["Операции" "ctx-menu-action-ops"]])
-(add-context-menu-items
-  [["-" "-"]
-   ["КСП" "ctx-menu-action-refs-set"]
-   ["Операции" "ctx-menu-action-ops"]])
-(add-context-menu-items
-  []#_[["-" "-"]
-   ["КСП" "ctx-menu-action-refs-set"]
-   ["Операции" "ctx-menu-action-ops"]])
-(def fields-settings
-  [[:expiration "Срок годности" false]
-   [:v_id "ID поверки" true]
-   [:ref_id "ID эталона" true]
-   [:mi_name "Наименование СИ" false]
-   [:mi_type "Тип, модификация СИ" false]
-   [:components "Состав" false]
-   [:value "Значение" false]
-   [:serial_number "Заводской номер" false]
-   [:number_1c "Номер 1С" false]
-   [:level "Разряд" false]
-   [:expiration_date "Срок годности" false]])
-(def toolbar-fields-settings
-  '(["id поверки" " v_id "]
-    ["id эталона" " ref_id "]
-    ["номер 1C" " number_1c "]))
-(defn make-filter-query
-  [where ids]
-  (str where
-       (string/join (str "or " where) ids)))
-(make-filter-query "id = " [1 2 3 4])
-(defn make-filter-query
-  [where ids]
-  (str where
-       (string/join (str " or " where) ids)))
-(make-filter-query "id = " [1 2 3 4])
-(make-filter-query "id = " '(1 2 3 4))
-(defn f
-  [a b]
-  (+ a b))
-(f 1 4)
-(defn make-filter-query
-  [where ids]
-  (str where
-       (string/join (str " or " where) ids)))
-(make-filter-query "id = " '(1 2 3 4))
-(require '[clojure.string :as string])
-(defn make-filter-query
-  [where ids]
-  (str where
-       (string/join (str " or " where) ids)))
-(make-filter-query "id = " '(1 2 3 4))
-(not-zero? 0)
-(notzero? 0)
-(zero? 0)
-(zero-not? 0)
-(empty? '())
-(empty? [])
-(not-empty? [])
-(notempty? [])
-(empty-not? [])
-(defn change-field
-  [data k]
-  (map (fn [{:keys [id v_id ref_id]} rec]
-           {:id id :v_id v_id k ref_id})
-       data))
-(change-field
-'({:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
- {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
- {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"})
-  :gso_id)
-(change-field
-  '({:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"})
-  ':gso_id)
-(change-field
-  '({:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"})
-  (keyword "gso_id"))
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  (keyword "gso_id"))
-(defn change-field
-  [data k]
-  (map (fn [{:keys [id v_id ref_id]} rec]
-           {:id id :v_id v_id (keyword k) ref_id})
-       data))
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "gso_id")
-(defn change-field
+                              html))))
+         data)))
+(defn assoc-multi
+  [m nm]
+  (reduce (fn [a b]
+            (let [[k v] b]
+              (assoc a k v)))
+          m
+          nm))
+(defn get-references-data
+  [where]
+  (jdbc/query
+    midb
+    (str "select * from refs
+          where " where)))
+(defn references
+  ""
+  [where]
+  (spit
+    (str midb-path "references.html")
+    (report/refs-report
+      (get-references-data where))))
+(defn get-report-data
+  ""
+  [coll]
+  (let [v-data (jdbc/query
+                midb
+                (str
+                  q/report-verifications
+                  "("
+                  (string/join ", " coll)
+                  ")
+                  order by date desc, id desc"))
+        measurements (jdbc/query
+                      midb
+                      (str "select * from view_v_measurements
+                          where id in ("
+                          (string/join ", " coll)
+                          ")"))
+        operations (jdbc/query
+                    midb
+                    (str
+                      q/get-operations
+                      "("
+                      (string/join ", " coll)
+                      ")"))
+        refs (jdbc/query
+              midb
+              (str "select * from verification_refs
+                      where v_id in ("
+                      (string/join ", " coll)
+                      ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:measurements
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          measurements))
+                           :refs
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          refs))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          operations))}))
+         v-data)))
+(defn get-methodology-data
+  [coll]
+  (let [met-data
+         (jdbc/query
+           midb
+           (str "select * from methodology
+                 where id in ("
+                 (string/join
+                   ", "
+                   coll)
+                 ")"))
+        metrology-data
+          (jdbc/query
+            midb
+            (str "select * from view_metrology
+                  where id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))
+        operations-data
+          (jdbc/query
+            midb
+            (str "select * from verification_operations
+                  where methodology_id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:metrology
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          metrology-data))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:methodology_id r) (:id m)))
+                                          operations-data))}))
+         met-data)))
+(defn get-conditions-by-v-id 
+  [id]
+  (->>
+    ["select *
+      from conditions
+      where id = ?"
+          (->>
+            ["select conditions
+              from verification
+              where id = ?" id]
+            (jdbc/query midb)
+            first
+            :conditions
+           )]
+    (jdbc/query midb)
+    first))
+(conj (list 233 32 245) 140)
+(defn update-record!
+  [record table changes]
+  (jdbc/update! midb
+                table
+                (assoc-multi (table record) changes)
+                ["id = ?" ((comp :id table) record)]))
+(defn all-refs
+  [id]
+  (jdbc/query midb [q/all-refs id]))
+(defn check-gso
+  [coll column]
+  (map (fn [num]
+         (first (jdbc/query midb
+                     [(str "select id, number_1c, pass_number, expiration_date
+                            from gso
+                            where " column " = ?") num])))
+       coll))
+(defn set-v-gso!
+  [v-id coll]
+  (do (delete-v-gso! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_gso
+        (vec (map (fn [el] (hash-map :v_id v-id :gso_id el))
+                  coll)))))
+(defn set-v-refs!
+  [v-id coll]
+  (do (delete-v-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
+                  coll)))))
+(defn set-v-opt-refs!
+  [v-id coll]
+  (do (delete-v-opt-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_opt_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
+                  coll)))))
+(defn set-v-operations!
+  [v-id coll]
+  (do (delete-v-operations! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_operations
+        (vec (map (fn [el] (hash-map :v_id v-id :op_id el :result 1))
+                  coll)))))
+(defn ins-channel!
+  "Вставить запись канала измерения и метрологических характеристик."
+  [ch-obj mc-list]
+  (let [ch-id
+          (->>
+            (jdbc/insert!
+              midb
+              :channels
+              ch-obj)
+            first
+            vals
+            first)]
+    (map (fn [m]
+             (jdbc/insert!
+               midb
+               :metrology
+               (assoc m :channel_id ch-id)))
+         mc-list)))
+(defn get-operations
+  "Возвращает коллекцию операций поверки по заданному v_id."
+  [id]
+  (jdbc/query
+    midb
+    ["select * from view_operations where v_id = ?" id]))
+(defn gen-custom-protocols
   [data]
-  (map (fn [{:keys [id v_id ref_id]} rec]
-           {:id id :v_id v_id :gso_id #_(keyword k) ref_id})
-       data))
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "gso_id")
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  #_"gso_id")
-(defn change-field
-  [data]
-  (map (fn [{:keys [:id :v_id :ref_id]} rec]
-           {:id id :v_id v_id :gso_id #_(keyword k) ref_id})
-       data))
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  #_"gso_id")
-(defn change-field
-  [data k]
-  (map (fn [{:keys [id v_id ref_id]}]
-           {:id id :v_id v_id k ref_id})
-       data))
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  :gso_id)
-(change-field
-  [{:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}
-    {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}
-    {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  :gso_id)
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (-> data
-      filter-refs type-id
-      change-field field))
-(defn filter-refs
-  [data type-id]
-  (filter (fn [rec]
-              (= type-id (:type_id rec)))
-          data))
-(defn prepare-data
-  [data type-id field]
-  (-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field data field)
-        j (pprint l)]
-    ())
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        i (change-field data field)
-        ]
-    ())
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field data field)
-        j (pprint l)]
-    ())
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field data field)
-        j (pprint i)]
-    ())
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field data field)
-        j (pprint i)]
-    (i))
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field data field)
-        ]
-    (pprint i))
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field l field)
-        ]
-    (pprint i))
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field l field)
-        ]
-    i)
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  #_(let [l (filter-refs data type-id)
-        k (pprint l)
-        i (change-field l field)
-        ]
-    i)
-  (-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (let [f-data (filter-refs data type-id)
-        res (change-field l field)]
-    res)
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(defn prepare-data
-  [data type-id field]
-  (let [f-data (filter-refs data type-id)
-        res (change-field f-data field)]
-    res)
-  #_(-> data
-      filter-refs type-id
-      change-field field))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  #_(let [f-data (filter-refs data type-id)
-        res (change-field f-data field)]
-    res)
-  (-> data
-      (filter-refs type-id)
-      (change-field field)))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn prepare-data
-  [data type-id field]
-  (-> data
-      (filter-refs type-id)
-      (change-field field)))
-(prepare-data
-  [{:v_id "4851", :id "6988", :ref_id "2846", :type_id "1"}
-   {:v_id "4851", :id "6989", :ref_id "2820", :type_id "1"}                                                                              
-   {:v_id "4851", :id "11211", :ref_id "382", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11212", :ref_id "387", :type_id "3"}                                                                              
-   {:v_id "4851", :id "11213", :ref_id "286", :type_id "3"}]
-  "1" :ref_id)
-(defn f [xs] (map #(/ % 4.4 0.01)) xs)
-(f [1.116 1.806])
-(defn f [xs] (map #(/ % 4.4 0.01) xs)
-)
-(f [1.116 1.806])
-(f [1.116 2.15])
-kkkjjj(require '[hiccup2.core :as h])
-(h/html [:td {:class "centered-cells"} "0,0"])
-(require '[net.cgrand.enlive-html :as enlive])
-(reuire '[clojure.repl :refer :all])
+  (doall
+    (map (fn [m]
+             (when (:protocol m)
+                     (jdbc/delete!
+                       midb
+                       :v_html
+                       ["id = ?" (:id m)])
+                     (jdbc/insert!
+                       midb
+                       :v_html
+                       {:id (:id m)
+                        :html ((eval (read-string (str
+                                                   "protocol/"
+                                                   (:protocol m))))
+                                m)})))
+        data)))
+(defn gen-protocols
+  "Генерирует протоколы поверки в файл protocol.html."
+  [where]
+  (let [data (get-protocols-data where)]
+    (spit
+      (str midb-path
+           "protocol.html")
+           (pr/protocols data))))
+(defn gen-report
+  "генерирует отчет о записях в файл report.html."
+  ([coll]
+   (spit
+     (str midb-path
+          "report.html")
+     (report/verification-report (get-report-data coll))))
+  ([from to]
+   (gen-report (range from (inc to)))))
+(defn find-counteragent
+  "Возвращает список контрагентов соответствующих запросу."
+  [s]
+  (jdbc/query midb [q/counteragents (str "%" s "%")]))
+(defn counteragents
+  ""
+  [s]
+  (spit
+    (str midb-path
+         "counteragents.html")
+    (report/counteragents-report (find-counteragent s))))
+(defn gso
+  ([where]
+  (spit
+    (str midb-path "gso.html")
+    (report/gso-report
+      (jdbc/query
+        midb
+        (str "select * from gso"
+             (if (= "" where)
+                 ""
+                 (str " where " where))
+             " order by available desc, components, conc")))))
+  ([]
+   (gso "")))
+(defn methodology
+  [coll]
+  (spit
+    (str midb-path
+         "methodology.html")
+    (report/methodology-report (get-methodology-data coll))))
+(defn gen-values!
+  "Записывает в БД случайные значения результатов измерений в пределах
+   основной погрешности."
+  [where]
+  (map (fn [prot] 
+           (map (fn [m]
+                    (map (fn [r]
+                             (jdbc/update!
+                               midb
+                               :measurements
+                               {:value (:value r)}
+                               ["id = ?"
+                                 (:measurement_id r)]))
+                         (metr/gen-values m)))
+                (list (:measurements prot))))
+       (get-protocols-data where)))
+(defn insert-measurements
+  [id ch-name coll cmnt]
+  (map (fn [[m-id & ref]]
+         (map (fn [r-value]
+                  (jdbc/insert!
+                    midb
+                    :measurements
+                    (hash-map
+                      :v_id id
+                      :channel_name ch-name
+                      :metrology_id m-id
+                      :ref_value r-value
+                      :comment cmnt)))
+         ref))
+       coll))
+(defn add-measurements
+  [id coll]
+  (map (fn [item]
+           (insert-measurements
+             id
+             (get item 0)
+             (get item 1)
+             (get item 2)))
+       coll))
+(defn unusability
+  ""
+  [id op_id s]
+  (jdbc/update!
+    midb
+    :v_operations
+    {:result -1
+     :unusability s}
+    ["v_id = ? and op_id = ?" id op_id])
+  (jdbc/update!
+    midb
+    :v_operations
+    {:result 0}
+    ["v_id = ? and op_id > ?" id op_id]))
+(defn parse-int [s]
+  (Integer/parseInt s))
+(defn calc-references-hash
+  "code-example:
+    (calc-references-hash
+      \"v_id >= 3000\")"
+  [where]
+  (->> (jdbc/query
+         midb
+         (str "select v_id, group_concat(ref_id, ', ') as refs
+               from verification_refs
+               where "
+               where
+               " group by v_id")) 
+       (map (fn [r]
+                (->> (string/split
+                       (:refs r)
+                       #", ")
+                     (map string/trim)
+                     (map parse-int)
+                     sort
+                     hash
+                     (assoc r :refs))))
+       (map (fn [r]
+                (jdbc/update!
+                  midb
+                  :verification
+                  {:hash_refs (:refs r)}
+                  ["id = ?" (:v_id r)])))))
+(defn gs2000
+  ([gen-n gas s-conc t-conc-coll]
+    (map (fn [c]
+             ((gs/calculator (gs/passports gen-n))
+                             gas
+                             :air
+                             s-conc
+                             c))
+         t-conc-coll))
+  ([gen-n s-conc t-conc-coll]
+    (map (fn [c]
+             ((gs/calculator (gs/passports gen-n))
+                             :air
+                             s-conc
+                             c))
+         t-conc-coll)))
+;; #split#rename#scan#protocol
+(defn split-pdf
+  "author: Aleksandr Ermolaev
+  version: 2024-04-23
+  dependency: pdftk"
+  [scan-path f pages start-number]
+  (let [scan-pages (->
+                     (sh "identify" (str scan-path f))
+                     :out
+                     (string/split #"\n")
+                     count)
+        pages (read-string pages)
+        start-number (read-string start-number)]
+    (dotimes [i (/ scan-pages pages)]
+      (sh "pdftk"
+          (str scan-path f)
+          "cat"
+          (str (inc (* i pages)) "-" (+ (* i pages) pages))
+          "output"
+          (str scan-path "9-61-" (+ i start-number) "-2024.pdf")))
+    (sh "mv"
+          (str scan-path f)
+          (str scan-path "trash/"))))
+;; #split#rename#scan#protocol
+(defn protocol-backup
+  "author: Aleksandr Ermolaev
+  version: 2024-04-23"
+  []
+  (let [scan-path "/media/sf_SCAN/"
+      get-files-list
+        (fn []
+            (doall
+              (filter (fn [s]
+                          (re-matches #".*\.pdf" s))
+                      (->
+                        (sh "ls" scan-path)
+                        :out
+                        (string/split #"\n")))))]
+  ;; приводим имена сканов к общему виду {start_protocol}.{pages_per_protocol}.pdf
+  (dorun
+    (map (fn [f] 
+             (sh "mv" (str scan-path f)
+                      (->
+                        (str scan-path f)
+                        (string/replace #"Protokol" "")
+                        (string/replace #"\d{6}\.pdf" "pdf"))))
+         (get-files-list)))
+  ;; делим общий скан на протоколы и переименовываем их.
+  (dorun
+    (map (fn [f]
+             (let [[start-number pages _] (string/split f #"\.")]
+               (split-pdf scan-path f pages start-number)
+               (println "split-pdf" (str scan-path f) pages start-number)))
+         (doall
+           (filter (fn [f]
+                       (re-matches #"\d+\.\d\.pdf" f))
+                   (get-files-list)))))))
+(comment
 (require '[clojure.repl :refer :all])
-(dir enlive)
-(doc keep)
-(doc identity)
-(defn enlive->hiccup
-   [el]
-   (if-not (string? el)
-     (->> (map enlive->hiccup (:content el))
-       (concat [(:tag el) (:attrs el)])
-       (keep identity)
-       vec)
-     el))
-(defn html->enlive 
-  [html]
-  (first (enlive/html-resource (StringReader. html))))
-(require '[java.io.StringReader :refer [StringReader]] :reload)
-(defn html->enlive 
-  [html]
-  (first (enlive/html-resource (java.io.StringReader. html))))
-(defn html->hiccup [html]
-  (-> html
-      html->enlive
-      enlive->hiccup))
-(html->hiccup "<html><ol></ol></html>")
-(range 3 6)
-(last '(1 2 3 4))
-(range 10)
-(range 10 3)
-(range 10 3 -1)
-(range 10 14 1)
+(require '[mapp.lib.midb-queries :as q] :reload)
+(require '[mapp.protocols.custom :as protocol] :reload)
+;; example table-rows пример функции создания строк таблицы
+(spit
+  (str midb-path "temp.html")
+    (html (table (mapp.protocols.custom/table-rows
+            (list
+              (list "Детектор" "Значение уровня шумов" "Значение дрейфа")
+              (list "действительное" "допускаемое" "ед. изм."
+                    "действительное" "допускаемое" "ед. изм."))
+            #_(list
+              (list [2 1] [1 3] [1 3])
+              (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1]))
+            #_th))))
+(require '[mapp.lib.metrology :as metr] :reload)
+(require '[mapp.utils.protocol :as pr] :reload)
+(require '[mapp.lib.gen-html :refer :all] :reload)
+(require '[mapp.lib.midb-queries :as q] :reload)
+(require '[mapp.lib.chemistry :as ch] :reload)
+(doc flatten)
+(doc assoc)
+)
+(pprint (gs2000 0
+                "H2S"
+                496 
+                #_(list ) 
+                (map #(ch/ppm->mg "H2S" %1)
+                     (list 5 9 11 15 18))))
+(pprint (gs2000 0
+                "H2S"
+                496 
+                #_(list ) 
+                (map #(ch/ppm->mg "H2S" %1)
+                     (list 430 740))))
+(pprint (gs2000 0
+                "CO"
+                9030
+                #_(list ) 
+                (map #(ch/ppm->mg "CO" %1)
+                     (list 430 740))))
+(pprint (gs2000 0
+                "H2S"
+                496
+                #_(list ) 
+                (map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(map (partial ch/ppm->mg
+              "H2S")
+     '(5.4 27))
+(pprint (gs2000 0
+                ;"H2S"
+                9030
+                (list 50 1000 1900) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                "CO"
+                9030
+                (list 58.2 1164 1800) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                "H2S"
+                496
+                (list 2.8 70.7 90) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                ;"H2S"
+                496
+                (list 2 50 90) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                ;"H2S"
+                1000
+                (list 10 18) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))

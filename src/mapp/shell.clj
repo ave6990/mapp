@@ -2,12 +2,12 @@
 (require '[mapp.lib.gs2000 :as gs])
 (require '[clojure.java.shell :refer [sh]])
 
-(pprint (gs2000 2
-                "H2S"
-                496 
-                #_(list ) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 5 9 11 15 18))))
+(pprint (gs2000 0
+                ;"H2S"
+                1000
+                (list 10 18) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
 
 ((gs/calculator
   (gs/passports 1))
@@ -21,7 +21,7 @@
 
 (map (partial ch/ppm->mg
               "H2S")
-     '(25 47.5))
+     '(5.4 27))
 
 (* 0.94 0.05)
 

@@ -302,9 +302,20 @@
   [body]
   ())
 
-(defn delete-refs-set ;;TODO
+(defn delete-refs-set 
   [body]
-  ())
+  (let [data (:data (keywordize body))
+        ids (:ids (keywordize body))]
+    (dorun
+      (for [rec data]
+           (midb/delete!
+             (case (:type_id rec)
+               "1" :v_refs
+               "2" :v_opt_refs
+               "3" :v_gso
+               :else (println "Unknown refs type!"))
+             (:id rec))))
+    (println "Delete refs-set records complete! " ids)))
 
 (defn save-records
   [body]
