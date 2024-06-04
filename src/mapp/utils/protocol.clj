@@ -401,15 +401,15 @@
   [:section {:class "page_2"}
     [:header {:class "header2"}
       [:p
-        (str "Приложение к протоколу " 
+        "Приложение к протоколу " 
              (:verification_type m)
-             " поверки ")
-        (str "№ " (:department m)
+             " поверки "
+        "№ " (:department m)
         "/" (:engineer m)
         "-" (:protocol_number m)
         "-" (:year m) " от "
         [:time (date-iso->local (:date m))]
-        " г.")]]
+        " г."]]
     [:main
       (if (zero? (count (:html m)))
           [:ol

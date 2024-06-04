@@ -121,6 +121,7 @@
 (make-get-fn "refs-set")
 (make-get-fn "channels")
 (make-get-fn "metrology")
+(make-get-fn "ref-values")
 
 ;;#copy
 (defn last-id
@@ -285,7 +286,6 @@
 
 (defn update-measurements-value
   [r]
-  (println r)
   (jdbc/update!
     midb
     :measurements

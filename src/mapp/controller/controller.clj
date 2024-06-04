@@ -19,6 +19,7 @@
     [mapp.views.channels-settings :as ch]
     [mapp.views.metrology-settings :as metr]
     [mapp.views.conditions-settings :as cs]
+    [mapp.views.ref-values-settings :as rv]
     [mapp.utils.protocol :as pr]))
 
 (defn keywordize
@@ -152,6 +153,7 @@
 (make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
 (make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings [])
 (make-get-page "Каналы измерений" "channels" ch/fields-settings ch/toolbar-fields-settings ch/context-menu-settings)
+(make-get-page "Опорные значения" "ref-values" rv/fields-settings rv/toolbar-fields-settings [])
 (make-get-page "Метрологические характеристики" "metrology" metr/fields-settings metr/toolbar-fields-settings [])
 
 (defn get-protocols
@@ -215,6 +217,10 @@
 (defn get-measurements-data
   [req]
   (get-data req midb/get-measurements meas/fields-settings))
+
+(defn get-ref-values-data
+  [req]
+  (get-data req midb/get-ref-values rv/fields-settings))
 
 (defn write-verifications
   [body]

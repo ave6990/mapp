@@ -32,5 +32,7 @@
     [:value "Изм. значение" true]
     [:value_2 "Знач. (вариация)" true]
     [:ref_value "Действ. знач." true]
+    ;[:ref_value_id "ID опорного значения" true]
+    ;[:ref_value_info "Опорное значение по НД" false]
     [:text "Текст" true]
     [:comment "Комментарий" true]))

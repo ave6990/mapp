@@ -1,57 +1,3 @@
-                              html))))
-         data)))
-(defn assoc-multi
-  [m nm]
-  (reduce (fn [a b]
-            (let [[k v] b]
-              (assoc a k v)))
-          m
-          nm))
-(defn get-references-data
-  [where]
-  (jdbc/query
-    midb
-    (str "select * from refs
-          where " where)))
-(defn references
-  ""
-  [where]
-  (spit
-    (str midb-path "references.html")
-    (report/refs-report
-      (get-references-data where))))
-(defn get-report-data
-  ""
-  [coll]
-  (let [v-data (jdbc/query
-                midb
-                (str
-                  q/report-verifications
-                  "("
-                  (string/join ", " coll)
-                  ")
-                  order by date desc, id desc"))
-        measurements (jdbc/query
-                      midb
-                      (str "select * from view_v_measurements
-                          where id in ("
-                          (string/join ", " coll)
-                          ")"))
-        operations (jdbc/query
-                    midb
-                    (str
-                      q/get-operations
-                      "("
-                      (string/join ", " coll)
-                      ")"))
-        refs (jdbc/query
-              midb
-              (str "select * from verification_refs
-                      where v_id in ("
-                      (string/join ", " coll)
-                      ")"))]
-    (map (fn [m]
-             (assoc-multi m
                           {:measurements
                            (doall (filter (fn [r]
                                               (= (:id r) (:id m)))
@@ -498,3 +444,57 @@
                 (list 10 18) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 35 60))))
+(map #(/ %1 4.4 0.01)
+     '(1.116 2.09))
+(pprint (gs2000 0
+                "H2S"
+                496
+                (list 28.3 141 255) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                "H2S"
+                2012
+                (list 28.3 141 255) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                "H2S"
+                496 
+                (list 50 75 90) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                "H2S"
+                496 
+                (list 50 85) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                ;"H2S"
+                496 
+                (list 7.7 50 97) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(pprint (gs2000 0
+                ;"H2S"
+                496 
+                (list 7.7 50 95) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(/ 1.619 1.7 0.01)
+(* 2 2.75)
+(-> (/ 5.5 0.01) 1.447)
+(-> (/ 5.5 0.01) 2.6)
+(#(/ % 5.5 0.01) 2.6)
+(#(/ % 5.5 0.01) 1.447)
+(pprint (gs2000 0
+                "NH3"
+                2906
+                (list 40 310 550) 
+                #_(map #(ch/ppm->mg "H2S" %1)
+                     (list 35 60))))
+(map #(/ %1 4.4 0.01)
+     '(1.116 2.09))
+;;#scan#backup#protocol#split
+(protocol-backup)

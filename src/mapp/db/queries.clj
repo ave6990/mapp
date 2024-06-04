@@ -327,6 +327,9 @@
   inner join
       characteristics as chr
       on chr.id = metr.type_id
+  /*left join
+      ref_values as rv
+      on rv.metrology_id = meas.ref_value_id*/
   inner join    
       verification as v
       on meas.v_id = v.id
@@ -350,6 +353,12 @@
       meas.value,
       meas.value_2,
       meas.ref_value,
+      meas.ref_value_id,
+      /*rv.id as ref_value_id,
+      rv.nominal || ' ' || coalesce(rv.units, metr.units, ch.units) || ' ± '
+        || rv.tolerance || ' '
+        || iif(rv.tolerance_type = 0,
+               coalesce(rv.units, metr.units, ch.units), '%') as ref_value_info,*/
       meas.text,
       metr.value as error_value,
       metr.fraction as error_fraction,
@@ -370,7 +379,63 @@
   inner join    
       verification as v
       on meas.v_id = v.id
+  /*left join
+    ref_values as rv
+    on rv.metrology_id = meas.ref_value_id*/
   {where}
+  {limit}
+  {offset};")
+
+(def get-ref-values-records-count
+  "select count(*) as count
+  from
+  (select *
+  from
+    ref_values as rv
+  inner join
+    metrology as metr
+    on metr.id = rv.metrology_id
+  inner join
+    channels as ch
+    on ch.id = metr.channel_id
+  inner join
+    methodology as met
+    on met.id = ch.methodology_id
+  {where});")
+
+(def get-ref-values
+  "select 
+    rv.id
+    , met.registry_number
+    , ch.channel as channel_name
+    , ifnull(ch.component || ' ', '') || '(' || ch.range_from || ' - '
+      || ch.range_to || ') ' || ch.units as channel
+    , '(' || metr.r_from || ' - ' || metr.r_to || ') '
+      || ifnull(metr.units, ch.units) as range
+    , rv.metrology_id
+    , rv.number
+    , rv.nominal
+    , rv.units
+    , rv.tolerance
+    , rv.tolerance_type
+    , rv.reference
+    , rv.level
+    , rv.error
+    , rv.error_type
+    , rv.comment
+  from
+    ref_values as rv
+  inner join
+    metrology as metr
+    on metr.id = rv.metrology_id
+  inner join
+    channels as ch
+    on ch.id = metr.channel_id
+  inner join
+    methodology as met
+    on met.id = ch.methodology_id
+  {where}
+  order by ch.id
   {limit}
   {offset};")
 

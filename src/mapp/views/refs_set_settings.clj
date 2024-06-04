@@ -1,9 +1,9 @@
 (ns mapp.views.refs-set-settings)
 
 (def fields-settings
-  [[:expiration "Срок годности" false]
+  [[:id "ID записи" true]
+   [:expiration "Срок годности" false]
    [:v_id "ID поверки" true]
-   [:id "ID записи" true]
    [:ref_id "ID эталона" true]
    [:type_id "Вид средства поверки" true]
    [:mi_name "Наименование СИ" false]

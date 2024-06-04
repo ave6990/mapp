@@ -21,4 +21,5 @@
 
 (def context-menu-settings
   '(["-" "-"]
-    ["МХ" "ctx-menu-action-metrology"]))
+    ["МХ" "ctx-menu-action-metrology"]
+    ["Опорные значения" "ctx-menu-action-ref-values"]))

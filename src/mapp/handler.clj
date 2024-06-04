@@ -27,7 +27,7 @@
     (POST "/save" req (response (c/write-verifications (:body req))))
     (POST "/copy" req (response (c/copy-verifications (:body req))))
     (POST "/gen-value" req (response (c/gen-value-verifications (:body req))))
-    (DELETE "/verifications/delete" req (response (c/delete-verifications (:body req)))))
+    (DELETE "/delete" req (response (c/delete-verifications (:body req)))))
   (context "/conditions" []
     (GET "/" req (c/get-conditions-page (:params req)))
     (GET "/get" req (response (c/get-conditions-data (:params req))))
@@ -82,7 +82,13 @@
     query-save
     query-copy
     query-delete)
-  (context "/channels" []
+  (context "/ref-values" []
+    (GET "/" req (c/get-ref-values-page (:params req)))
+    (GET "/get" req (response (c/get-ref-values-data (:params req))))
+    query-save
+    query-copy
+    query-delete)
+ (context "/channels" []
     (GET "/" req (c/get-channels-page (:params req)))
     (GET "/get" req (response (c/get-channels-data (:params req))))
     query-save

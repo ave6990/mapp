@@ -102,6 +102,12 @@
     (.open js/window
       (make-url "verification-operations" " methodology_id = " ids))))
 
+(defn ctx-action-ref-values
+  [event]
+  (let [ids (->> (table/read-selected-rows) (map :id) set)]
+    (.open js/window
+      (make-url "ref-values" " ch.id = " ids))))
+
 (def menu-actions
   {"ctx-menu-action-save" ctx-action-save
    "ctx-menu-action-copy" ctx-action-copy
@@ -116,6 +122,7 @@
    "ctx-menu-action-refs-set" ctx-action-refs-set
    "ctx-menu-action-gen-value" ctx-action-gen-value
    "ctx-menu-action-verification-operations" ctx-action-verification-operations
+   "ctx-menu-action-ref-values" ctx-action-ref-values
    "ctx-menu-action-protocols" ctx-action-protocols})
 
 (defn add-event-listeners
