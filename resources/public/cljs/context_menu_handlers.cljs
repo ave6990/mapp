@@ -104,9 +104,16 @@
 
 (defn ctx-action-ref-values
   [event]
-  (let [ids (->> (table/read-selected-rows) (map :id) set)]
+  (let [rows (table/read-selected-rows)
+        where (case (table/get-table-id)
+                "measurements"
+                  {:field " rv.metrology_id = "
+                   :ids (->> rows (map :metrology_id) set)}
+                "channels"
+                  {:field " ch.id = "
+                   :ids (->> rows (map :id) set)})]
     (.open js/window
-      (make-url "ref-values" " ch.id = " ids))))
+      (make-url "ref-values" (:field where) (:ids where)))))
 
 (def menu-actions
   {"ctx-menu-action-save" ctx-action-save

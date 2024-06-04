@@ -151,7 +151,7 @@
 (make-get-page "Операции поверки" "v-operations" ops/fields-settings ops/toolbar-fields-settings [])
 (make-get-page "Операции поверки по НД" "verification-operations" v-ops/fields-settings v-ops/toolbar-fields-settings [])
 (make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
-(make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings [])
+(make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings meas/context-menu-settings)
 (make-get-page "Каналы измерений" "channels" ch/fields-settings ch/toolbar-fields-settings ch/context-menu-settings)
 (make-get-page "Опорные значения" "ref-values" rv/fields-settings rv/toolbar-fields-settings [])
 (make-get-page "Метрологические характеристики" "metrology" metr/fields-settings metr/toolbar-fields-settings [])

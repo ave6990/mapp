@@ -107,13 +107,13 @@ td[contenteditable^="false"] {
 }
 
 .context-menu {
-  font-size: 12pt;
+  font-size: 10pt;
   display: none;
   position: absolute;
   z-index: 10;
   background: white;
   border: solid 1px;
-  box-shadow: 1px 1px 2px #cfcfcf;
+  box-shadow: 1px 1px 2px #afafaf;
 }
 
 .context-menu-active {
@@ -122,12 +122,13 @@ td[contenteditable^="false"] {
 
 .context-menu-items {
   list-style: none;
-  margin: 2px;
+  margin: 4px;
   padding: 0;
 }
 
 .context-menu-item {
   background: white;
+  padding: 2px;
   color: var(--color-text);
   text-align: left;
 }

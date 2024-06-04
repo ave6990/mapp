@@ -327,9 +327,9 @@
   inner join
       characteristics as chr
       on chr.id = metr.type_id
-  /*left join
+  inner join
       ref_values as rv
-      on rv.metrology_id = meas.ref_value_id*/
+      on rv.id = meas.ref_value_id
   inner join    
       verification as v
       on meas.v_id = v.id
@@ -354,11 +354,7 @@
       meas.value_2,
       meas.ref_value,
       meas.ref_value_id,
-      /*rv.id as ref_value_id,
-      rv.nominal || ' ' || coalesce(rv.units, metr.units, ch.units) || ' ± '
-        || rv.tolerance || ' '
-        || iif(rv.tolerance_type = 0,
-               coalesce(rv.units, metr.units, ch.units), '%') as ref_value_info,*/
+      rv.nominal_range,
       meas.text,
       metr.value as error_value,
       metr.fraction as error_fraction,
@@ -379,9 +375,9 @@
   inner join    
       verification as v
       on meas.v_id = v.id
-  /*left join
+  inner join
     ref_values as rv
-    on rv.metrology_id = meas.ref_value_id*/
+    on rv.id = meas.ref_value_id
   {where}
   {limit}
   {offset};")
@@ -414,6 +410,7 @@
       || ifnull(metr.units, ch.units) as range
     , rv.metrology_id
     , rv.number
+    , rv.nominal_range
     , rv.nominal
     , rv.units
     , rv.tolerance

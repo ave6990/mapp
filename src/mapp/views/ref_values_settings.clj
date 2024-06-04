@@ -12,6 +12,7 @@
     [:range "Диапазон" false]
     [:metrology_id "id МХ" true]
     [:number "Номер п/п" true]
+    [:nominal_range "Диапазон допустимых значений" false]
     [:nominal "Номинальное значение" true]
     [:units "Единицы измерения" true]
     [:tolerance "Отклонение" true]

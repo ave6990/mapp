@@ -26,13 +26,17 @@
   '([:id "id" true]
     [:v_id "id поверки" true]
     [:serial_number "Зав. №" false]
-    [:channel_name "Имя канала" false]
+    [:channel_name "Имя канала" true]
     [:channel "Канал" false]
     [:metrology_id "id МХ" true]
     [:value "Изм. значение" true]
     [:value_2 "Знач. (вариация)" true]
     [:ref_value "Действ. знач." true]
-    ;[:ref_value_id "ID опорного значения" true]
-    ;[:ref_value_info "Опорное значение по НД" false]
+    [:ref_value_id "ID опорного значения" true]
+    [:nominal_range "Опорное значение по НД" false]
     [:text "Текст" true]
     [:comment "Комментарий" true]))
+
+(def context-menu-settings
+  '(["-" "-"]
+    ["Опорные значения" "ctx-menu-action-ref-values"]))
