@@ -327,7 +327,7 @@
   inner join
       characteristics as chr
       on chr.id = metr.type_id
-  inner join
+  left join
       ref_values as rv
       on rv.id = meas.ref_value_id
   inner join    
@@ -375,7 +375,7 @@
   inner join    
       verification as v
       on meas.v_id = v.id
-  inner join
+  left join
     ref_values as rv
     on rv.id = meas.ref_value_id
   {where}

@@ -209,7 +209,8 @@
 
 (def footer
   [:footer
-      [:p "Mapp, версия 2024-05-15"]
+      #_[:p "Mapp, версия 2024-05-15"]
+      [:p {:id "status"}]
       (save-popup)
       (copy-popup)
       (delete-popup)

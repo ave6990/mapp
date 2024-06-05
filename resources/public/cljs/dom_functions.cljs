@@ -28,6 +28,14 @@
   [id v]
   (set! (-> id get-by-id .-innerHTML) v))
 
+(defn get-text
+  [id]
+  (-> id get-by-id .-textContent))
+
+(defn set-text
+  [id s]
+  (set! (-> id get-by-id .-textContent) s))
+
 (defn add-event-listener
   [id event fn]
   (-> id get-by-id (.addEventListener event fn)))
@@ -55,4 +63,7 @@
   (.stringify js/JSON
               (clj->js data)))
 
+(defn status! ;; TOFIX: move to other place
+  [s]
+  (set! (> "status" get-by-id .-textContent) s))
 

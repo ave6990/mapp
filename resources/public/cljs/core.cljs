@@ -22,7 +22,8 @@
   (when (= "F5" (-> event .-key))
         (-> event (.preventDefault))
         (query-handlers/execute-query)
-        (table-handlers/unselect-rows)))
+        (table-handlers/unselect-rows)
+        #_(status! "Данные обновлены!")))
 
 (defn add-reload-event-listener
   []
@@ -43,13 +44,3 @@
   (popups/add-popup-event-listeners))
 
 (add-behavior)
-
-(comment
-
-(.open js/window (make-url
-                   "verifications"
-                   p-num
-                   (get-value "query")
-                   @records-limit))
-
-)

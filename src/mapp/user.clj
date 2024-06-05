@@ -694,6 +694,15 @@
           (str scan-path f)
           (str scan-path "trash/"))))
 
+(defn move-backups ;; TODO:
+  []
+  (let [department 9
+        engineer-num 61
+        year 2024
+        scan-path "/media/sf_SCAN/"
+        local-path "./scans"]
+    ()))
+
 ;; #split#rename#scan#protocol
 (defn protocol-backup
   "author: Aleksandr Ermolaev
