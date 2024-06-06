@@ -65,5 +65,5 @@
 
 (defn status! ;; TOFIX: move to other place
   [s]
-  (set! (> "status" get-by-id .-textContent) s))
+  (set! (-> "status" get-by-id .-textContent) s))
 
