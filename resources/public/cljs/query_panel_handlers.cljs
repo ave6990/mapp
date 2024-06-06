@@ -31,7 +31,7 @@
   []
   (let [table-id (table/get-table-id)
         query (get-value "query")
-        page-number (read-string
+        page-number (js/parseInt
                       (get-value "page-number"))]
     (println table-id query page-number)
     (->
@@ -46,7 +46,7 @@
 (defn page-number-changed
   [event]
   (let [temp-p-num (-> event .-target .-value)
-        pages-count (read-string (-> (get-by-id "pages-count") .-innerHTML))
+        pages-count (js/parseInt (-> (get-by-id "pages-count") .-innerHTML))
         p-num (if (> temp-p-num pages-count)
                   pages-count
                   temp-p-num)]

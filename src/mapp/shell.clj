@@ -9,6 +9,8 @@
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 35 60))))
 
+(find-doc "sorted-set")
+
 ((gs/calculator
   (gs/passports 1))
   "CH4"
@@ -629,16 +631,19 @@
 ;;#scan#backup#protocol#split
 (protocol-backup)
 
-(defn control-points
+;;#move#backup#protocols
+
+(defn control-points ;; TODO: add tolerance value to the point
   "Расчитывает значения опорных точек 5, 50 и 95 %
    (или заданных вектором `points) диапазона
    измерений заданного вектором `rng"
   ([rng points]
    (let [s-rng (rng 0)
          e-rng (rng 1)]
-    (map (fn [p]
-             (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
-         points)))
+    (into (sorted-set)
+      (map (fn [p]
+               (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
+           points))))
   ([rng]
    (control-points rng [5 50 95])))
 

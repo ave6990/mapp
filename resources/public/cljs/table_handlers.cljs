@@ -27,7 +27,7 @@
     (-> tr
         (.getAttribute "id")
         (string/replace #"row_" "")
-        read-string)))
+        js/parseInt)))
 
 (defn select-row-by-number
   [n]

@@ -26,8 +26,8 @@
 
 (defn copy-popup-yes-click
   [event]
-  (let [rec-num (read-string (get-html "copy-record-number"))
-        cnt (read-string (get-value "copy-count"))
+  (let [rec-num (js/parseInt (get-html "copy-record-number"))
+        cnt (js/parseInt (get-value "copy-count"))
         tab-id (table/get-table-id)]
     (.log js/console "Copy record " rec-num cnt " times")
     (table-handlers/unselect-rows)
@@ -43,7 +43,7 @@
   [event]
   (let [data (table/read-selected-rows)
         ids (map :id data)
-        rec-nums (map read-string ids)
+        rec-nums (map js/parseInt ids)
         tab-id (table/get-table-id)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "delete-popup") "show-popup")
@@ -59,7 +59,7 @@
   [event]
   (let [data (table/read-selected-rows)
         ids (map :id data)
-        rec-nums (map read-string ids)]
+        rec-nums (map js/parseInt ids)]
     (table-handlers/unselect-rows)
     (remove-class (get-by-id "gen-value-popup") "show-popup")
     (js/fetch (str "/verifications/gen-value")
