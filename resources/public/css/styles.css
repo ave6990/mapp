@@ -80,6 +80,7 @@ thead {
 
 td, th {
   border: 1px solid var(--table-border-color);
+  padding: 4px;
 }
 
 table .selected {

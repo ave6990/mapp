@@ -1,7 +1,3 @@
-      (jdbc/insert-multi!
-        midb
-        :v_refs
-        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
                   coll)))))
 (defn set-v-opt-refs!
   [v-id coll]
@@ -498,3 +494,7 @@
 (type (Integer. "12"))
 (type (read-string "12"))
 (type (Float. "12"))
+;;#scan#backup#protocol#split
+(protocol-backup)
+;;#scan#backup#protocol#split
+(protocol-backup)

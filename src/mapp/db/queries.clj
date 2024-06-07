@@ -96,7 +96,7 @@
     conditions
   {where}
   order by
-    id desc
+    date desc
   {limit}
   {offset};")
 
