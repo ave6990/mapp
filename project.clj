@@ -6,6 +6,7 @@
     [[org.clojure/clojure "1.11.1"]
      [org.clojure/java.jdbc "0.7.12"]
      [org.xerial/sqlite-jdbc "3.42.0.0"]
+     [incanter "1.9.3"]
      [enlive "1.1.6"]
      [hiccup "2.0.0-RC3"]
      [compojure "1.7.1"]

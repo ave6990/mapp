@@ -1,3 +1,182 @@
+                          "v_operations" "measurements"))))
+(defn get-protocols-data
+  ""
+  [where]
+  (let [data (jdbc/query
+                midb
+                (str "select * from protocol where " where))
+        measurements (jdbc/query
+                        midb
+                        (str "select * from view_v_measurements where " where))
+        html (jdbc/query
+               midb
+               (str "select * from v_html where " where))]
+    (map (fn [m]
+             (assoc
+               (assoc m
+                    :measurements
+                    (doall (filter (fn [r]
+                                       (= (:id r) (:id m)))
+                                   measurements)))
+               :html
+               (doall (filter (fn [r]
+                                (= (:id r) (:id m)))
+                              html))))
+         data)))
+(defn assoc-multi
+  [m nm]
+  (reduce (fn [a b]
+            (let [[k v] b]
+              (assoc a k v)))
+          m
+          nm))
+(defn get-references-data
+  [where]
+  (jdbc/query
+    midb
+    (str "select * from refs
+          where " where)))
+(defn references
+  ""
+  [where]
+  (spit
+    (str midb-path "references.html")
+    (report/refs-report
+      (get-references-data where))))
+(defn get-report-data
+  ""
+  [coll]
+  (let [v-data (jdbc/query
+                midb
+                (str
+                  q/report-verifications
+                  "("
+                  (string/join ", " coll)
+                  ")
+                  order by date desc, id desc"))
+        measurements (jdbc/query
+                      midb
+                      (str "select * from view_v_measurements
+                          where id in ("
+                          (string/join ", " coll)
+                          ")"))
+        operations (jdbc/query
+                    midb
+                    (str
+                      q/get-operations
+                      "("
+                      (string/join ", " coll)
+                      ")"))
+        refs (jdbc/query
+              midb
+              (str "select * from verification_refs
+                      where v_id in ("
+                      (string/join ", " coll)
+                      ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:measurements
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          measurements))
+                           :refs
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          refs))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          operations))}))
+         v-data)))
+(defn get-methodology-data
+  [coll]
+  (let [met-data
+         (jdbc/query
+           midb
+           (str "select * from methodology
+                 where id in ("
+                 (string/join
+                   ", "
+                   coll)
+                 ")"))
+        metrology-data
+          (jdbc/query
+            midb
+            (str "select * from view_metrology
+                  where id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))
+        operations-data
+          (jdbc/query
+            midb
+            (str "select * from verification_operations
+                  where methodology_id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:metrology
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          metrology-data))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:methodology_id r) (:id m)))
+                                          operations-data))}))
+         met-data)))
+(defn get-conditions-by-v-id 
+  [id]
+  (->>
+    ["select *
+      from conditions
+      where id = ?"
+          (->>
+            ["select conditions
+              from verification
+              where id = ?" id]
+            (jdbc/query midb)
+            first
+            :conditions
+           )]
+    (jdbc/query midb)
+    first))
+(conj (list 233 32 245) 140)
+(defn update-record!
+  [record table changes]
+  (jdbc/update! midb
+                table
+                (assoc-multi (table record) changes)
+                ["id = ?" ((comp :id table) record)]))
+(defn all-refs
+  [id]
+  (jdbc/query midb [q/all-refs id]))
+(defn check-gso
+  [coll column]
+  (map (fn [num]
+         (first (jdbc/query midb
+                     [(str "select id, number_1c, pass_number, expiration_date
+                            from gso
+                            where " column " = ?") num])))
+       coll))
+(defn set-v-gso!
+  [v-id coll]
+  (do (delete-v-gso! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_gso
+        (vec (map (fn [el] (hash-map :v_id v-id :gso_id el))
+                  coll)))))
+(defn set-v-refs!
+  [v-id coll]
+  (do (delete-v-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
                   coll)))))
 (defn set-v-opt-refs!
   [v-id coll]
@@ -227,6 +406,14 @@
     (sh "mv"
           (str scan-path f)
           (str scan-path "trash/"))))
+(defn move-backups ;; TODO:
+  []
+  (let [department 9
+        engineer-num 61
+        year 2024
+        scan-path "/media/sf_SCAN/"
+        local-path "./scans"]
+    ()))
 ;; #split#rename#scan#protocol
 (defn protocol-backup
   "author: Aleksandr Ermolaev
@@ -286,215 +473,28 @@
 (doc assoc)
 )
 (pprint (gs2000 0
-                "H2S"
-                496 
-                #_(list ) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 5 9 11 15 18))))
-(pprint (gs2000 0
-                "H2S"
-                496 
-                #_(list ) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 430 740))))
-(pprint (gs2000 0
-                "CO"
-                9030
-                #_(list ) 
-                (map #(ch/ppm->mg "CO" %1)
-                     (list 430 740))))
-(pprint (gs2000 0
-                "H2S"
-                496
-                #_(list ) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(map (partial ch/ppm->mg
-              "H2S")
-     '(5.4 27))
-(pprint (gs2000 0
-                ;"H2S"
-                9030
-                (list 50 1000 1900) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                "CO"
-                9030
-                (list 58.2 1164 1800) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                "H2S"
-                496
-                (list 2.8 70.7 90) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                ;"H2S"
-                496
-                (list 2 50 90) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                ;"H2S"
-                1000
-                (list 10 18) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(map #(/ %1 4.4 0.01)
-     '(1.116 2.09))
-(pprint (gs2000 0
-                "H2S"
-                496
-                (list 28.3 141 255) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                "H2S"
-                2012
-                (list 28.3 141 255) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                "H2S"
-                496 
-                (list 50 75 90) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                "H2S"
-                496 
-                (list 50 85) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                ;"H2S"
-                496 
-                (list 7.7 50 97) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(pprint (gs2000 0
-                ;"H2S"
-                496 
-                (list 7.7 50 95) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(/ 1.619 1.7 0.01)
-(* 2 2.75)
-(-> (/ 5.5 0.01) 1.447)
-(-> (/ 5.5 0.01) 2.6)
-(#(/ % 5.5 0.01) 2.6)
-(#(/ % 5.5 0.01) 1.447)
-(pprint (gs2000 0
                 "NH3"
                 2906
                 (list 40 310 550) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 35 60))))
-(map #(/ %1 4.4 0.01)
-     '(1.116 2.09))
-;;#scan#backup#protocol#split
-(protocol-backup)
-(map #(/ %1 4.4 0.01)
-     '(0.944 1.806))
-;;#scan#backup#protocol#split
-(protocol-backup)
-(find-doc "sorted-set")
-(defn control-points
-  "Расчитывает значения опорных точек 5, 50 и 95 %
-   (или заданных вектором `points) диапазона
-   измерений заданного вектором `rng"
-  ([rng points]
-   (let [s-rng (rng 0)
-         e-rng (rng 1)]
-    (sorted-set
-      (map (fn [p]
-               (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
-           points)))
-  ([rng]
-   (control-points rng [5 50 95])))
-)
-(control-points [10 100])
-(defn control-points
-  "Расчитывает значения опорных точек 5, 50 и 95 %
-   (или заданных вектором `points) диапазона
-   измерений заданного вектором `rng"
-  ([rng points]
-   (let [s-rng (rng 0)
-         e-rng (rng 1)]
-    (sorted-set
-      (map (fn [p]
-               (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
-           points)))
-  ([rng]
-   (control-points rng [5 50 95]))))
-(control-points [10 100])
-(control-points [10 100] [5 50 95])
-(sorted-set [1 2 2 2 3 4 33 2 2 23 3 3])
-(sorted-set 1 2 2 2 3 4 33 2 2 23 3 3)
-(defn control-points
-  "Расчитывает значения опорных точек 5, 50 и 95 %
-   (или заданных вектором `points) диапазона
-   измерений заданного вектором `rng"
-  ([rng points]
-   (let [s-rng (rng 0)
-         e-rng (rng 1)]
-    (apply sorted-set
-      (map (fn [p]
-               (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
-           points)))
-  ([rng]
-   (control-points rng [5 50 95]))))
-(control-points [10 100] [5 50 95])
-(defn control-points
-  "Расчитывает значения опорных точек 5, 50 и 95 %
-   (или заданных вектором `points) диапазона
-   измерений заданного вектором `rng"
-  ([rng points]
-   (let [s-rng (rng 0)
-         e-rng (rng 1)]
-    (into (sorted-set)
-      (map (fn [p]
-               (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
-           points)))
-  ([rng]
-   (control-points rng [5 50 95]))))
-(control-points [10 100] [5 50 95])
-(defn control-points
-  "Расчитывает значения опорных точек 5, 50 и 95 %
-   (или заданных вектором `points) диапазона
-   измерений заданного вектором `rng"
-  ([rng points]
-   (let [s-rng (rng 0)
-         e-rng (rng 1)]
-    (into (sorted-set)
-      (map (fn [p]
-               (+ s-rng (* (- e-rng s-rng) (double (/ p 100)))))
-           points))))
-  ([rng]
-   (control-points rng [5 50 95])))
-(control-points [10 100] [5 50 95])
-(control-points [10 100])
-(doc into)
-(into [4] '[1 2 3])
-(into inc '[1 2 3])
-(into (inc) '[1 2 3])
-(into (list) '[1 2 3])
-(source into)
-(eval "(list 1 2 3)")
-(eval '(list 1 2 3))
-(doc eval)
-(find-doc "eval text")
-(find-doc "eval")
-(read-string "(list 1 2 3)"
-)
-(type (Integer. "12"))
-(type (read-string "12"))
-(type (Integer. "12"))
-(type (read-string "12"))
-(type (Float. "12"))
-;;#scan#backup#protocol#split
-(protocol-backup)
-;;#scan#backup#protocol#split
-(protocol-backup)
+(#(/ % 5.5 0.01) 1.447)
+(pprint (gs2000 0
+                "C3H8"
+                7910 
+                #_(list 40 310 550) 
+                (map #(ch/ppm->mg "C3H8" %1)
+                     (list 820 1500))))
+(pprint (gs2000 0
+                #_"C3H8"
+                7910 
+                (list 820 1500) 
+                #_(map #(ch/ppm->mg "C3H8" %1)
+                     (list 820 1500))))
+(pprint (gs2000 0
+                #_"C3H8"
+                7910 
+                #_(list 820 1500) 
+                (map #(ch/ppm->mg "C3H8" %1)
+                     (list 820 1500))))
+exit
