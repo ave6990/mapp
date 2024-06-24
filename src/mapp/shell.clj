@@ -620,11 +620,11 @@
              "select
                 v.protocol_number,
                 c.date as date
-              from verification
+              from verification as v
               inner join conditions as c
                 on c.id = v.conditions
               where
-                c.date > "2024-01-01"
+                c.date > '2024-01-01'
                 --v.protocol_number >= 2319
                 --and v.protocol_number  <= 2322")]
   (map (fn [m]

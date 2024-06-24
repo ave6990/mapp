@@ -17,12 +17,17 @@
       .-dataTransfer
       (.setData "text/plain" (-> event .-target (.getAttribute "name")))))
 
+(defn reload-table
+  []
+  (.log js/console "`(reload-table) called")
+  (query-handlers/execute-query)
+  (table-handlers/unselect-rows))
+
 (defn reload-pressed
   [event]
   (when (= "F5" (-> event .-key))
         (-> event (.preventDefault))
-        (query-handlers/execute-query)
-        (table-handlers/unselect-rows)
+        (reload-table)
         #_(status! "Данные обновлены!")))
 
 (defn add-reload-event-listener
@@ -44,3 +49,7 @@
   (popups/add-popup-event-listeners))
 
 (add-behavior)
+
+(if (= (.-readyState js/document) "loading")
+    (.addEventListener js/document "DOMContentLoaded" reload-table)
+    (reload-table))

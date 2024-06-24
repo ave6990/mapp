@@ -232,41 +232,6 @@
       context-menu]
     footer])
 
-(defn create-table-header
-  [model]
-  [:tr {:class "headers-row"}
-    (for [[id nm _] model]
-      [:th {:class (str "col" id)}
-                 nm])])
-
-(defn create-table-row
-  [model row-data i]
-  (let [ids (for [[id _ _] model] id) 
-        editables (for [[_ _ editable] model] (str editable))]
-    [:tr {:id (str "row_" i)}
-      (map (fn [id editable]
-               [:td {:class (str "col" id)
-                    :contenteditable editable}
-                 (id row-data)])
-           ids
-           editables)]))
-
-(defn create-table-rows
-  [model data]
-  (map (fn [row i]
-           (create-table-row model row i))
-       data
-       (range (count data))))
-
-(defn create-table
-  "args: model [[id name visibility] [] ... []]"
-  [id model data]
-  [:table {:id id}
-    [:thead
-      (create-table-header model)]
-    [:tbody
-      (create-table-rows model data)]])
-
 (comment
 
 (require '[hiccup2.core :as h] :reload)
@@ -279,22 +244,5 @@
 (str (h/html t-page))
 
 (str (h/html (meta-tag "author" "ave6990")))
-
-(create-table-header
-          '([:id "id" true]
-            [:name "name" true]))
-
-(str (h/html
-(create-table-row
-  '([:id "id" true]
-    [:name "name" true])
-  {:id 123 :name "peter"})))
-
-(str (h/html
-(create-table-rows
-  '([:id "id" true]
-    [:name "name" true])
-  '({:id 123 :name "peter"}
-    {:id 456 :name "petra"}))))
 
 )

@@ -114,7 +114,8 @@
               query
               (calc-pages recs-count limit)
               recs-count)
-            (tmpl/create-table
+            [:table {:id table-id}]
+            #_(tmpl/create-table
               table-id
               fields-settings
               data)
@@ -280,14 +281,6 @@
           (write-refs refs))
     (when (not (empty? opt-refs))
           (write-opt-refs opt-refs))))
-
-(defn copy-refs-set
-  [body]
-  ())
-
-(defn delete-refs-set
-  [body]
-  ())
 
 (defn copy-verifications
   [body]
