@@ -45,4 +45,5 @@
 
 (def context-menu-settings
   '(["-" "-"]
-    ["Операции поверки" "ctx-menu-action-verification-operations"]))
+    ["Операции поверки" "ctx-menu-action-verification-operations"]
+    ["Каналы измерений" "ctx-menu-action-channels"]))

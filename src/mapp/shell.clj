@@ -2,12 +2,14 @@
 (require '[mapp.lib.gs2000 :as gs])
 (require '[clojure.java.shell :refer [sh]])
 
-(pprint (gs2000 0
-                "NH3"
-                2906
-                (list 40 310 550) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
+(pprint (gs2000 2
+                "H2S"
+                78
+                #_(list 2.2 20) 
+                (map #(ch/ppm->mg "H2S" %1)
+                     (list 1.7 5.8))))
+
+(map #(* 1.42 %) [7.639991978624116 49.98285275269121 89.96797778940756])
 
 (find-doc "sorted-set")
 
@@ -20,22 +22,24 @@
 
 (#(/ % 5.5 0.01) 1.447)
 
+(map #(* 2.5 %) '(3.782 399.71 640.268))
+
 ;; #chemistry
 (ch/coefficient "NH3")
 
 (map (partial ch/ppm->mg
               "H2S")
-     '(5.4 27))
+     '(2.1 6.3))
 
 (* 0.94 0.05)
 
-(ch/mg->ppm "NH3" 1600)
+(ch/mg->ppm "C6H14" )
 
 (map #(/ (* %1 32.07) 62.14)
      '(4.9 7.8 40 70))
 
 (map #(/ %1 4.4 0.01)
-     '(0.944 1.806))
+     '(1.116 2.09))
 
 (map #(* % 30)
      '(0.05 0.5 0.95))
@@ -584,13 +588,13 @@
   (jdbc/insert!
     auto
     :travel_order
-    {:auto_id 2
-     :count "9/0000"
-     :date_departure "2024-05-07T10:00"
-     :date_arrive "2024-05-07T11:00"
-     :odometr_departure 148006
-     :fuel_departure 32.18
-     :odometr_arrive 148018
+    {:auto_id 4
+     :count "9/0001260"
+     :date_departure "2024-06-20T09:00"
+     :date_arrive "2024-06-20T13:30"
+     :odometr_departure 153210
+     :fuel_departure 28.49
+     :odometr_arrive 153249
      :fuel_add 0})
   (pprint
     (jdbc/query
@@ -610,26 +614,32 @@
 
 ;; Дата изменения скана протокола = дата поверки
 ;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2023/Ермолаев/"
+(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
       data (jdbc/query
              midb
-             "select protocol_number, date
+             "select
+                v.protocol_number,
+                c.date as date
               from verification
-              inner join conditions
-                on conditions.id = verification.conditions
-              where protocol_number >= 2319
-                and protocol_number  <= 2322")]
+              inner join conditions as c
+                on c.id = v.conditions
+              where
+                c.date > "2024-01-01"
+                --v.protocol_number >= 2319
+                --and v.protocol_number  <= 2322")]
   (map (fn [m]
            (sh
              "touch"
              (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2023.pdf"))
+                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
              "-mad"
              (str (:date m) "T17:30")))
        data))
 
 ;;#scan#backup#protocol#split
 (protocol-backup)
+
+(/ 1600 2.5)
 
 ;;#move#backup#protocols
 
