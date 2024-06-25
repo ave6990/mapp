@@ -94,8 +94,8 @@
                    :model fields-settings})}))
 
 (defn get-page
-  [title table-id toolbar-settings context-menu-settings]
-  (let []
+  [title table-id params toolbar-settings context-menu-settings]
+  (let [{:keys [q]} params]
     (str
       (h/html
         (tmpl/gen-page
@@ -106,7 +106,7 @@
                 tmpl/symbols)
               (tmpl/toolbar-text-snippets
                 toolbar-settings))
-            (tmpl/query-panel "" 1 0)
+            (tmpl/query-panel q 1 0)
             [:table {:id table-id}]
             nil
             (tmpl/context-menu
@@ -126,6 +126,7 @@
          (mapp.controller.controller/get-page
            ~title
            ~table-id
+           ~params
            ~toolbar-settings
            ~context-menu-settings)))))
 
