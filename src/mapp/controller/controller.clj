@@ -94,12 +94,8 @@
                    :model fields-settings})}))
 
 (defn get-page
-  [title table-id params get-fn fields-settings toolbar-settings context-menu-settings]
-  (let [request (parse-request params)
-        {:keys [query limit offset]} request
-        records (get-fn
-                  query limit offset)
-        {:keys [recs-count data]} records]
+  [title table-id toolbar-settings context-menu-settings]
+  (let []
     (str
       (h/html
         (tmpl/gen-page
@@ -110,21 +106,14 @@
                 tmpl/symbols)
               (tmpl/toolbar-text-snippets
                 toolbar-settings))
-            (tmpl/query-panel
-              query
-              (calc-pages recs-count limit)
-              recs-count)
+            (tmpl/query-panel "" 1 0)
             [:table {:id table-id}]
-            #_(tmpl/create-table
-              table-id
-              fields-settings
-              data)
             nil
             (tmpl/context-menu
               context-menu-settings)))))))
 
 (defmacro make-get-page
-  [title table-id fields-settings toolbar-settings context-menu-settings]
+  [title table-id toolbar-settings context-menu-settings]
   (let [req (gensym "req")
         params (gensym "params")]
     `(defn ~(symbol (str "get-" table-id "-page"))
@@ -137,25 +126,22 @@
          (mapp.controller.controller/get-page
            ~title
            ~table-id
-           ~params
-           ~(symbol (str "midb/get-" table-id))
-           ~fields-settings
            ~toolbar-settings
            ~context-menu-settings)))))
 
-(make-get-page "Журнал ПР" "verifications" vs/fields-settings vs/toolbar-fields-settings vs/context-menu-settings)
-(make-get-page "Условия поверки" "conditions" cs/fields-settings cs/toolbar-fields-settings [])
-(make-get-page "Эталоны" "references" refs/fields-settings refs/toolbar-fields-settings [])
-(make-get-page "ГСО" "gso" gso/fields-settings gso/toolbar-fields-settings [])
-(make-get-page "Контрагенты" "counteragents" ca/fields-settings ca/toolbar-fields-settings [])
-(make-get-page "МП" "methodology" met/fields-settings met/toolbar-fields-settings met/context-menu-settings)
-(make-get-page "Операции поверки" "v-operations" ops/fields-settings ops/toolbar-fields-settings [])
-(make-get-page "Операции поверки по НД" "verification-operations" v-ops/fields-settings v-ops/toolbar-fields-settings [])
-(make-get-page "КСП" "refs-set" refs-set/fields-settings refs-set/toolbar-fields-settings [])
-(make-get-page "Результаты измерений" "measurements" meas/fields-settings meas/toolbar-fields-settings meas/context-menu-settings)
-(make-get-page "Каналы измерений" "channels" ch/fields-settings ch/toolbar-fields-settings ch/context-menu-settings)
-(make-get-page "Опорные значения" "ref-values" rv/fields-settings rv/toolbar-fields-settings [])
-(make-get-page "Метрологические характеристики" "metrology" metr/fields-settings metr/toolbar-fields-settings [])
+(make-get-page "Журнал ПР" "verifications" vs/toolbar-fields-settings vs/context-menu-settings)
+(make-get-page "Условия поверки" "conditions" cs/toolbar-fields-settings [])
+(make-get-page "Эталоны" "references" refs/toolbar-fields-settings [])
+(make-get-page "ГСО" "gso" gso/toolbar-fields-settings [])
+(make-get-page "Контрагенты" "counteragents" ca/toolbar-fields-settings [])
+(make-get-page "МП" "methodology" met/toolbar-fields-settings met/context-menu-settings)
+(make-get-page "Операции поверки" "v-operations" ops/toolbar-fields-settings [])
+(make-get-page "Операции поверки по НД" "verification-operations" v-ops/toolbar-fields-settings [])
+(make-get-page "КСП" "refs-set" refs-set/toolbar-fields-settings [])
+(make-get-page "Результаты измерений" "measurements" meas/toolbar-fields-settings meas/context-menu-settings)
+(make-get-page "Каналы измерений" "channels" ch/toolbar-fields-settings ch/context-menu-settings)
+(make-get-page "Опорные значения" "ref-values" rv/toolbar-fields-settings [])
+(make-get-page "Метрологические характеристики" "metrology" metr/toolbar-fields-settings [])
 
 (defn get-protocols
   [req]
@@ -321,8 +307,8 @@
   (let [{:keys [table data]} (keywordize body)]
     (dorun
       (for [rec data]
-        (midb/write!
-          (keyword (string/replace table #"-" "_"))
+       (midb/write!
+        (keyword (string/replace table #"-" "_"))
           rec)))
         (println (str "Save data to " table " table complete"))))
 
