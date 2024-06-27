@@ -340,17 +340,16 @@
       meas.id,
       meas.v_id,
       v.serial_number,
+      v_ops.section || ' ' || v_ops.name as operation,
       meas.metrology_id,
       meas.channel_name,
-      ifnull(ch.channel, ch.component) || ' '
-        || ifnull('(' || metr.r_from || ' - ' || metr.r_to || ') ' ||
-          ch.units || '; ', '')|| ifnull(chr.symbol || ' ', '')
+      ifnull(ifnull(ch.channel, ch.component) || ' ', '')
+        || ifnull('(' || metr.r_from || ' - ' || metr.r_to || ') ' || ch.units || '; ', '')
+        || ifnull(chr.symbol || ' ', '')
         || ifnull(chr.comparison || ' ', '')
-        || (ifnull(metr.value, 0) + ifnull(metr.fraction, 0) * meas.ref_value)
-        || ' ' || ifnull(
-          iif(metr.type_id > 0 and metr.type_id < 3, '%',
-            metr.units), ch.units) as channel,
-      meas.value,
+        || coalesce(ifnull(metr.value, 0) + ifnull(metr.fraction, 0) * meas.ref_value || ' ', metr.value, '')
+        || coalesce(iif(metr.type_id > 0 and metr.type_id < 3, '%', metr.units), ch.units, '') as channel,
+            meas.value,
       meas.value_2,
       meas.ref_value,
       meas.ref_value_id,
@@ -360,25 +359,32 @@
       metr.fraction as error_fraction,
       metr.units as error_units,
       metr.type_id as error_type,
+      meas.unusability,
+      meas.operation_id,
       meas.comment
   from
       measurements as meas
-  inner join
+  left join
       metrology as metr
       on metr.id = meas.metrology_id
-  inner join
+  left join
       channels as ch
       on ch.id = metr.channel_id    
-  inner join
+  left join
       characteristics as chr
       on chr.id = metr.type_id
   inner join    
       verification as v
       on meas.v_id = v.id
   left join
+      verification_operations as v_ops
+      on v_ops.id = meas.operation_id
+  left join
     ref_values as rv
     on rv.id = meas.ref_value_id
   {where}
+  order by
+    meas.v_id, meas.operation_id
   {limit}
   {offset};")
 

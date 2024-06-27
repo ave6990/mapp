@@ -74,6 +74,23 @@
        "-" (:protocol_number m)
        "-" (:year m)))
 
+#_(defn protocol-header ;;TOFIX convert to hiccup
+  "Версия до 27.04.2024" ;;TOFIX check the date
+  [m]
+  (header {:class "header1"}
+          (p "ФБУ «ОРЕНБУРГСКИЙ ЦСМ»")
+          (p "460021, Оренбург, ул.60 лет Октября, 2 «Б»")
+          (p "тел/факс (3532) 33-37-05, факс (3532) 33-00-76")
+          (p "Уникальный номер записи об аккредитации в реестре аккредитованных лиц  № RA.RU.311228")
+          (p (br))
+          (p {:class "capitalize"} "протокол "
+                                   (:verification_type m)
+                                  " поверки")
+          (p (str "№ " (protocol-number m))
+             "от"
+             (time (date-iso->local (:date m)))
+             "г.")))
+
 (defn protocol-header
   ""
   [m]
@@ -186,10 +203,9 @@
       (page-1-conditions m)
       (page-1-refs-set m)
       [:div {:class "field"}
-        [:p #_{:class "capitalize"}
-          [:strong "Результаты поверки приведены в приложении, без
-            приложения протокол недействителен."]]]
-      #_[:div {:class "field"}
+        [:p {:class "capitalize"}
+          [:strong "Результаты поверки"]]]
+      [:div {:class "field"}
         (html->hiccup (str "<ol>" (:operations m) "</ol>"))]
       (field "Заключение"
              (:conclusion m))
@@ -205,31 +221,33 @@
 (defn sw-version
   ""
   [m]
-  [:table {:class "measurement-table"}
-    [:thead
-      [:tr
-        [:th "Идентификационное наименование ПО"]
-        [:th "Идентификационный номер ПО"]
-        (if (:sw_version_real m)
-            [:th "Действительный идентификационный номер ПО"])
-        [:th "Цифровой идентификатор ПО"]
-        [:th "Алгоритм вычисления цифрового идентификатора ПО"]]]
-    [:tbody
-      [:tr
-         (map (fn [s]
-                  (when s
-                        [:td {:class "centered-cell"} s]))
-              (list (:sw_name m)
-                    (:sw_version m)
-                    (if (:sw_version_real m)
-                        (:sw_version_real m)
-                        nil)
-                    (if (:sw_checksum m)
-                        (:sw_checksum m)
-                        "-")
-                    (if (:sw_checksum m)
-                        (:sw_algorithm m)
-                        "-")))]]])
+  [:li {:class "appendix-section"}
+      [:p "Подтверждение соответствия программного обеспечения:"]
+      [:table {:class "measurement-table"}
+        [:thead
+          [:tr
+            [:th "Идентификационное наименование ПО"]
+            [:th "Идентификационный номер ПО"]
+            (if (:sw_version_real m)
+                [:th "Действительный идентификационный номер ПО"])
+            [:th "Цифровой идентификатор ПО"]
+            [:th "Алгоритм вычисления цифрового идентификатора ПО"]]]
+        [:tbody
+          [:tr
+             (map (fn [s]
+                      (when s
+                            [:td {:class "centered-cell"} s]))
+                  (list (:sw_name m)
+                        (:sw_version m)
+                        (if (:sw_version_real m)
+                            (:sw_version_real m)
+                            nil)
+                        (if (:sw_checksum m)
+                            (:sw_checksum m)
+                            "-")
+                        (if (:sw_checksum m)
+                            (:sw_algorithm m)
+                            "-")))]]]])
 
 (defn get-discrete-val
   [m]
@@ -299,7 +317,6 @@
     (if (:value m)
         (hash-map
           :value (string/replace val "." ",")
-          :value2 (if (nil? val2) nil (string/replace val2 "." ","))
           :ref (string/replace ref "." ",")
           :error
             (string/replace
@@ -324,8 +341,8 @@
       [:th "Опорное значение"]
       [:th "Измеренное значение"]
       [:th "Действительное значение основной погрешности"]
-      [:th "Предел допускаемого значения основной погрешности"]
-      #_[:th "Вариация показаний"]]])
+      [:th "Предел допускаемого значение основной погрешности"]
+      [:th "Вариация показаний"]]])
 
 (defn measurements-table-create-row
   [m]
@@ -333,23 +350,27 @@
      [:tr
        [:td {:class "channel-cell"}
            (str (:channel_name m))]
-       (let [res (metrology-calc m)]
-         (list
-           [:td {:class "centered-cell"}
-                ;{TOFIX} use round
-                (string/replace
-                  (:ref res)
-                  "." ",")]
-           [:td {:class "centered-cell"}
-                (:value res)]
-           [:td {:class "centered-cell"}
-                (:error res)]
-           [:td {:class "centered-cell"}
-                (:error_string m)]
-           #_[:td {:class "centered-cell"}
-                (if (:variation res)
-                  (:variation res)
-                  "-")]))]
+       (if (< (:error_type m) 3)
+           (let [res (metrology-calc m)]
+             (list
+               [:td {:class "centered-cell"}
+                    ;{TOFIX} use round
+                    (string/replace
+                      (:ref res)
+                      "." ",")]
+               [:td {:class "centered-cell"}
+                    (:value res)]
+               [:td {:class "centered-cell"}
+                    (:error res)]
+               [:td {:class "centered-cell"}
+                    (:error_string m)]
+               [:td {:class "centered-cell"}
+                    (if (:variation res)
+                      (:variation res)
+                      "-")]))
+           (when (> (:error_type m) 5)
+             [:td {:class "channel-cell" :colspan 5}
+                  (:chr_string m)]))]
      (catch Exception e
        (print (ex-message e))
        (pprint m))))
@@ -359,76 +380,12 @@
   [coll]
   (if (not (zero? (count coll)))
     [:li {:class "appendix-section"}
-      [:p (:name (first coll))]
+      [:p "Определение метрологических характеристик:"]
       [:table {:class "measurement-table"}
         (measurements-table-header) 
         [:tbody
           (map measurements-table-create-row
                coll)]]]))
-
-(defn time-table
-  [m]
-  [:li {:class "appendix-section"}
-    [:p (:name (first m))]
-    [:table {:id "time-table"}
-      [:thead
-        [:tr
-          [:th "Канал измерений, диапазон, с"]
-          [:th "Действительное значение, с"]
-          [:th "Значение по НД"]]]
-      [:tbody
-        (for [r m]
-             [:tr
-               [:td {:class "channel-cell"}
-                    (str (:channel_name r))]
-               [:td {:class "centered-cell"} (:value r)]
-               [:td {:class "centered-cell"} (:error r)]])]]])
-
-(defn variations-table-header
-  []
-  [:thead
-    [:tr 
-      [:th "Канал измерений, диапазон"]
-      [:th "Опорное значение"]
-      [:th "Измеренное значение со стороны меньших значений"]
-      [:th "Измеренное значение со стороны больших значений"]
-      [:th "Вариация показаний"]]])
-
-(defn variations-table-create-row
-  [m]
-  (try
-     [:tr
-       [:td {:class "channel-cell"}
-           (str (:channel_name m))]
-       (let [res (metrology-calc m)]
-         (pprint res)
-         (list
-           [:td {:class "centered-cell"}
-                ;{TOFIX} use round
-                (string/replace
-                  (:ref res)
-                  "." ",")]
-           [:td {:class "centered-cell"}
-                (:value res)]
-           [:td {:class "centered-cell"}
-                (:value2 res)]
-           [:td {:class "centered-cell"}
-                (if (:variation res)
-                  (:variation res)
-                  "-")]))]
-     (catch Exception e
-       (print (ex-message e))
-       (pprint m))))
-
-(defn variation
-  [meas]
-  [:li {:class "appendix-section"}
-      [:p (:name (first meas))]
-      [:table {:class "variations-table"}
-        (variations-table-header) 
-        [:tbody
-          (map variations-table-create-row
-               meas)]]])
 
 (defn custom-html
   ""
@@ -439,55 +396,6 @@
         (map (fn [m]
                  (:html m))
              coll))))
-
-(defn operation-conclusion
-  [m]
-  [:em (str
-          (if (= 1.0 (:value m)) "" "не ")
-          "соответствует требованиям п. "
-          (:section m) " МП"
-          (if (nil? (:unusability m))
-              "." 
-              (str " (" (:unusability m) ").")))])
-
-(defn common-operation
-  [meas]
-  (map (fn [m]
-           [:li {:class "appendix-section"}
-                [:p (str (:name m) ": ")
-                    (operation-conclusion m)]])
-      meas))
-
-(defn operations
-  [m]
-  (let [meas (:measurements m)
-        ops (apply sorted-set
-                   (map #(:operation_id %)
-                        meas))
-        sections (doall (map (fn [id]
-                          (filter #(= id (:operation_id %))
-                                  meas))
-                        ops))]
-    (doall (map (fn [sctn]
-              (let [err-type (-> sctn first :error_type)
-                    val2 (-> sctn first :value_2)
-                    ch-name (-> sctn first :channel_name)]
-                (println err-type)
-                (println ch-name)
-                (cond (nil? err-type)
-                        (if (= "software" ch-name)
-                            [:li {:class "appendix-section"}
-                                [:p "Подтверждение соответствия программного обеспечения:"
-                                    (operation-conclusion (first sctn))]
-                                (sw-version m)]
-                            (common-operation sctn))
-                      (and (<= 0 err-type) (> 3 err-type))
-                        (if (nil? val2)
-                            (measurements-table sctn)
-                            (variation sctn))
-                      (and (< 5 err-type) (> 8 err-type))
-                        (time-table sctn))))
-          sections))))
 
 (defn page-2
   "Приложение к протоколу поверки."
@@ -505,18 +413,14 @@
         [:time (date-iso->local (:date m))]
         " г."]]
     [:main
-      [:div {:class "field"}
-        [:p {:class "capitalize"}
-          [:strong "результаты поверки"]]
       (if (zero? (count (:html m)))
           [:ol
-            (operations m)
-            #_(when (:sw_version m)
+            (when (:sw_version m)
                   (sw-version m))
-            #_(measurements-table (:measurements m))]
+            (measurements-table (:measurements m))]
           [:ol
             (custom-html (:html m))])]
-    (page-footer m 2 2)]])
+    (page-footer m 2 2)])
 
 (defn protocol
   ""

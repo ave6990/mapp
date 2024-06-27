@@ -25,6 +25,8 @@
 (def fields-settings
   '([:id "id" true]
     [:v_id "id поверки" true]
+    [:operation_id "id операции" true]
+    [:operation "Операция" false]
     [:serial_number "Зав. №" false]
     [:channel_name "Имя канала" true]
     [:channel "Канал" false]
@@ -35,6 +37,7 @@
     [:ref_value_id "ID опорного значения" true]
     [:nominal_range "Опорное значение по НД" false]
     [:text "Текст" true]
+    [:unusability "Причина непригодности" true]
     [:comment "Комментарий" true]))
 
 (def context-menu-settings

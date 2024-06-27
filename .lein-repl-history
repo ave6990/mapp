@@ -1,3 +1,264 @@
+               midb
+               (str "select * from v_html where " where))]
+    (map (fn [m]
+             (assoc
+               (assoc m
+                    :measurements
+                    (doall (filter (fn [r]
+                                       (= (:id r) (:id m)))
+                                   measurements)))
+               :html
+               (doall (filter (fn [r]
+                                (= (:id r) (:id m)))
+                              html))))
+         data)))
+(defn assoc-multi
+  [m nm]
+  (reduce (fn [a b]
+            (let [[k v] b]
+              (assoc a k v)))
+          m
+          nm))
+(defn get-references-data
+  [where]
+  (jdbc/query
+    midb
+    (str "select * from refs
+          where " where)))
+(defn references
+  ""
+  [where]
+  (spit
+    (str midb-path "references.html")
+    (report/refs-report
+      (get-references-data where))))
+(defn get-report-data
+  ""
+  [coll]
+  (let [v-data (jdbc/query
+                midb
+                (str
+                  q/report-verifications
+                  "("
+                  (string/join ", " coll)
+                  ")
+                  order by date desc, id desc"))
+        measurements (jdbc/query
+                      midb
+                      (str "select * from view_v_measurements
+                          where id in ("
+                          (string/join ", " coll)
+                          ")"))
+        operations (jdbc/query
+                    midb
+                    (str
+                      q/get-operations
+                      "("
+                      (string/join ", " coll)
+                      ")"))
+        refs (jdbc/query
+              midb
+              (str "select * from verification_refs
+                      where v_id in ("
+                      (string/join ", " coll)
+                      ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:measurements
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          measurements))
+                           :refs
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          refs))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          operations))}))
+         v-data)))
+(defn get-methodology-data
+  [coll]
+  (let [met-data
+         (jdbc/query
+           midb
+           (str "select * from methodology
+                 where id in ("
+                 (string/join
+                   ", "
+                   coll)
+                 ")"))
+        metrology-data
+          (jdbc/query
+            midb
+            (str "select * from view_metrology
+                  where id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))
+        operations-data
+          (jdbc/query
+            midb
+            (str "select * from verification_operations
+                  where methodology_id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:metrology
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          metrology-data))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:methodology_id r) (:id m)))
+                                          operations-data))}))
+         met-data)))
+(defn get-conditions-by-v-id 
+  [id]
+  (->>
+    ["select *
+      from conditions
+      where id = ?"
+          (->>
+            ["select conditions
+              from verification
+              where id = ?" id]
+            (jdbc/query midb)
+            first
+            :conditions
+           )]
+    (jdbc/query midb)
+    first))
+(conj (list 233 32 245) 140)
+(defn update-record!
+  [record table changes]
+  (jdbc/update! midb
+                table
+                (assoc-multi (table record) changes)
+                ["id = ?" ((comp :id table) record)]))
+(defn all-refs
+  [id]
+  (jdbc/query midb [q/all-refs id]))
+(defn check-gso
+  [coll column]
+  (map (fn [num]
+         (first (jdbc/query midb
+                     [(str "select id, number_1c, pass_number, expiration_date
+                            from gso
+                            where " column " = ?") num])))
+       coll))
+(defn set-v-gso!
+  [v-id coll]
+  (do (delete-v-gso! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_gso
+        (vec (map (fn [el] (hash-map :v_id v-id :gso_id el))
+                  coll)))))
+(defn set-v-refs!
+  [v-id coll]
+  (do (delete-v-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
+                  coll)))))
+(defn set-v-opt-refs!
+  [v-id coll]
+  (do (delete-v-opt-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_opt_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
+                  coll)))))
+(defn set-v-operations!
+  [v-id coll]
+  (do (delete-v-operations! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_operations
+        (vec (map (fn [el] (hash-map :v_id v-id :op_id el :result 1))
+                  coll)))))
+(defn ins-channel!
+  "Вставить запись канала измерения и метрологических характеристик."
+  [ch-obj mc-list]
+  (let [ch-id
+          (->>
+            (jdbc/insert!
+              midb
+              :channels
+              ch-obj)
+            first
+            vals
+            first)]
+    (map (fn [m]
+             (jdbc/insert!
+               midb
+               :metrology
+               (assoc m :channel_id ch-id)))
+         mc-list)))
+(defn get-operations
+  "Возвращает коллекцию операций поверки по заданному v_id."
+  [id]
+  (jdbc/query
+    midb
+    ["select * from view_operations where v_id = ?" id]))
+(defn gen-custom-protocols
+  [data]
+  (doall
+    (map (fn [m]
+             (when (:protocol m)
+                     (jdbc/delete!
+                       midb
+                       :v_html
+                       ["id = ?" (:id m)])
+                     (jdbc/insert!
+                       midb
+                       :v_html
+                       {:id (:id m)
+                        :html ((eval (read-string (str
+                                                   "protocol/"
+                                                   (:protocol m))))
+                                m)})))
+        data)))
+(defn gen-protocols
+  "Генерирует протоколы поверки в файл protocol.html."
+  [where]
+  (let [data (get-protocols-data where)]
+    (spit
+      (str midb-path
+           "protocol.html")
+           (pr/protocols data))))
+(defn gen-report
+  "генерирует отчет о записях в файл report.html."
+  ([coll]
+   (spit
+     (str midb-path
+          "report.html")
+     (report/verification-report (get-report-data coll))))
+  ([from to]
+   (gen-report (range from (inc to)))))
+(defn find-counteragent
+  "Возвращает список контрагентов соответствующих запросу."
+  [s]
+  (jdbc/query midb [q/counteragents (str "%" s "%")]))
+(defn counteragents
+  ""
+  [s]
+  (spit
+    (str midb-path
+         "counteragents.html")
+    (report/counteragents-report (find-counteragent s))))
+(defn gso
+  ([where]
+  (spit
+    (str midb-path "gso.html")
+    (report/gso-report
+      (jdbc/query
         midb
         (str "select * from gso"
              (if (= "" where)
@@ -200,301 +461,40 @@
 (doc flatten)
 (doc assoc)
 )
-(pprint (gs2000 0
-                "NH3"
-                2906
-                (list 40 310 550) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 35 60))))
-(#(/ % 5.5 0.01) 1.447)
-(pprint (gs2000 0
-                "C3H8"
-                7910 
-                #_(list 40 310 550) 
-                (map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(pprint (gs2000 0
-                #_"C3H8"
-                7910 
-                (list 820 1500) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(pprint (gs2000 0
-                #_"C3H8"
-                7910 
-                #_(list 820 1500) 
-                (map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-:q
-;;#scan#backup#protocol#split
-(protocol-backup)
-(/ 748 0.133322)
-(ch/mg->ppm "C6H14" 3584)
-;; #cars
-;; #insert#order#auto
-(do
-  (jdbc/insert!
-    auto
-    :travel_order
-    {:auto_id 4
-     :count "9/0001260"
-     :date_departure "2024-06-20T09:00"
-     :date_arrive "2024-06-20T13:30"
-     :odometr_departure 153210
-     :fuel_departure 28.49
-     :odometr_arrive 153249
-     :fuel_add 0})
-  (pprint
-    (jdbc/query
-      auto
-      "select * from view_travel_order order by id desc limit 1;")))
-(pprint (gs2000 0
-                #_"C3H8"
-                9030
-                (list 19 1800) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(map #(/ %1 4.4 0.01)
-     '(1.096 2.15))
-(pprint (gs2000 0
-                #_"C3H8"
-                168 
-                (list 19) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
 (pprint (gs2000 2
-                #_"C3H8"
-                168 
-                (list 19) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(pprint (gs2000 2
-                #_"C3H8"
-                9030
-                (list 1800) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(pprint (gs2000 2
-                #_"C3H8"
-                496
-                (list 10 90) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(pprint (gs2000 2
-                #_"C3H8"
-                496
-                (list 6.5) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(pprint (gs2000 2
-                #_"C3H8"
-                168
-                (list 26) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(map #(/ %1 4.4 0.01)
-     '(0.227 1.096 2.15))
-(* 4.4 0.9)
-(* 4.4 0.95)
-(pprint (gs2000 2
-                #_"C3H8"
-                496
-                (list 7.5 50 90) 
-                #_(map #(ch/ppm->mg "C3H8" %1)
-                     (list 820 1500))))
-(map #(* 1.42 %) [7.639991978624116 49.98285275269121 89.96797778940756])
-(map #(/ %1 4.4 0.01)
-     '(1.116 2.09))
-(pprint (gs2000 2
-                "H2S"
-                78
-                #_(list 7.5 50 90) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(map (partial ch/ppm->mg
-              "H2S")
-     '(5.8 29))
-(map (partial ch/ppm->mg
-              "H2S")
-     '(2.1 6.3))
-;;#scan#backup#protocol#split
-(protocol-backup)
-(/ 10 0.05)
-(/ 5 0.03)
-(/ 0.03 0.03)
-(/ 0.5 0.04)
-(/ 0.1 0.03)
-(/ 9 2.5)
-(/ 1000 2.5)
-(/ 1600 2.5)
-(pprint (gs2000 2
-                ;"H2S"
-                4690
-                (list 3.6 400 640) 
+                "CO"
+                518
+                (list 1.2 25 46) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 1.7 5.8))))
-(map #(* 2.5 %) '(3.782 399.71 640.268))
-(pprint (gs2000 2
-                "H2S"
-                496
-                (list 2.2 20) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                "H2S"
-                496
-                #_(list 2.2 20) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 2.2 20))))
-(pprint (gs2000 2
-                "C6H14"
-                4640
-                #_(list 2.2 20) 
-                (map #(ch/ppm->mg "C6H14" %1)
-                     (list 79 500 950))))
-;;#scan#backup#protocol#split
-(protocol-backup)
-(pprint (gs2000 2
-                "H2S"
-                78
-                #_(list 2.2 20) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 6.8))))
-(pprint (gs2000 2
-                "H2S"
-                78
-                #_(list 2.2 20) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-;; Дата изменения скана протокола = дата поверки
-;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
-      data (jdbc/query
-             midb
-             "select protocol_number, date
-              from verification
-              inner join conditions
-                on conditions.id = verification.conditions
-              where protocol_number >= 2319
-                and protocol_number  <= 2322")]
-  (map (fn [m]
-           (sh
-             "touch"
-             (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
-             "-mad"
-             (str (:date m) "T17:30")))
-       data))
-;; Дата изменения скана протокола = дата поверки
-;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
-      data (jdbc/query
-             midb
-             "select protocol_number, date
-              from verification
-              inner join conditions
-                on conditions.id = verification.conditions
-              where
-                conditions.date > "2024-01-01"
-                --protocol_number >= 2319
-                --and protocol_number  <= 2322")]
-  (map (fn [m]
-           (sh
-             "touch"
-             (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
-             "-mad"
-             (str (:date m) "T17:30")))
-       data))
-;; Дата изменения скана протокола = дата поверки
-;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
-      data (jdbc/query
-             midb
-             "select
-                verification.protocol_number,
-                conditions.date as date
-              from verification
-              inner join conditions
-                on conditions.id = verification.conditions
-              where
-                conditions.date > "2024-01-01"
-                --protocol_number >= 2319
-                --and protocol_number  <= 2322")]
-  (map (fn [m]
-           (sh
-             "touch"
-             (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
-             "-mad"
-             (str (:date m) "T17:30")))
-       data))
-;; Дата изменения скана протокола = дата поверки
-;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
-      data (jdbc/query
-             midb
-             "select
-                v.protocol_number,
-                c.date as date
-              from verification
-              inner join conditions as c
-                on c.id = v.conditions
-              where
-                c.date > "2024-01-01"
-                --v.protocol_number >= 2319
-                --and v.protocol_number  <= 2322")]
-  (map (fn [m]
-           (sh
-             "touch"
-             (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
-             "-mad"
-             (str (:date m) "T17:30")))
-       data))
-;; Дата изменения скана протокола = дата поверки
-;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
-      data (jdbc/query
-             midb
-             "select
-                v.protocol_number,
-                c.date as date
-              from verification
-              inner join conditions as c
-                on c.id = v.conditions
-              where
-                c.date > '2024-01-01'
-                --v.protocol_number >= 2319
-                --and v.protocol_number  <= 2322")]
-  (map (fn [m]
-           (sh
-             "touch"
-             (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
-             "-mad"
-             (str (:date m) "T17:30")))
-       data))
-;; Дата изменения скана протокола = дата поверки
-;; #set#date#scans
-(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
-      data (jdbc/query
-             midb
-             "select
-                v.protocol_number,
-                c.date as date
-              from verification as v
-              inner join conditions as c
-                on c.id = v.conditions
-              where
-                c.date > '2024-01-01'
-                --v.protocol_number >= 2319
-                --and v.protocol_number  <= 2322")]
-  (map (fn [m]
-           (sh
-             "touch"
-             (str scan-path
-                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
-             "-mad"
-             (str (:date m) "T17:30")))
-       data))
+(sorted-set '(1 23 4 2 43 5))
+(apply sorted-set '(1 23 4 2 43 5))
+(sorted-set (map #(%) '(4 23 545 62 12)))
+(apply sorted-set (map #(%) '(4 23 545 62 12)))
+(apply sorted-set (map #(+ 1 %) '(4 23 545 62 12)))
+(apply sorted-set (map #(:id %) '({:id 4} {:id 23} {:id 545} {:id 62})))
+(apply sorted-set '({:id 100 :data {}} {:id 10 :data {}}))
+  (conj [] [:li 2])
+  (conj [] [:li 2] [:li 4])
+(reduce (fn [res n] (conj res n)) '(1 2 3 4 5))
+(reduce (fn [res n] (conj res n)) [] '(1 2 3 4 5))
+(reduce (fn [res n] (conj res n)) '() '(1 2 3 4 5))
+(reduce (fn [res n] (cons res n)) '() '(1 2 3 4 5))
+(defn operations
+  [meas]
+  (let [ops (apply sorted-set
+                   (map #(:operation_id %)
+                        meas))
+        sections (map (fn [id]
+                          (filter #(= id (:operation_id %))
+                                  meas)
+                      ops))]
+    (pprint (map (fn [sctn]
+                (let [met-id (-> sctn first :metrology_id)]
+                  (cond (nil? met-id)
+                          "good" #_(conj res (common-operation sctn))
+                        (and (> 0 met-id) (< 3 met-id))
+                          "more good" #_(conj res (measurements-table sctn)))))
+            sections))))
+(= 1 1.0)
+(and (>= 0 1) (< 3 1))
