@@ -230,14 +230,17 @@
   (let [k1 0.6
         channels-k (get-channels-k coll)]
     (map (fn [m]
+             (println m)
              {:measurement_id (:measurement_id m)
               :value
                 (try
-                  (->>
-                    (:channel_id m)
-                    (get channels-k)
-                    (assoc m :channel_error)
-                    gen-value)
+                  (if (nil? (:metrology_id m))
+                      1
+                      (->>
+                        (:channel_id m)
+                        (get channels-k)
+                        (assoc m :channel_error)
+                        gen-value))
                   (catch Exception e
                     (println (str
                                 "gen-value error!!! \n"

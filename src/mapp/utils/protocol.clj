@@ -219,8 +219,12 @@
          (map (fn [s]
                   (when s
                         [:td {:class "centered-cell"} s]))
-              (list (:sw_name m)
-                    (:sw_version m)
+              (list (if (:sw_name m)
+                        (:sw_name m)
+                        "-")
+                    (if (:sw_version m)
+                        (:sw_version m)
+                        "-")
                     (if (:sw_version_real m)
                         (:sw_version_real m)
                         nil)
@@ -481,9 +485,11 @@
                 (cond (nil? err-type)
                         (if (= "software" ch-name)
                             [:li {:class "appendix-section"}
-                                [:p "Подтверждение соответствия программного обеспечения:"
+                                [:p "Подтверждение соответствия программного обеспечения: "
                                     (operation-conclusion (first sctn))]
-                                (sw-version m)]
+                                    (if (or (:sw_name m) (:sw_version m))
+                                        (sw-version m)
+                                        "")]
                             (common-operation sctn))
                       (and (<= 0 err-type) (> 3 err-type))
                         (if (nil? val2)

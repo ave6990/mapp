@@ -234,7 +234,7 @@
    (dorun
      (map (fn [f] (f id))
           (list delete-v-gso! delete-v-refs! delete-v-opt-refs!
-                delete-v-operations!
+                ;delete-v-operations!
                 delete-measurements! delete-verification!))))
 
 (defn copy-record!
@@ -253,7 +253,7 @@
                      (list copy-v-gso!
                            copy-v-refs!
                            copy-v-opt-refs!
-                           copy-v-operations!
+                           ;copy-v-operations! ;; operations moved to the measurements table 
                            copy-measurements!)))))
            (range n))))
   ([id-from]

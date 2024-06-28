@@ -207,7 +207,7 @@
                     :id "gen-value-popup-yes"
                     :value "Да"}]
            [:input {:type "button"
-                    :id "gen-value-popup-no"
+                    :class "popup-no"
                     :value "Нет"}])))
 
 (def footer
