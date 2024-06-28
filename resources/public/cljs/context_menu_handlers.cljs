@@ -76,7 +76,10 @@
 
 (defn ctx-action-channels
   [event]
-  (let [ids (->> (table/read-selected-rows) (map :methodology_id) set)]
+  (let [field (case (table/get-table-id)
+                "methodology" :id
+                "verifications" :methodology_id)
+        ids (->> (table/read-selected-rows) (map field) set)]
     (.open js/window
       (make-url "channels" "methodology_id = " ids))))
 

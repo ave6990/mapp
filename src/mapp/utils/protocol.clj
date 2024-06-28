@@ -363,7 +363,8 @@
   [coll]
   (if (not (zero? (count coll)))
     [:li {:class "appendix-section"}
-      [:p (:name (first coll))]
+      [:p (:name (first coll))
+        [:em (str ": в соответствии с п. " (:section (first coll)) " МП.")]]
       [:table {:class "measurement-table"}
         (measurements-table-header) 
         [:tbody
@@ -480,8 +481,6 @@
               (let [err-type (-> sctn first :error_type)
                     val2 (-> sctn first :value_2)
                     ch-name (-> sctn first :channel_name)]
-                (println err-type)
-                (println ch-name)
                 (cond (nil? err-type)
                         (if (= "software" ch-name)
                             [:li {:class "appendix-section"}
@@ -520,10 +519,7 @@
           [:strong "результаты поверки"]]
       (if (zero? (count (:html m)))
           [:ol
-            (operations m)
-            #_(when (:sw_version m)
-                  (sw-version m))
-            #_(measurements-table (:measurements m))]
+            (operations m)]
           [:ol
             (custom-html (:html m))])]
     (page-footer m 2 2)]])
