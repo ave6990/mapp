@@ -1,3 +1,40 @@
+(defn-get "v_refs" "ref_id")
+(defn-get "v_opt_refs" "ref_id")
+(defn-get "v_operations" "op_id")
+(defn get-v-operations
+  ""
+  [id]
+  (jdbc/query
+    midb
+    ["select op_id from v_operations where v_id = ?" id]))
+(defn get-record
+  "Возвращает hash-map записи о поверке."
+  [id]
+  (conj (hash-map
+          :verification (get-verification id))
+          (reduce (fn [m table]
+                      (conj m
+                            (hash-map
+                              (keyword table)
+                              (jdbc/query
+                                midb
+                                [(str "select * from "
+                                      table
+                                      " where v_id = ?;")
+                                 2380]))))
+                          {}
+                         (list "v_gso" "v_refs" "v_opt_refs"
+                          "v_operations" "measurements"))))
+(defn get-protocols-data
+  ""
+  [where]
+  (let [data (jdbc/query
+                midb
+                (str "select * from protocol where " where))
+        measurements (jdbc/query
+                        midb
+                        (str "select * from view_v_measurements where " where))
+        html (jdbc/query
                midb
                (str "select * from v_html where " where))]
     (map (fn [m]
@@ -461,40 +498,3 @@
 (doc flatten)
 (doc assoc)
 )
-(pprint (gs2000 2
-                "CO"
-                518
-                (list 1.2 25 46) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(sorted-set '(1 23 4 2 43 5))
-(apply sorted-set '(1 23 4 2 43 5))
-(sorted-set (map #(%) '(4 23 545 62 12)))
-(apply sorted-set (map #(%) '(4 23 545 62 12)))
-(apply sorted-set (map #(+ 1 %) '(4 23 545 62 12)))
-(apply sorted-set (map #(:id %) '({:id 4} {:id 23} {:id 545} {:id 62})))
-(apply sorted-set '({:id 100 :data {}} {:id 10 :data {}}))
-  (conj [] [:li 2])
-  (conj [] [:li 2] [:li 4])
-(reduce (fn [res n] (conj res n)) '(1 2 3 4 5))
-(reduce (fn [res n] (conj res n)) [] '(1 2 3 4 5))
-(reduce (fn [res n] (conj res n)) '() '(1 2 3 4 5))
-(reduce (fn [res n] (cons res n)) '() '(1 2 3 4 5))
-(defn operations
-  [meas]
-  (let [ops (apply sorted-set
-                   (map #(:operation_id %)
-                        meas))
-        sections (map (fn [id]
-                          (filter #(= id (:operation_id %))
-                                  meas)
-                      ops))]
-    (pprint (map (fn [sctn]
-                (let [met-id (-> sctn first :metrology_id)]
-                  (cond (nil? met-id)
-                          "good" #_(conj res (common-operation sctn))
-                        (and (> 0 met-id) (< 3 met-id))
-                          "more good" #_(conj res (measurements-table sctn)))))
-            sections))))
-(= 1 1.0)
-(and (>= 0 1) (< 3 1))

@@ -442,13 +442,17 @@
 
 (defn operation-conclusion
   [m]
-  [:em (str
-          (if (= 1.0 (:value m)) "" "не ")
-          "соответствует требованиям п. "
-          (:section m) " МП"
-          (if (nil? (:unusability m))
-              "." 
-              (str " (" (:unusability m) ").")))])
+  (let [value (:value m)
+        unusability (:unusability m)]
+    [:em
+      (if (zero? value)
+        "-"
+        (str (if (= 1.0 value) "" "не ")
+             "соответствует требованиям п. "
+             (:section m) " МП"
+             (if (nil? unusability)
+                 "." 
+                 (str " (" unusability ")."))))]))
 
 (defn common-operation
   [meas]
