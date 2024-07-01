@@ -4,9 +4,9 @@
 
 (pprint (gs2000 2
                 "H2S"
-                78
-                #_(list 2.2 20) 
-                (map #(ch/ppm->mg "H2S" %1)
+                496
+                (list 39 67.3) 
+                #_(map #(ch/ppm->mg "H2S" %1)
                      (list 1.7 5.8))))
 
 (map #(* 1.42 %) [7.639991978624116 49.98285275269121 89.96797778940756])
@@ -588,13 +588,13 @@
   (jdbc/insert!
     auto
     :travel_order
-    {:auto_id 4
-     :count "9/0001260"
-     :date_departure "2024-06-20T09:00"
-     :date_arrive "2024-06-20T13:30"
-     :odometr_departure 153210
-     :fuel_departure 28.49
-     :odometr_arrive 153249
+    {:auto_id 1
+     :count "9/000"
+     :date_departure "2024-06-27T11:00"
+     :date_arrive "2024-06-27T13:30"
+     :odometr_departure 245116
+     :fuel_departure 21.96
+     :odometr_arrive 245120
      :fuel_add 0})
   (pprint
     (jdbc/query

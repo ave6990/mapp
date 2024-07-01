@@ -497,14 +497,14 @@
       )
   insert into
       verification (
-          engineer, count, counteragent, mi_type, methodology_id,
+          engineer, count, counteragent, conditions, mi_type, methodology_id,
           serial_number, manufacture_year, components,
           scope, channels, area, interval, verification_type,
           sw_name, sw_version, sw_version_real, sw_checksum,
           sw_algorithm, voltage, protocol, protolang, copy_from, comment
       )
   select
-      engineer, count, counteragent, mi_type, methodology_id,
+      engineer, count, counteragent, conditions, mi_type, methodology_id,
       serial_number, manufacture_year, components, scope,
       channels, area, interval, verification_type, sw_name,
       sw_version, sw_version_real, sw_checksum, sw_algorithm,
@@ -551,6 +551,7 @@
   where
       v_id = ?;")
 
+;; TODO: delete
 (def copy-v-operations
   "Query to copy operations."
   "insert into v_operations
@@ -567,12 +568,14 @@
 (def copy-measurements
   "Query to copy measurements."
   "insert into measurements
-      (v_id, metrology_id, channel_name, ref_value, comment)
+      (v_id, metrology_id, channel_name, ref_value, operation_id, ref_value_id, comment)
   select
       ?,
       metrology_id,
       channel_name,
       ref_value,
+      operation_id,
+      ref_value_id,
       comment
   from
       measurements
