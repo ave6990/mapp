@@ -2,7 +2,6 @@
   (:require
     [clojure.string :as string]
     [clojure.pprint :refer [pprint]]
-    [net.cgrand.enlive-html :as html] ;;DELETE not used
     [hiccup2.core :as h]
     [mapp.model.midb :as midb]
     [mapp.views.view :as v]
@@ -159,10 +158,7 @@
         {:keys [query limit]} request
         link (midb/save-journal (string/replace query #"\*" "%") limit)]
     (println link)
-    (java.io.File. link)
-    #_{:status 200
-     :body (merge request
-                  {:link link})}))
+    (java.io.File. link)))
 
 (defn get-data
   [params get-fn fields-settings]

@@ -75,10 +75,7 @@
                   (set! (.-href a) (.createObjectURL (.-URL js/window) %)) 
                   (set! (.-download a) "journal.xls")
                   (.log js/console a)
-                  (.click a)))
-      #_(.then #(.json %))
-      #_(.then #(js->clj % :keywordize-keys true))
-      #_(.then #(.open js/window (:link (:body %)))))))
+                  (.click a))))))
 
 (defn ctx-action-refs-set
   [event]
