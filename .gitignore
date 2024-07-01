@@ -4,3 +4,7 @@
 
 #signs images
 /resources/public/img/signs
+
+#excel
+*.xls
+*.xlsx

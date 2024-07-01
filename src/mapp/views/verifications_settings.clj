@@ -91,4 +91,6 @@
     ["Методика" "ctx-menu-action-methodology"]
     ["-" "-"]
     ["Тестовые значения" "ctx-menu-action-gen-value"]
-    ["Протоколы" "ctx-menu-action-protocols"]))
+    ["Протоколы" "ctx-menu-action-protocols"]
+    ["-" "-"]
+    ["Журнал" "ctx-menu-action-journal"]))

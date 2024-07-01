@@ -2,6 +2,8 @@
   (:require 
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
+    [incanter.core :refer [dataset]]
+    [incanter.excel :refer [save-xls]]
     [mapp.lib.database :as db]
     [mapp.lib.chemistry :as ch]
     [mapp.lib.gs2000 :as gs]
@@ -122,6 +124,23 @@
 (make-get-fn "channels")
 (make-get-fn "metrology")
 (make-get-fn "ref-values")
+
+(defn save-journal
+  [query limit]
+  (let [link (str "resources/public/files/journal.xls")
+        records (get-journal query limit 0)
+        {:keys [recs-count data]} records
+        column-names
+          [:id :count :counteragent :mi_type :serial_number :manufacture_year
+           :registry_number :methodology :interval :components :channels
+           :reference_codes :area :verification_type :protocol_number
+           :usability :date :sticker_number :sign_mi :sign_pass
+           :temperature :humidity :pressure :voltage :frequency :other
+           :factor_7 :factor_8 :schema :level :reference_registry :scope
+           :send_protocol :unusability :calibration_base :upload
+           :engineer :comment]]
+    (save-xls (dataset column-names data) link)
+    link))
 
 ;;#copy
 (defn last-id

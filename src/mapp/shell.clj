@@ -4,8 +4,8 @@
 
 (pprint (gs2000 2
                 "H2S"
-                496
-                (list 39 67.3) 
+                2012
+                (list 1.2 100 190) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 1.7 5.8))))
 
@@ -39,7 +39,7 @@
      '(4.9 7.8 40 70))
 
 (map #(/ %1 4.4 0.01)
-     '(1.116 2.09))
+     '(1.096 2.15))
 
 (map #(* % 30)
      '(0.05 0.5 0.95))
@@ -590,11 +590,11 @@
     :travel_order
     {:auto_id 1
      :count "9/000"
-     :date_departure "2024-06-27T11:00"
-     :date_arrive "2024-06-27T13:30"
-     :odometr_departure 245116
-     :fuel_departure 21.96
-     :odometr_arrive 245120
+     :date_departure "2024-06-28T11:00"
+     :date_arrive "2024-06-28T13:30"
+     :odometr_departure 245120
+     :fuel_departure 21.59
+     :odometr_arrive 245124
      :fuel_add 0})
   (pprint
     (jdbc/query
@@ -765,3 +765,8 @@
         [:p "hello people"]])
 
 (list* 1 2 3 [4 5])
+
+(require '[incanter.core :refer [dataset]] :reload)
+(require '[incanter.excel :refer [save-xls]])
+
+(save-xls (dataset [:id :value] [{:id 1 :value 11} {:id 2 :value 22}]) "resources/public/files/test.xls")

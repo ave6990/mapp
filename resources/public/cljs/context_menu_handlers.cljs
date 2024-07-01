@@ -62,6 +62,24 @@
     (.open js/window
       (make-url "verification-operations" " methodology_id = " ids))))
 
+(defn ctx-action-journal
+  [event]
+  (let [ids (->> (table/read-selected-rows) (map :id) set)]
+    (->
+      (js/fetch
+        (make-url
+          "journal/get" " id = " ids))
+      (.then #(.blob %))
+      (.then  #(let [a (.createElement js/document "a")]
+                  (.log js/console a)
+                  (set! (.-href a) (.createObjectURL (.-URL js/window) %)) 
+                  (set! (.-download a) "journal.xls")
+                  (.log js/console a)
+                  (.click a)))
+      #_(.then #(.json %))
+      #_(.then #(js->clj % :keywordize-keys true))
+      #_(.then #(.open js/window (:link (:body %)))))))
+
 (defn ctx-action-refs-set
   [event]
   (let [ids (->> (table/read-selected-rows) (map :id) set)]
@@ -133,6 +151,7 @@
    "ctx-menu-action-gen-value" ctx-action-gen-value
    "ctx-menu-action-verification-operations" ctx-action-verification-operations
    "ctx-menu-action-ref-values" ctx-action-ref-values
+   "ctx-menu-action-journal" ctx-action-journal
    "ctx-menu-action-protocols" ctx-action-protocols})
 
 (defn add-event-listeners

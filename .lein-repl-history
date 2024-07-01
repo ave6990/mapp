@@ -1,31 +1,3 @@
-                                       (= (:id r) (:id m)))
-                                   measurements)))
-               :html
-               (doall (filter (fn [r]
-                                (= (:id r) (:id m)))
-                              html))))
-         data)))
-(defn assoc-multi
-  [m nm]
-  (reduce (fn [a b]
-            (let [[k v] b]
-              (assoc a k v)))
-          m
-          nm))
-(defn get-references-data
-  [where]
-  (jdbc/query
-    midb
-    (str "select * from refs
-          where " where)))
-(defn references
-  ""
-  [where]
-  (spit
-    (str midb-path "references.html")
-    (report/refs-report
-      (get-references-data where))))
-(defn get-report-data
   ""
   [coll]
   (let [v-data (jdbc/query
@@ -498,3 +470,31 @@
                 (list 1.2 100 190) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 1.7 5.8))))
+(require '[incanter.core [dataset]])
+(require '[incanter.excel [save-xls]])
+(require '[incanter.core :refer [dataset]])
+(require '[incanter.excel :refer [save-xls]])
+(save-xls (dataset ["id" "value"] [{:id 1 :value 11} {:id 2 :value 22}]) "test.xls")
+(save-xls (dataset ["id" "value"] [[1 11] [2 22]]) "test.xls")
+(save-xls (dataset ["id" "value"] [{:id [1 11]} {:value [2 22]}]) "test.xls")
+(dataset :cars)
+(get-dataset :cars)
+(require '[incanter.core :refer [dataset get-dataset]] :reload)
+(require '[incanter.excel :refer [save-xls]])
+(get-dataset :cars)
+(require '[incanter.core :refer [dataset get-dataset]] :reload)
+(require '[incanter.excel :refer [save-xls]])
+(save-xls (dataset [:id :value] [{:id [1 11]} {:value [2 22]}]) "test.xls")
+(save-xls (dataset [:id :value] [{:id 1 :value 11} {:id 2 :value 22}]) "test.xls")
+(save-xls (dataset [:id :value] [{:id 1 :value 11} {:id 2 :value 22}]) "resources/files/test.xls")
+(save-xls (dataset [:id :value] [{:id 1 :value 11} {:id 2 :value 22}]) "resources/public/files/test.xls")
+(.Date "now")
+(.Date)
+(java.util.Date.)
+(def obj {:id 1 :value 34})
+(for [[k _] obj] (print k))
+(def obj {:id 1 :value 34})
+(for [[k _] obj] k)
+(def obj {:id 1 :value 34})
+(for [[k _] obj] k)
+(keys obj)

@@ -28,6 +28,8 @@
     (POST "/copy" req (response (c/copy-verifications (:body req))))
     (POST "/gen-value" req (response (c/gen-value-verifications (:body req))))
     (DELETE "/delete" req (response (c/delete-verifications (:body req)))))
+  (context "/journal" []
+    (GET "/get" req (response (c/get-journal (:params req)))))
   (context "/conditions" []
     (GET "/" req (c/get-conditions-page (:params req)))
     (GET "/get" req (response (c/get-conditions-data (:params req))))

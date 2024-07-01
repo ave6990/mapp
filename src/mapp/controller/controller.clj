@@ -153,6 +153,31 @@
   [req]
   (get-data req midb/get-verifications vs/fields-settings))
 
+(defn get-journal
+  [req]
+  (let [request (parse-request req)
+        {:keys [query limit]} request
+        link (midb/save-journal (string/replace query #"\*" "%") limit)]
+    (println link)
+    (java.io.File. link)
+    #_{:status 200
+     :body (merge request
+                  {:link link})}))
+
+(defn get-data
+  [params get-fn fields-settings]
+  (let [request (parse-request params)
+        {:keys [query limit offset]} request
+        records (get-fn
+                  (string/replace query #"\*" "%") limit offset)
+        {:keys [recs-count data]} records]
+    {:status 200
+     :body (merge request
+                  {:recs-count recs-count
+                   :pages (calc-pages recs-count limit)
+                   :data data
+                   :model fields-settings})}))
+
 (defn gen-value-verifications
   [body]
   (let [ids (:ids (keywordize body))
