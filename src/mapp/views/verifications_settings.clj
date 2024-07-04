@@ -40,7 +40,7 @@
    ["дата" " date "]
    ["зав. №" " serial_number LIKE '**'"]
    ["количество" " channels "]
-   ["контрагент" " short_name LIKE '**'"]
+   ["контрагент" " ca_short_name LIKE '**'"]
    ["объем" " scope LIKE '**'"]
    ["протокол" " protocol_number "]
    ["рег. №" " registry_number LIKE '**'"]

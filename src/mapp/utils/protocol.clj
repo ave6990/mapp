@@ -487,7 +487,7 @@
                 (cond (nil? err-type)
                         (if (= "software" ch-name)
                             [:li {:class "appendix-section"}
-                                [:p "Подтверждение соответствия программного обеспечения: "
+                                [:p (str (:name (first sctn)) ": ")
                                     (operation-conclusion (first sctn))]
                                     (if (or (:sw_name m) (:sw_version m))
                                         (sw-version m)
