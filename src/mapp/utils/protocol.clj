@@ -470,6 +470,29 @@
                     (operation-conclusion m)]])
       meas))
 
+(defn event-conclusion
+  [m]
+  (pprint m)
+  [:tr
+    [:td (if (= 1.0 (:value m))
+             "соответствует"
+             "не соответствует")]
+    [:td (str (:ref_value m) " "
+              (:units m) ": "
+              (:metrology_text m))]])
+
+(defn event-table
+  [meas]
+  [:li {:class "appendix-section"}
+       [:p (str (:name (first meas)) ": ")
+         [:table {:id "event-table"}
+           [:thead
+             [:th "Действительный результат"]
+             [:th "Требуемый результат"]]
+           [:tbody
+             (for [m meas]
+                  (event-conclusion m))]]]])
+
 (defn operations
   [m]
   (let [meas (:measurements m)
@@ -498,7 +521,9 @@
                             (measurements-table sctn)
                             (variation sctn))
                       (and (< 5 err-type) (> 8 err-type))
-                        (time-table sctn))))
+                        (time-table sctn)
+                      (= 15 err-type)
+                        (event-table sctn))))
           sections))))
 
 (defn page-2
