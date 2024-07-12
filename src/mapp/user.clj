@@ -22,6 +22,15 @@
 (db/defdb midb)
 (db/defdb auto)
 
+(def mmidb
+  "mariaDB spec"
+  {:dbtype "mysql"
+   :dbname "midb"
+   :host "127.0.0.1"
+   :port 3306
+   :user "ave"
+   :password "enter"})
+
 (defn load-icu
   ;; TOFIX не работает.
   []
@@ -738,7 +747,27 @@
                        (re-matches #"\d+\.\d\.pdf" f))
                    (get-files-list)))))))
 
+(defn date-to-iso
+  [s]
+  (string/join "-"
+    (->
+      s
+      (string/split #"\.")
+      reverse)))
+
 (comment
+
+(dir string)
+
+(doc string/split)
+
+(jdbc/query
+  pmidb
+  "select 1 as value;")
+
+(jdbc/query
+  midb
+  "select * from characteristics")
 
 (require '[clojure.repl :refer :all])
 

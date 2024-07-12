@@ -11,7 +11,7 @@
     v.id as id, v.engineer, v.count, v.counteragent, v.conditions,
     v.verification_type,
     v.protocol_number, v.mi_type, v.methodology_id, v.serial_number,
-    v.manufacture_year, v.channels, v.area, v.interval, v.components,
+    v.manufacture_year, v.channels, v.area, v.period, v.components,
     v.scope, v.sw_name, v.sw_version, v.sw_version_real,
     v.sw_checksum, v.sw_algorithm, v.protocol,
     v.protolang, v.voltage as v_voltage, v.other_conditions as v_other_conditions
@@ -46,7 +46,7 @@
     v.id as id, v.engineer, v.count, v.counteragent, v.conditions,
     v.verification_type,
     v.protocol_number, v.mi_type, v.methodology_id, v.serial_number,
-    v.manufacture_year, v.channels, v.area, v.interval, v.components,
+    v.manufacture_year, v.channels, v.area, v.period, v.components,
     v.scope, v.sw_name, v.sw_version, v.sw_version_real,
     v.sw_checksum, v.sw_algorithm, v.protocol,
     v.protolang, v.voltage as voltage, v.other_conditions as v_other_conditions
@@ -499,14 +499,14 @@
       verification (
           engineer, count, counteragent, conditions, mi_type, methodology_id,
           serial_number, manufacture_year, components,
-          scope, channels, area, interval, verification_type,
+          scope, channels, area, period, verification_type,
           sw_name, sw_version, sw_version_real, sw_checksum,
           sw_algorithm, voltage, protocol, protolang, copy_from, comment
       )
   select
       engineer, count, counteragent, conditions, mi_type, methodology_id,
       serial_number, manufacture_year, components, scope,
-      channels, area, interval, verification_type, sw_name,
+      channels, area, period, verification_type, sw_name,
       sw_version, sw_version_real, sw_checksum, sw_algorithm,
       voltage, protocol, protolang,
       (select v_id from temp), comment

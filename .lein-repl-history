@@ -1,500 +1,500 @@
-  [m nm]
-  (reduce (fn [a b]
-            (let [[k v] b]
-              (assoc a k v)))
-          m
-          nm))
-(defn get-references-data
-  [where]
   (jdbc/query
     midb
-    (str "select * from refs
-          where " where)))
-(defn references
-  ""
-  [where]
-  (spit
-    (str midb-path "references.html")
-    (report/refs-report
-      (get-references-data where))))
-(defn get-report-data
-  ""
-  [coll]
-  (let [v-data (jdbc/query
-                midb
-                (str
-                  q/report-verifications
-                  "("
-                  (string/join ", " coll)
-                  ")
-                  order by date desc, id desc"))
-        measurements (jdbc/query
-                      midb
-                      (str "select * from view_v_measurements
-                          where id in ("
-                          (string/join ", " coll)
-                          ")"))
-        operations (jdbc/query
-                    midb
-                    (str
-                      q/get-operations
-                      "("
-                      (string/join ", " coll)
-                      ")"))
-        refs (jdbc/query
-              midb
-              (str "select * from verification_refs
-                      where v_id in ("
-                      (string/join ", " coll)
-                      ")"))]
-    (map (fn [m]
-             (assoc-multi m
-                          {:measurements
-                           (doall (filter (fn [r]
-                                              (= (:id r) (:id m)))
-                                          measurements))
-                           :refs
-                           (doall (filter (fn [r]
-                                              (= (:v_id r) (:id m)))
-                                          refs))
-                           :operations
-                           (doall (filter (fn [r]
-                                              (= (:v_id r) (:id m)))
-                                          operations))}))
-         v-data)))
-(defn get-methodology-data
-  [coll]
-  (let [met-data
-         (jdbc/query
-           midb
-           (str "select * from methodology
-                 where id in ("
-                 (string/join
-                   ", "
-                   coll)
-                 ")"))
-        metrology-data
-          (jdbc/query
-            midb
-            (str "select * from view_metrology
-                  where id in ("
-                  (string/join
-                    ", "
-                    coll)
-                  ")"))
-        operations-data
-          (jdbc/query
-            midb
-            (str "select * from verification_operations
-                  where methodology_id in ("
-                  (string/join
-                    ", "
-                    coll)
-                  ")"))]
-    (map (fn [m]
-             (assoc-multi m
-                          {:metrology
-                           (doall (filter (fn [r]
-                                              (= (:id r) (:id m)))
-                                          metrology-data))
-                           :operations
-                           (doall (filter (fn [r]
-                                              (= (:methodology_id r) (:id m)))
-                                          operations-data))}))
-         met-data)))
-(defn get-conditions-by-v-id 
-  [id]
-  (->>
-    ["select *
-      from conditions
-      where id = ?"
-          (->>
-            ["select conditions
-              from verification
-              where id = ?" id]
-            (jdbc/query midb)
-            first
-            :conditions
-           )]
-    (jdbc/query midb)
-    first))
-(conj (list 233 32 245) 140)
-(defn update-record!
-  [record table changes]
-  (jdbc/update! midb
-                table
-                (assoc-multi (table record) changes)
-                ["id = ?" ((comp :id table) record)]))
-(defn all-refs
-  [id]
-  (jdbc/query midb [q/all-refs id]))
-(defn check-gso
-  [coll column]
-  (map (fn [num]
-         (first (jdbc/query midb
-                     [(str "select id, number_1c, pass_number, expiration_date
-                            from gso
-                            where " column " = ?") num])))
-       coll))
-(defn set-v-gso!
-  [v-id coll]
-  (do (delete-v-gso! v-id)
-      (jdbc/insert-multi!
-        midb
-        :v_gso
-        (vec (map (fn [el] (hash-map :v_id v-id :gso_id el))
-                  coll)))))
-(defn set-v-refs!
-  [v-id coll]
-  (do (delete-v-refs! v-id)
-      (jdbc/insert-multi!
-        midb
-        :v_refs
-        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
-                  coll)))))
-(defn set-v-opt-refs!
-  [v-id coll]
-  (do (delete-v-opt-refs! v-id)
-      (jdbc/insert-multi!
-        midb
-        :v_opt_refs
-        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
-                  coll)))))
-(defn set-v-operations!
-  [v-id coll]
-  (do (delete-v-operations! v-id)
-      (jdbc/insert-multi!
-        midb
-        :v_operations
-        (vec (map (fn [el] (hash-map :v_id v-id :op_id el :result 1))
-                  coll)))))
-(defn ins-channel!
-  "Вставить запись канала измерения и метрологических характеристик."
-  [ch-obj mc-list]
-  (let [ch-id
-          (->>
-            (jdbc/insert!
-              midb
-              :channels
-              ch-obj)
-            first
-            vals
-            first)]
-    (map (fn [m]
-             (jdbc/insert!
-               midb
-               :metrology
-               (assoc m :channel_id ch-id)))
-         mc-list)))
-(defn get-operations
-  "Возвращает коллекцию операций поверки по заданному v_id."
-  [id]
+    "select * from methodology where id = 1"))
+(jdbc/insert!
+  mmidb
+  :methodology
+  (dissoc (first data) :conc))
+(def res (migrate-table :methodology))
+(println res)
+(def data
   (jdbc/query
     midb
-    ["select * from view_operations where v_id = ?" id]))
-(defn gen-custom-protocols
-  [data]
-  (doall
-    (map (fn [m]
-             (when (:protocol m)
-                     (jdbc/delete!
-                       midb
-                       :v_html
-                       ["id = ?" (:id m)])
-                     (jdbc/insert!
-                       midb
-                       :v_html
-                       {:id (:id m)
-                        :html ((eval (read-string (str
-                                                   "protocol/"
-                                                   (:protocol m))))
-                                m)})))
-        data)))
-(defn gen-protocols
-  "Генерирует протоколы поверки в файл protocol.html."
-  [where]
-  (let [data (get-protocols-data where)]
-    (spit
-      (str midb-path
-           "protocol.html")
-           (pr/protocols data))))
-(defn gen-report
-  "генерирует отчет о записях в файл report.html."
-  ([coll]
-   (spit
-     (str midb-path
-          "report.html")
-     (report/verification-report (get-report-data coll))))
-  ([from to]
-   (gen-report (range from (inc to)))))
-(defn find-counteragent
-  "Возвращает список контрагентов соответствующих запросу."
-  [s]
-  (jdbc/query midb [q/counteragents (str "%" s "%")]))
-(defn counteragents
-  ""
-  [s]
-  (spit
-    (str midb-path
-         "counteragents.html")
-    (report/counteragents-report (find-counteragent s))))
-(defn gso
-  ([where]
-  (spit
-    (str midb-path "gso.html")
-    (report/gso-report
-      (jdbc/query
-        midb
-        (str "select * from gso"
-             (if (= "" where)
-                 ""
-                 (str " where " where))
-             " order by available desc, components, conc")))))
-  ([]
-   (gso "")))
-(defn methodology
-  [coll]
-  (spit
-    (str midb-path
-         "methodology.html")
-    (report/methodology-report (get-methodology-data coll))))
-(defn gen-values!
-  "Записывает в БД случайные значения результатов измерений в пределах
-   основной погрешности."
-  [where]
-  (map (fn [prot] 
-           (map (fn [m]
-                    (map (fn [r]
-                             (jdbc/update!
-                               midb
-                               :measurements
-                               {:value (:value r)}
-                               ["id = ?"
-                                 (:measurement_id r)]))
-                         (metr/gen-values m)))
-                (list (:measurements prot))))
-       (get-protocols-data where)))
-(defn insert-measurements
-  [id ch-name coll cmnt]
-  (map (fn [[m-id & ref]]
-         (map (fn [r-value]
-                  (jdbc/insert!
-                    midb
-                    :measurements
-                    (hash-map
-                      :v_id id
-                      :channel_name ch-name
-                      :metrology_id m-id
-                      :ref_value r-value
-                      :comment cmnt)))
-         ref))
-       coll))
-(defn add-measurements
-  [id coll]
-  (map (fn [item]
-           (insert-measurements
-             id
-             (get item 0)
-             (get item 1)
-             (get item 2)))
-       coll))
-(defn unusability
-  ""
-  [id op_id s]
-  (jdbc/update!
+    "select * from methodology where id = 1"))
+(jdbc/insert!
+  mmidb
+  :methodology
+  (dissoc (first data) :conc))
+;; #cars
+;; #insert#order#auto
+(do
+  (jdbc/insert!
+    auto
+    :travel_order
+    {:auto_id 4
+     :count "9/000"
+     :date_departure "2024-07-10T09:00"
+     :date_arrive "2024-07-10T15:00"
+     :odometr_departure 154278
+     :fuel_departure 22.37
+     :odometr_arrive 154374
+     :fuel_add 0})
+  (pprint
+    (jdbc/query
+      auto
+      "select * from view_travel_order order by id desc limit 1;")))
+(def data
+  (jdbc/query
     midb
-    :v_operations
-    {:result -1
-     :unusability s}
-    ["v_id = ? and op_id = ?" id op_id])
-  (jdbc/update!
+    "select * from methodology where id = 1"))
+(jdbc/insert!
+  mmidb
+  :methodology
+  (dissoc (first data) :conc))
+(def res (migrate-table :methodology))
+(println res)
+(def data
+  (jdbc/query
     midb
-    :v_operations
-    {:result 0}
-    ["v_id = ? and op_id > ?" id op_id]))
-(defn parse-int [s]
-  (Integer/parseInt s))
-(defn calc-references-hash
-  "code-example:
-    (calc-references-hash
-      \"v_id >= 3000\")"
-  [where]
-  (->> (jdbc/query
-         midb
-         (str "select v_id, group_concat(ref_id, ', ') as refs
-               from verification_refs
-               where "
-               where
-               " group by v_id")) 
-       (map (fn [r]
-                (->> (string/split
-                       (:refs r)
-                       #", ")
-                     (map string/trim)
-                     (map parse-int)
-                     sort
-                     hash
-                     (assoc r :refs))))
-       (map (fn [r]
-                (jdbc/update!
-                  midb
-                  :verification
-                  {:hash_refs (:refs r)}
-                  ["id = ?" (:v_id r)])))))
-(defn gs2000
-  ([gen-n gas s-conc t-conc-coll]
-    (map (fn [c]
-             ((gs/calculator (gs/passports gen-n))
-                             gas
-                             :air
-                             s-conc
-                             c))
-         t-conc-coll))
-  ([gen-n s-conc t-conc-coll]
-    (map (fn [c]
-             ((gs/calculator (gs/passports gen-n))
-                             :air
-                             s-conc
-                             c))
-         t-conc-coll)))
-;; #split#rename#scan#protocol
-(defn split-pdf
-  "author: Aleksandr Ermolaev
-  version: 2024-04-23
-  dependency: pdftk"
-  [scan-path f pages start-number]
-  (let [scan-pages (->
-                     (sh "identify" (str scan-path f))
-                     :out
-                     (string/split #"\n")
-                     count)
-        pages (read-string pages)
-        start-number (read-string start-number)]
-    (dotimes [i (/ scan-pages pages)]
-      (sh "pdftk"
-          (str scan-path f)
-          "cat"
-          (str (inc (* i pages)) "-" (+ (* i pages) pages))
-          "output"
-          (str scan-path "9-61-" (+ i start-number) "-2024.pdf")))
-    (sh "mv"
-          (str scan-path f)
-          (str scan-path "trash/"))))
-(defn move-backups ;; TODO:
-  []
-  (let [department 9
-        engineer-num 61
-        year 2024
-        scan-path "/media/sf_SCAN/"
-        local-path "./scans"]
-    ()))
-;; #split#rename#scan#protocol
-(defn protocol-backup
-  "author: Aleksandr Ermolaev
-  version: 2024-04-23"
-  []
-  (let [scan-path "/media/sf_SCAN/"
-      get-files-list
-        (fn []
-            (doall
-              (filter (fn [s]
-                          (re-matches #".*\.pdf" s))
-                      (->
-                        (sh "ls" scan-path)
-                        :out
-                        (string/split #"\n")))))]
-  ;; приводим имена сканов к общему виду {start_protocol}.{pages_per_protocol}.pdf
-  (dorun
-    (map (fn [f] 
-             (sh "mv" (str scan-path f)
-                      (->
-                        (str scan-path f)
-                        (string/replace #"Protokol" "")
-                        (string/replace #"\d{6}\.pdf" "pdf"))))
-         (get-files-list)))
-  ;; делим общий скан на протоколы и переименовываем их.
-  (dorun
-    (map (fn [f]
-             (let [[start-number pages _] (string/split f #"\.")]
-               (split-pdf scan-path f pages start-number)
-               (println "split-pdf" (str scan-path f) pages start-number)))
-         (doall
-           (filter (fn [f]
-                       (re-matches #"\d+\.\d\.pdf" f))
-                   (get-files-list)))))))
-(comment
-(require '[clojure.repl :refer :all])
-(require '[mapp.lib.midb-queries :as q] :reload)
-(require '[mapp.protocols.custom :as protocol] :reload)
-;; example table-rows пример функции создания строк таблицы
-(spit
-  (str midb-path "temp.html")
-    (html (table (mapp.protocols.custom/table-rows
-            (list
-              (list "Детектор" "Значение уровня шумов" "Значение дрейфа")
-              (list "действительное" "допускаемое" "ед. изм."
-                    "действительное" "допускаемое" "ед. изм."))
-            #_(list
-              (list [2 1] [1 3] [1 3])
-              (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1]))
-            #_th))))
-(require '[mapp.lib.metrology :as metr] :reload)
-(require '[mapp.utils.protocol :as pr] :reload)
-(require '[mapp.lib.gen-html :refer :all] :reload)
-(require '[mapp.lib.midb-queries :as q] :reload)
-(require '[mapp.lib.chemistry :as ch] :reload)
-(doc flatten)
-(doc assoc)
-)
-(pprint (gs2000 2
-                ;"H2S"
-                2012
-                (list 20 100 180) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                1000
-                (list 10 18) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(* 7 0.15)
-(* 7 0.20)
-(* 7 0.25)
-(* 0.25 14)
-(pprint (gs2000 2
-                ;"H2S"
-                1000
-                (list 20 100 180) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                496 
-                (list 5.2 8.8 11.5 17.5) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(map #(/ %1 4.4 0.01)
-     '(0.944 1.096 2.15))
-(map #(/ %1 4.4 0.01)
-     '(0.944 1.096 1.806 1.806 1.806 1.806 1.806 1.806 1.806 1.806 1.806 2.15))
-(map #(/ %1 4.4 0.01)
-     '(0.944 1.096 1.806 2.15))
-(pprint (gs2000 2
-                "CO"
-                168
-                (list 1.2 15 25 125) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                "CO"
-                9030
-                (list 1.2 15 25 125) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                "CO"
-                9030
-                (list 100 190) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
+    "select * from methodology where id = 334"))
+(jdbc/insert!
+  mmidb
+  :methodology
+  (dissoc (first data) :conc))
+(def res (migrate-table :methodology))
+(println res)
+(def res (migrate-table :refs))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from refs where id = 1"))
+(jdbc/insert!
+  mmidb
+  :refs
+  (dissoc (first data) :conc))
+(dir string)
+(doc split)
+(doc string/split)
+(defn date-to-iso
+  [s]
+  (->
+    s
+    (split #".")
+    reverse
+    (string/join "-")))
+(defn date-to-iso
+  [s]
+  (->
+    s
+    (string/split #".")
+    reverse
+    (string/join "-")))
+(defn date-to-iso
+  [s]
+  (->
+    s
+    (string/split #".")
+    reverse
+    (string/join "-")))
+(date-to-iso "15.07.1990")
+(-> "15.07.1990"
+    (string/split #"."))
+(-> "15.07.1990"
+    (string/split #"\."))
+(defn date-to-iso
+  [s]
+  (->
+    s
+    (string/split #"\.")
+    reverse
+    (string/join "-")))
+(date-to-iso "15.07.1990")
+(defn date-to-iso
+  [s]
+  (->
+    s
+    (string/split #"\.")
+    reverse
+    (string/join "-")))
+(date-to-iso "15.07.1990")
+(-> "15.07.1990"
+    (string/split #"\."))
+(-> "15.07.1990"
+    (string/split #"\.")
+    reverse)
+(string/join "-" (-> "15.07.1990"
+    (string/split #"\.")
+    reverse
+    ))
+(defn date-to-iso
+  [s]
+  (string/join "-"
+    (->
+      s
+      (string/split #"\.")
+      reverse)))
+(date-to-iso "15.07.1990")
+(let [data (jdbc/query
+             midb
+             "select * from refs")]
+  (for [r data]
+    (jdbc/update!
+      midb
+      :refs
+      {:commisioning (date-to-iso (:commisioning r))}))) 
+(let [data (jdbc/query
+             midb
+             "select * from refs")]
+  (for [r data]
+    (jdbc/update!
+      midb
+      :refs
+      {:commisioning (date-to-iso (:commisioning r))}
+      []))) 
+kjj(let [data (jdbc/query
+             midb
+             "select * from refs")]
+  (for [r data]
+    (jdbc/update!
+      midb
+      :refs
+      {:commisioning (date-to-iso (:commisioning r))}
+      ["id = ?" (:id r)]))) 
+(def data
+  (jdbc/query
+    midb
+    "select * from refs where id = 1"))
+(jdbc/insert!
+  mmidb
+  :refs
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from refs where id = 1"))
+(jdbc/insert!
+  mmidb
+  :refs
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from refs where id = 1"))
+(jdbc/insert!
+  mmidb
+  :refs
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from refs where id = 1"))
+(jdbc/insert!
+  mmidb
+  :refs
+  (dissoc (first data) :conc))
+(def res (migrate-table :refs))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from refs where id = 236"))
+(jdbc/insert!
+  mmidb
+  :refs
+  (dissoc (first data) :conc))
+(def res (migrate-table :refs))
+(println res)
+(def res (migrate-table :verification_operations))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from verification_operations where id = 1"))
+(jdbc/insert!
+  mmidb
+  :verification_operations
+  (dissoc (first data) :conc))
+(def res (migrate-table :verification_types))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from verification_operations where id = 1"))
+(jdbc/insert!
+  mmidb
+  :verification_operations
+  (dissoc (first data) :conc))
+(def res (migrate-table :verification_operations))
+(println res)
+(def res (migrate-table :channels))
+(println res)
+(def res (migrate-table :channels))
+(println res)
+(def res (migrate-table :metrology))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from metrology where id = 1207"))
+(jdbc/insert!
+  mmidb
+  :metrology
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from metrology where id = 1207"))
+(jdbc/insert!
+  mmidb
+  :metrology
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from metrology where id = 1207"))
+(jdbc/insert!
+  mmidb
+  :metrology
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from metrology where id = 1207"))
+(jdbc/insert!
+  mmidb
+  :metrology
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from metrology where id = 1211"))
+(jdbc/insert!
+  mmidb
+  :metrology
+  (dissoc (first data) :conc))
+(def res (migrate-table :metrology))
+(println res)
+(def res (migrate-table :engineers))
+(println res)
+(def res (migrate-table :ref_values))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 1"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :conc))
+(dissoc {:id1 1 :id2 2 :id3 3} [:id2 :id3])
+(dissoc {:id1 1 :id2 2 :id3 3} :id2)
+(find-doc "dissoc")
+(dissoc {:id1 1 :id2 2 :id3 3} :id2 :id3)
+(defn migrate-table
+  [tab]
+  (let [data
+          (jdbc/query
+            midb
+            (str "select * from " (string/replace (str tab) ":" "")))
+        er []]
+    (doall
+      (reduce (fn [er r]
+                  (try
+                    (do
+                      (jdbc/insert!
+                        mmidb
+                        tab
+                        (dissoc r :nominal_from :nominal_to :nominal_range))
+                      er)
+                    (catch Exception e
+                      (print (ex-cause e))
+                      (conj er (:id r)))))
+              []
+              data))))
+(def res (migrate-table :ref_values))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 22"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 204"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :conc))
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 204"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :nominal_from :nominal_to :nominal_range))
+(def res (migrate-table :ref_values))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 349"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :nominal_from :nominal_to :nominal_range))
+(def res (migrate-table :ref_values))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 475"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :nominal_from :nominal_to :nominal_range))
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 476"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :nominal_from :nominal_to :nominal_range))
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 673"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :nominal_from :nominal_to :nominal_range))
+(def res (migrate-table :ref_values))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from ref_values where id = 565"))
+(jdbc/insert!
+  mmidb
+  :ref_values
+  (dissoc (first data) :nominal_from :nominal_to :nominal_range))
+(def res (migrate-table :ref_values))
+(println res)
+(def res (migrate-table :verification))
+(println res)
+(defn migrate-table
+  [tab]
+  (let [data
+          (jdbc/query
+            midb
+            (str "select * from " (string/replace (str tab) ":" "")))
+        er []]
+    (doall
+      (reduce (fn [er r]
+                  (try
+                    (do
+                      (jdbc/insert!
+                        mmidb
+                        tab
+                        r)
+                      er)
+                    (catch Exception e
+                      (print (ex-cause e))
+                      (conj er (:id r)))))
+              []
+              data))))
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 1"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 1"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def res (migrate-table :verification))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 1944"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 2409"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 2409"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 2410"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def res (migrate-table :verification))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from verification where id = 3605"))
+(jdbc/insert!
+  mmidb
+  :verification
+  (first data))
+(def res (migrate-table :verification))
+(println res)
+(def res (migrate-table :measurements))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from measurements where id = 571"))
+(jdbc/insert!
+  mmidb
+  :measurements
+  (first data))
+(def data
+  (jdbc/query
+    midb
+    "select * from measurements where id = 22158"))
+(jdbc/insert!
+  mmidb
+  :measurements
+  (first data))
+(def res (migrate-table :measurements))
+(println res)
+(def res (migrate-table :v_gso))
+(println res)
+(def res (migrate-table :v_html))
+(println res)
+(def res (migrate-table :v_opt_refs))
+(println res)
+(def data
+  (jdbc/query
+    midb
+    "select * from v_opt_refs where id = 2355"))
+(jdbc/insert!
+  mmidb
+  :v_opt_refs
+  (first data))
+(def res (migrate-table :v_refs))
+(println res)
+exit

@@ -4,10 +4,12 @@
 
 (pprint (gs2000 2
                 "H2S"
-                2012
-                (list 1.2 100 190) 
+                51.1
+                (list 2.8 25) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 1.7 5.8))))
+
+(* 0.25 14)
 
 (map #(* 1.42 %) [7.639991978624116 49.98285275269121 89.96797778940756])
 
@@ -39,7 +41,7 @@
      '(4.9 7.8 40 70))
 
 (map #(/ %1 4.4 0.01)
-     '(1.096 2.15))
+     '(0.944 1.096 1.806 2.15))
 
 (map #(* % 30)
      '(0.05 0.5 0.95))
@@ -588,13 +590,13 @@
   (jdbc/insert!
     auto
     :travel_order
-    {:auto_id 1
+    {:auto_id 4
      :count "9/000"
-     :date_departure "2024-06-28T11:00"
-     :date_arrive "2024-06-28T13:30"
-     :odometr_departure 245120
-     :fuel_departure 21.59
-     :odometr_arrive 245124
+     :date_departure "2024-07-10T09:00"
+     :date_arrive "2024-07-10T15:00"
+     :odometr_departure 154278
+     :fuel_departure 22.37
+     :odometr_arrive 154374
      :fuel_add 0})
   (pprint
     (jdbc/query
@@ -770,3 +772,60 @@
 (require '[incanter.excel :refer [save-xls]])
 
 (save-xls (dataset [:id :value] [{:id 1 :value 11} {:id 2 :value 22}]) "resources/public/files/test.xls")
+
+(def mmidb
+  "mariaDB spec"
+  {:dbtype "mysql"
+   :dbname "midb"
+   :host "127.0.0.1"
+   :port 3306
+   :user "ave"
+   :password "enter"})
+
+(defn migrate-table
+  [tab]
+  (let [data
+          (jdbc/query
+            midb
+            (str "select * from " (string/replace (str tab) ":" "")))
+        er []]
+    (doall
+      (reduce (fn [er r]
+                  (try
+                    (do
+                      (jdbc/insert!
+                        mmidb
+                        tab
+                        r)
+                      er)
+                    (catch Exception e
+                      (print (ex-cause e))
+                      (conj er (:id r)))))
+              []
+              data))))
+
+(dissoc {:id1 1 :id2 2 :id3 3} :id2 :id3)
+
+(find-doc "dissoc")
+
+#_(let [data (jdbc/query
+             midb
+             "select * from refs")]
+  (for [r data]
+    (jdbc/update!
+      midb
+      :refs
+      {:commisioning (date-to-iso (:commisioning r))}
+      ["id = ?" (:id r)]))) 
+
+(def data
+  (jdbc/query
+    midb
+    "select * from v_refs where id = 2355"))
+(jdbc/insert!
+  mmidb
+  :v_refs
+  (first data))
+
+(def res (migrate-table :v_refs))
+(println res)
