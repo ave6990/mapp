@@ -35,7 +35,7 @@
 (defn date-iso->local
   "Преобразует дату из формата ISO в локальный формат."
   [s]
-  (->> (string/split s #"\-")
+  (->> (string/split (re-find #"\d{4}\-\d{2}\-\d{2}" (str s)) #"\-")
        reverse
        (string/join ".")))
 
@@ -409,7 +409,6 @@
        [:td {:class "channel-cell"}
            (str (:channel_name m))]
        (let [res (metrology-calc m)]
-         (pprint res)
          (list
            [:td {:class "centered-cell"}
                 ;{TOFIX} use round
@@ -472,7 +471,6 @@
 
 (defn event-conclusion
   [m]
-  (pprint m)
   [:tr
     [:td (if (= 1.0 (:value m))
              "соответствует"
