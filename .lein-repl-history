@@ -1,3 +1,16 @@
+                                [(str "select * from "
+                                      table
+                                      " where v_id = ?;")
+                                 2380]))))
+                          {}
+                         (list "v_gso" "v_refs" "v_opt_refs"
+                          "v_operations" "measurements"))))
+(defn get-protocols-data
+  ""
+  [where]
+  (let [data (jdbc/query
+                midb
+                (str "select * from protocol where " where))
         measurements (jdbc/query
                         midb
                         (str "select * from view_v_measurements where " where))
@@ -480,21 +493,8 @@
 (doc flatten)
 (doc assoc)
 )
-;; #cars
-;; #insert#order#auto
-(do
-  (jdbc/insert!
-    auto
-    :travel_order
-    {:auto_id 4
-     :count "9/0001574"
-     :date_departure "2024-07-12T09:00"
-     :date_arrive "2024-07-12T15:00"
-     :odometr_departure 154374
-     :fuel_departure 13.73
-     :odometr_arrive 154387
-     :fuel_add 20})
-  (pprint
-    (jdbc/query
-      auto
-      "select * from view_travel_order order by id desc limit 1;")))
+(string/replace "some {v_id}" #"\{v_id\}" 100)
+(doc string/replace)
+(string/replace "some {v_id}" #"\{v_id\}" 100)
+(string/replace "some {v_id}" #"\{v_id\}" (str 100))
+(doc copy-verification!)

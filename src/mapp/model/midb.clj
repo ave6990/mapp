@@ -15,7 +15,17 @@
   ;"/mnt/d/UserData/YandexDisk/Ermolaev/midb/"
   "/media/sf_YandexDisk/Ermolaev/midb/")
 
-(db/defdb midb)
+;; sqlite3 database spec
+#_(db/defdb midb)
+
+(def midb
+  "mariaDB spec"
+  {:dbtype "mysql"
+   :dbname "midb"
+   :host "127.0.0.1"
+   :port 3306
+   :user "ave"
+   :password "enter"})
 
 (defn write!
   [tab-id data]
@@ -167,7 +177,8 @@
 (defn copy-verification!
   "Копировать строку таблицы verification."
   [id]
-  (jdbc/execute! midb [q/copy-verification id]))
+  (jdbc/execute! midb (string/replace q/copy-verification
+                        #"\{v_id\}" (str id))))
 
 (defn delete-verification!
   "Удалить строку таблицы verification."
@@ -264,15 +275,24 @@
   ([id-from n]
     (dorun
       (map (fn [i]
-            (let [id-to (inc (last-id))]
-              ;(conj (copy-verification! id-from)
-              (copy-verification! id-from)
-              (dorun
+            (let [id-to2 (inc (last-id))]
+              (jdbc/with-db-transaction [tx midb]
+                (jdbc/execute! tx (string/replace q/copy-verification
+                                #"\{v_id\}" (str id-from)))
+                (let [id-to (:id (first (jdbc/query tx
+                              "select id from verification
+                               order by id desc
+                               limit 1;")))]
+                  (jdbc/execute! tx [q/copy-v-gso id-to id-from])
+                  (jdbc/execute! tx [q/copy-v-refs id-to id-from])
+                  (jdbc/execute! tx [q/copy-v-opt-refs id-to id-from])
+                  (jdbc/execute! tx [q/copy-measurements id-to id-from])))
+              #_(copy-verification! id-from)
+              #_(dorun
                 (map (fn [f] (f id-from (list id-to)))
                      (list copy-v-gso!
                            copy-v-refs!
                            copy-v-opt-refs!
-                           ;copy-v-operations! ;; operations moved to the measurements table 
                            copy-measurements!)))))
            (range n))))
   ([id-from]
@@ -676,7 +696,7 @@
   [where]
   (->> (jdbc/query
          midb
-         (str "select v_id, group_concat(ref_id, ', ') as refs
+         (str "select v_id, group_concat(ref_id separator ', ') as refs
                from verification_refs
                where "
                where

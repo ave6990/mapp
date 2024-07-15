@@ -35,9 +35,9 @@
       on met.id = v.methodology_id
   inner join
       counteragents as ca
-      on ca.id = v.counteragent)
+      on ca.id = v.counteragent) subquery
   {where}
-  {group-by});")
+  {group-by}) subquery2;")
 
 (def get-verifications
   "select *
@@ -70,7 +70,7 @@
       on met.id = v.methodology_id
   inner join
       counteragents as ca
-      on ca.id = v.counteragent)
+      on ca.id = v.counteragent) subquery
   {where}
   {group-by}
   order by
@@ -87,7 +87,7 @@
   (select *
   from
     conditions
-  {where});")
+  {where}) subquery;")
 
 (def get-conditions
   "select
@@ -107,7 +107,7 @@
   (select *
    from
     journal
-  {where});")
+  {where}) subquery;")
 
 (def get-journal
   "select *
@@ -126,7 +126,7 @@
   (select *
   from
     gso
-  {where});")
+  {where}) subquery;")
 
 (def get-gso
   "select
@@ -146,7 +146,7 @@
   (select *
   from
     counteragents
-  {where});")
+  {where}) subquery;")
 
 (def get-counteragents
   "select
@@ -164,7 +164,7 @@
   (select *
   from
     view_refs_use_count
-  {where});")
+  {where}) subquery;")
 
 (def get-references
   "select
@@ -182,7 +182,7 @@
   (select *
   from
     channels
-  {where});")
+  {where}) subquery;")
 
 (def get-channels
   "select *
@@ -196,7 +196,7 @@
   "select
     count(*) as count
   from
-  (select *
+  (select ch.id
   from
     metrology as metr
   inner join
@@ -205,7 +205,7 @@
   inner join
     methodology as met
     on met.id = ch.methodology_id
-  {where});")
+  {where}) subquery;")
 
 (def get-metrology
   "select 
@@ -241,13 +241,13 @@
   "select
     count(*) as count
   from
-  (select *
+  (select op.id
   from
     verification_operations as op
   inner join
     methodology as met
     on met.id = op.methodology_id
-  {where});")
+  {where}) subquery;")
 
 (def get-verification-operations
   "select
@@ -275,7 +275,7 @@
   "select
     count(*) as count
   from
-  (select *
+  (select v_op.id
   from
     v_operations as v_op
   inner join
@@ -284,7 +284,7 @@
   inner join
     methodology as met
     on met.id = op.methodology_id
-  {where});")
+  {where}) subquery;")
 
 (def get-v-operations
   "select
@@ -315,7 +315,7 @@
     count(*) as count
   from
   (select
-    *
+    meas.id
   from
       measurements as meas
   inner join
@@ -333,23 +333,23 @@
   inner join    
       verification as v
       on meas.v_id = v.id
-  {where});")
+  {where}) subquery;")
 
 (def get-measurements
   "select
       meas.id,
       meas.v_id,
       v.serial_number,
-      v_ops.section || ' ' || v_ops.name as operation,
+      v_ops.section, ' ', v_ops.name as operation,
       meas.metrology_id,
       meas.channel_name,
-      ifnull(ifnull(ch.channel, ch.component) || ' ', '')
-        || ifnull('(' || metr.r_from || ' - ' || metr.r_to || ') ' || ch.units || '; ', '')
-        || ifnull(chr.symbol || ' ', '')
-        || ifnull(chr.comparison || ' ', '')
-        || coalesce(ifnull(metr.value, 0) + ifnull(metr.fraction, 0) * meas.ref_value || ' ', metr.value, '')
-        || coalesce(iif(metr.type_id > 0 and metr.type_id < 3, '%', metr.units), ch.units, '') as channel,
-            meas.value,
+      concat(ifnull(concat(ifnull(ch.channel, ch.component), ' '), '')
+       , ifnull(concat('(', metr.r_from, ' - ', metr.r_to, ') ', ch.units, '; '), '')
+       , ifnull(concat(chr.symbol, ' '), '')
+       , ifnull(concat(chr.comparison, ' '), '')
+       , coalesce(concat(ifnull(metr.value, 0) + ifnull(metr.fraction, 0) * meas.ref_value, ' '), metr.value, '')
+       , coalesce(if(metr.type_id > 0 and metr.type_id < 3, '%', metr.units), ch.units, '')) as channel,
+      meas.value,
       meas.value_2,
       meas.ref_value,
       meas.ref_value_id,
@@ -391,7 +391,7 @@
 (def get-ref-values-records-count
   "select count(*) as count
   from
-  (select *
+  (select rv.id
   from
     ref_values as rv
   inner join
@@ -403,17 +403,17 @@
   inner join
     methodology as met
     on met.id = ch.methodology_id
-  {where});")
+  {where}) subquery;")
 
 (def get-ref-values
   "select 
     rv.id
     , met.registry_number
     , ch.channel as channel_name
-    , ifnull(ch.component || ' ', '') || '(' || ch.range_from || ' - '
-      || ch.range_to || ') ' || ch.units as channel
-    , '(' || metr.r_from || ' - ' || metr.r_to || ') '
-      || ifnull(metr.units, ch.units) as range
+    , concat(ifnull(concat(ch.component, ' '), ''), '(', ch.range_from, ' - '
+     , ch.range_to, ') ', ch.units) as channel
+    , concat('(', metr.r_from, ' - ', metr.r_to, ') '
+     , ifnull(metr.units, ch.units)) as range
     , rv.metrology_id
     , rv.number
     , rv.nominal_range
@@ -491,11 +491,7 @@
 
 (def copy-verification
   "Query to copy the record with id from the verification table"
-  "with temp as (
-      select
-        ? as v_id
-      )
-  insert into
+  "insert into
       verification (
           engineer, count, counteragent, conditions, mi_type, methodology_id,
           serial_number, manufacture_year, components,
@@ -509,11 +505,11 @@
       channels, area, period, verification_type, sw_name,
       sw_version, sw_version_real, sw_checksum, sw_algorithm,
       voltage, protocol, protolang,
-      (select v_id from temp), comment
+      {v_id}, comment
   from
       verification
   where
-      id = (select v_id from temp);")
+      id = {v_id};")
 
 (def copy-v-gso
   "Query to copy gso."
