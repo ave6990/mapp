@@ -413,7 +413,7 @@
     , concat(ifnull(concat(ch.component, ' '), ''), '(', ch.range_from, ' - '
      , ch.range_to, ') ', ch.units) as channel
     , concat('(', metr.r_from, ' - ', metr.r_to, ') '
-     , ifnull(metr.units, ch.units)) as range
+     , ifnull(metr.units, ch.units)) as `range`
     , rv.metrology_id
     , rv.number
     , rv.nominal_range

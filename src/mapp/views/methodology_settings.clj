@@ -22,7 +22,7 @@
 (def toolbar-fields-settings
   '(["id" " id "]
     ["Рег. №" " registry_number LIKE '**'"]
-    ["Тип СИ" " mi_name || ' ' || mi_types LIKE '**'"]))
+    ["Тип СИ" " concat(mi_name, ' ', mi_types) LIKE '**'"]))
 
 (def fields-settings
   '([:id "id" true]

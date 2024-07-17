@@ -3,7 +3,7 @@
 (def toolbar-fields-settings
   '(["id" " metr.id "]
    ["id канала" " ch.id "]
-   ["Канал" " (ch.channel || ' ' || ch.component) LIKE '**'"]
+   ["Канал" " concat(ch.channel, ' ', ch.component) LIKE '**'"]
    ["Рег. №" " met.registry_number LIKE '**'"]))
 
 (def fields-settings

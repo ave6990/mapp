@@ -10,7 +10,7 @@
 
 (def toolbar-fields-settings
   '(["id" " id "]
-    ["наименование" " (short_name || ' ' || name) LIKE '**' "]
+    ["наименование" " concat(short_name, ' ', name) LIKE '**' "]
     ["инн" " inn LIKE '**'"]
     ["адрес" " address LIKE '**'"]))
 

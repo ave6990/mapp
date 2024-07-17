@@ -20,7 +20,7 @@
    ["отдел" " department "]
    ["рег. №" " registry_number LIKE '**'"]
    ["срок годности" " expiration_date "]
-   ["тип СИ" " mi_type || ' ' || mi_name LIKE '**' "]
+   ["тип СИ" " concat(mi_type, ' ', mi_name) LIKE '**' "]
    ["№ ФИФ" " code_fif "]))
 
 (def fields-settings

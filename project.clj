@@ -2,6 +2,7 @@
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
+  :jvm-opts ["-Duser.timezone=UTC"]
   :dependencies
     [[org.clojure/clojure "1.11.1"]
      [org.clojure/java.jdbc "0.7.12"]
