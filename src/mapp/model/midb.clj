@@ -143,7 +143,7 @@
         {:keys [recs-count data]} records
         column-names
           [:id :count :counteragent :mi_type :serial_number :manufacture_year
-           :registry_number :methodology :interval :components :channels
+           :registry_number :methodology :period :components :channels
            :reference_codes :area :verification_type :protocol_number
            :usability :date :sticker_number :sign_mi :sign_pass
            :temperature :humidity :pressure :voltage :frequency :other

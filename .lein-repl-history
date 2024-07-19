@@ -1,274 +1,381 @@
-      where v_id = ?"
-     v-id]))
-(ns mapp.model.midb
-  (:require 
-    [clojure.java.jdbc :as jdbc]
-    [clojure.string :as string]
-    [digest]  ;; MD5 hash
-    [incanter.core :refer [dataset]]
-    [incanter.excel :refer [save-xls]]
-    [mapp.lib.database :as db]
-    [mapp.lib.chemistry :as ch]
-    [mapp.lib.gs2000 :as gs]
-    [mapp.lib.metrology :as metr]
-    [mapp.db.queries :as q]
-    #_[mapp.protocols.custom :as protocol]))
-(defn get-metrology-hash
+                              (keyword table)
+                              (jdbc/query
+                                midb
+                                [(str "select * from "
+                                      table
+                                      " where v_id = ?;")
+                                 2380]))))
+                          {}
+                         (list "v_gso" "v_refs" "v_opt_refs"
+                          "v_operations" "measurements"))))
+(defn get-protocols-data
   ""
-  [db v-id]
+  [where]
+  (let [data (jdbc/query
+                midb
+                (str "select * from protocol where " where))
+        measurements (jdbc/query
+                        midb
+                        (str "select * from view_v_measurements where " where))
+        html (jdbc/query
+               midb
+               (str "select * from v_html where " where))]
+    (map (fn [m]
+             (assoc
+               (assoc m
+                    :measurements
+                    (doall (filter (fn [r]
+                                       (= (:id r) (:id m)))
+                                   measurements)))
+               :html
+               (doall (filter (fn [r]
+                                (= (:id r) (:id m)))
+                              html))))
+         data)))
+(defn assoc-multi
+  [m nm]
+  (reduce (fn [a b]
+            (let [[k v] b]
+              (assoc a k v)))
+          m
+          nm))
+(defn get-references-data
+  [where]
   (jdbc/query
-    db
-    ["select hash
-      from view_v_metrology_hash
-      where v_id = ?"
-     v-id]))
-(defn get-v-id-with-actual-refs
-  ""
-  [db v-id]
-  (jdbc/query
-    db
-    ["select v_id
-     from view_v_metrology_hash
-     where hash = ?
-     limit 1;"
-     (get-metrology-hach db v-id)]))
-(defn get-v-id-with-actual-refs
-  ""
-  [db v-id]
-  (jdbc/query
-    db
-    ["select v_id
-     from view_v_metrology_hash
-     where hash = ?
-     limit 1;"
-     (get-metrology-hash db v-id)]))
-(def midb
-  "mariaDB spec"
-  {:dbtype "mysql"
-   :dbname "midb"
-   :host "127.0.0.1"
-   :port 3306
-   :user "ave"
-   :password "enter"})
-(get-v-id-with-actual-refs midb 733) 
-(get-metrology-hash midb 733)
-(defn get-metrology-hash
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id = ?"
-       v-id])
-    first
-    :hash)
-(defn get-metrology-hash
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id = ?"
-       v-id])
-    first
-    :hash))
-(get-v-id-with-actual-refs midb 733) 
-(defn get-metrology-hash
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id = ?"
-       v-id])
-    first
-    ))
-(get-metrology-hash midb 733)
-(defn get-metrology-hash
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id = ?"
-       v-id])
-    first
-    :hash))
-(get-metrology-hash midb 733)
-(get-v-id-with-actual-refs midb 733) 
-(defn get-v-id-with-actual-refs
-  ""
-  [db v-id]
-  (jdbc/query
-    db
-    ["select v_id
-     from view_v_metrology_hash
-     where hash = ?
-     limit 1;"
-     (get-metrology-hash db v-id)]))
-(get-v-id-with-actual-refs midb 733) 
-(jdbc/query
-    db
-    ["select v_id
-     from view_v_metrology_hash
-     where hash = ?
-     limit 1;"
-     (get-metrology-hash db 733)])
-(jdbc/query
     midb
-    ["select v_id
-     from view_v_metrology_hash
-     where hash = ?
-     limit 1;"
-     (get-metrology-hash db 733)])
-(jdbc/query
+    (str "select * from refs
+          where " where)))
+(defn references
+  ""
+  [where]
+  (spit
+    (str midb-path "references.html")
+    (report/refs-report
+      (get-references-data where))))
+(defn get-report-data
+  ""
+  [coll]
+  (let [v-data (jdbc/query
+                midb
+                (str
+                  q/report-verifications
+                  "("
+                  (string/join ", " coll)
+                  ")
+                  order by date desc, id desc"))
+        measurements (jdbc/query
+                      midb
+                      (str "select * from view_v_measurements
+                          where id in ("
+                          (string/join ", " coll)
+                          ")"))
+        operations (jdbc/query
+                    midb
+                    (str
+                      q/get-operations
+                      "("
+                      (string/join ", " coll)
+                      ")"))
+        refs (jdbc/query
+              midb
+              (str "select * from verification_refs
+                      where v_id in ("
+                      (string/join ", " coll)
+                      ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:measurements
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          measurements))
+                           :refs
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          refs))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          operations))}))
+         v-data)))
+(defn get-methodology-data
+  [coll]
+  (let [met-data
+         (jdbc/query
+           midb
+           (str "select * from methodology
+                 where id in ("
+                 (string/join
+                   ", "
+                   coll)
+                 ")"))
+        metrology-data
+          (jdbc/query
+            midb
+            (str "select * from view_metrology
+                  where id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))
+        operations-data
+          (jdbc/query
+            midb
+            (str "select * from verification_operations
+                  where methodology_id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:metrology
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          metrology-data))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:methodology_id r) (:id m)))
+                                          operations-data))}))
+         met-data)))
+(defn get-conditions-by-v-id 
+  [id]
+  (->>
+    ["select *
+      from conditions
+      where id = ?"
+          (->>
+            ["select conditions
+              from verification
+              where id = ?" id]
+            (jdbc/query midb)
+            first
+            :conditions
+           )]
+    (jdbc/query midb)
+    first))
+(conj (list 233 32 245) 140)
+(defn update-record!
+  [record table changes]
+  (jdbc/update! midb
+                table
+                (assoc-multi (table record) changes)
+                ["id = ?" ((comp :id table) record)]))
+(defn all-refs
+  [id]
+  (jdbc/query midb [q/all-refs id]))
+(defn check-gso
+  [coll column]
+  (map (fn [num]
+         (first (jdbc/query midb
+                     [(str "select id, number_1c, pass_number, expiration_date
+                            from gso
+                            where " column " = ?") num])))
+       coll))
+(defn set-v-gso!
+  [v-id coll]
+  (do (delete-v-gso! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_gso
+        (vec (map (fn [el] (hash-map :v_id v-id :gso_id el))
+                  coll)))))
+(defn set-v-refs!
+  [v-id coll]
+  (do (delete-v-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
+                  coll)))))
+(defn set-v-opt-refs!
+  [v-id coll]
+  (do (delete-v-opt-refs! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_opt_refs
+        (vec (map (fn [el] (hash-map :v_id v-id :ref_id el))
+                  coll)))))
+(defn set-v-operations!
+  [v-id coll]
+  (do (delete-v-operations! v-id)
+      (jdbc/insert-multi!
+        midb
+        :v_operations
+        (vec (map (fn [el] (hash-map :v_id v-id :op_id el :result 1))
+                  coll)))))
+(defn ins-channel!
+  "Вставить запись канала измерения и метрологических характеристик."
+  [ch-obj mc-list]
+  (let [ch-id
+          (->>
+            (jdbc/insert!
+              midb
+              :channels
+              ch-obj)
+            first
+            vals
+            first)]
+    (map (fn [m]
+             (jdbc/insert!
+               midb
+               :metrology
+               (assoc m :channel_id ch-id)))
+         mc-list)))
+(defn get-operations
+  "Возвращает коллекцию операций поверки по заданному v_id."
+  [id]
+  (jdbc/query
     midb
-    ["select v_id
-     from view_v_metrology_hash
-     where hash = ?
-     limit 1;"
-     (get-metrology-hash midb 733)])
-(get-metrology-hash midb 733)
-(defn get-metrology-hash
+    ["select * from view_operations where v_id = ?" id]))
+(defn gen-custom-protocols
+  [data]
+  (doall
+    (map (fn [m]
+             (when (:protocol m)
+                     (jdbc/delete!
+                       midb
+                       :v_html
+                       ["id = ?" (:id m)])
+                     (jdbc/insert!
+                       midb
+                       :v_html
+                       {:id (:id m)
+                        :html ((eval (read-string (str
+                                                   "protocol/"
+                                                   (:protocol m))))
+                                m)})))
+        data)))
+(defn gen-protocols
+  "Генерирует протоколы поверки в файл protocol.html."
+  [where]
+  (let [data (get-protocols-data where)]
+    (spit
+      (str midb-path
+           "protocol.html")
+           (pr/protocols data))))
+(defn gen-report
+  "генерирует отчет о записях в файл report.html."
+  ([coll]
+   (spit
+     (str midb-path
+          "report.html")
+     (report/verification-report (get-report-data coll))))
+  ([from to]
+   (gen-report (range from (inc to)))))
+(defn find-counteragent
+  "Возвращает список контрагентов соответствующих запросу."
+  [s]
+  (jdbc/query midb [q/counteragents (str "%" s "%")]))
+(defn counteragents
   ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id like '?'"
-       v-id])
-    first
-    :hash))
-(get-metrology-hash midb 733)
-(defn get-metrology-hash
+  [s]
+  (spit
+    (str midb-path
+         "counteragents.html")
+    (report/counteragents-report (find-counteragent s))))
+(defn gso
+  ([where]
+  (spit
+    (str midb-path "gso.html")
+    (report/gso-report
+      (jdbc/query
+        midb
+        (str "select * from gso"
+             (if (= "" where)
+                 ""
+                 (str " where " where))
+             " order by available desc, components, conc")))))
+  ([]
+   (gso "")))
+(defn methodology
+  [coll]
+  (spit
+    (str midb-path
+         "methodology.html")
+    (report/methodology-report (get-methodology-data coll))))
+(defn gen-values!
+  "Записывает в БД случайные значения результатов измерений в пределах
+   основной погрешности."
+  [where]
+  (map (fn [prot] 
+           (map (fn [m]
+                    (map (fn [r]
+                             (jdbc/update!
+                               midb
+                               :measurements
+                               {:value (:value r)}
+                               ["id = ?"
+                                 (:measurement_id r)]))
+                         (metr/gen-values m)))
+                (list (:measurements prot))))
+       (get-protocols-data where)))
+(defn insert-measurements
+  [id ch-name coll cmnt]
+  (map (fn [[m-id & ref]]
+         (map (fn [r-value]
+                  (jdbc/insert!
+                    midb
+                    :measurements
+                    (hash-map
+                      :v_id id
+                      :channel_name ch-name
+                      :metrology_id m-id
+                      :ref_value r-value
+                      :comment cmnt)))
+         ref))
+       coll))
+(defn add-measurements
+  [id coll]
+  (map (fn [item]
+           (insert-measurements
+             id
+             (get item 0)
+             (get item 1)
+             (get item 2)))
+       coll))
+(defn unusability
   ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id like '?'"
-       v-id])
-    first
-    :hash))
-(get-metrology-hash midb 733)
-(defn get-metrology-hash
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select hash
-        from view_v_metrology_hash
-        where v_id like ?"
-       v-id])
-    first
-    :hash))
-(get-metrology-hash midb 733)
-(get-v-id-with-actual-refs midb 733) 
-(defn get-v-id-with-actual-refs
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select v_id
-       from view_v_metrology_hash
-       where hash = ?
-       limit 1;"
-       (get-metrology-hash db v-id)])
-    first
-    :v_id)
-(get-v-id-with-actual-refs midb 733) 
-(defn get-v-id-with-actual-refs
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select v_id
-       from view_v_metrology_hash
-       where hash = ?
-       limit 1;"
-       (get-metrology-hash db v-id)])
-    first
-    :v_id))
-(get-v-id-with-actual-refs midb 733) 
-(get-v-id-with-actual-refs 5200)
-(get-v-id-with-actual-refs midb 5200)
-(get-v-id-with-actual-refs midb 5220)
-(let [db midb
-      id = 5220]
-  (get-v-id-with-actual-refs db id)
-  (get-metrology-hash db id))
-(let [db midb
-      id 5220]
-  (get-v-id-with-actual-refs db id)
-  (get-metrology-hash db id))
-(let [db midb
-      id 5220]
-  (println (get-v-id-with-actual-refs db id)
-  (get-metrology-hash db id)))
-(let [db midb
-      id 5400]
-  (println (get-v-id-with-actual-refs db id)
-  (get-metrology-hash db id)))
-(let [db midb
-      id 5278]
-  (println (get-v-id-with-actual-refs db id)
-  (get-metrology-hash db id)))
-  (nil? nil)
-(defn get-v-id-with-actual-refs
-  ""
-  [db v-id]
-  (let [hash (get-metrology-hash db v-id)
-        query "select v_id
-             from view_v_metrology_hash
-             where hash = ?
-             limit 1;"]
-    (if (nil? hash)
-        v-id
-        (->
-          (jdbc/query db [query hash])
-          first
-          :v_id))))
-(let [db midb
-      id 5278]
-  (println (get-v-id-with-actual-refs db id)
-  (get-metrology-hash db id)))
-(pprint (gs2000 2
-                "H2S"
-                51.1
-                (list 2.8 25) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-;; #gs2000
-(require '[mapp.lib.gs2000 :as gs])
-(require '[clojure.java.shell :refer [sh]])
-(require '[clojure.pprint :refer [pprint]])
-(pprint (gs2000 2
-                "H2S"
-                51.1
-                (list 2.8 25) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs/gs2000 2
-                "H2S"
-                51.1
-                (list 2.8 25) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
+  [id op_id s]
+  (jdbc/update!
+    midb
+    :v_operations
+    {:result -1
+     :unusability s}
+    ["v_id = ? and op_id = ?" id op_id])
+  (jdbc/update!
+    midb
+    :v_operations
+    {:result 0}
+    ["v_id = ? and op_id > ?" id op_id]))
+(defn parse-int [s]
+  (Integer/parseInt s))
+(defn calc-references-hash
+  "code-example:
+    (calc-references-hash
+      \"v_id >= 3000\")"
+  [where]
+  (->> (jdbc/query
+         midb
+         (str "select v_id, group_concat(ref_id, ', ') as refs
+               from verification_refs
+               where "
+               where
+               " group by v_id")) 
+       (map (fn [r]
+                (->> (string/split
+                       (:refs r)
+                       #", ")
+                     (map string/trim)
+                     (map parse-int)
+                     sort
+                     hash
+                     (assoc r :refs))))
+       (map (fn [r]
+                (jdbc/update!
+                  midb
+                  :verification
+                  {:hash_refs (:refs r)}
+                  ["id = ?" (:v_id r)])))))
 (defn gs2000
   ([gen-n gas s-conc t-conc-coll]
     (map (fn [c]
@@ -285,216 +392,109 @@
                              s-conc
                              c))
          t-conc-coll)))
-(pprint (gs2000 2
-                "H2S"
-                51.1
-                (list 2.8 25) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                9030
-                (list 0 950 1500 1900) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                9030
-                (list 950 1500 1900) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                496
-                (list 9.5 50 95) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(map #(/ %1 4.4 0.01)
-     '(1.116 2.09))
-(defn get-channels-by-v-id
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select channels
-        from verifications
-        where id = ?
-        limit 1;"
-       v-id])
-    first
-    channels))
-(defn get-channels-by-v-id
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select channels
-        from verifications
-        where id = ?
-        limit 1;"
-       v-id])
-    first
-    :channels))
-(defn get-v-id-with-actual-meas
-  ""
-  [db v-id]
-  (let [query "select vm.v_id
-               from verification v
-               inner join view_v_metrology_hash vm on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ? limit 1;"
-        hash (get-metrology-hash db v-id)
-        ch (get-channels-by-v-id db v-id)]
-    (if (nil? hash)
-        v-id
-        (-> 
-          (jdbc/query db [query hash ch])
-          first
-          :v_id))))
-(get-v-id-with-actual-meas midb 2000)
-(defn get-channels-by-v-id
-  ""
-  [db v-id]
-  (->
-    (jdbc/query
-      db
-      ["select channels
-        from verification
-        where id = ?
-        limit 1;"
-       v-id])
-    first
-    :channels))
-(get-v-id-with-actual-meas midb 2000)
-(defn get-v-id-with-actual-meas
-  ""
-  [db v-id]
-  (let [query "select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ? limit 1;"
-        hash (get-metrology-hash db v-id)
-        ch (get-channels-by-v-id db v-id)]
-    (if (nil? hash)
-        v-id
-        (-> 
-          (jdbc/query db [query hash ch])
-          first
-          :v_id))))
-(get-v-id-with-actual-meas midb 2000)
-(get-v-id-with-actual-meas midb 2500)
-(get-v-id-with-actual-meas midb 2600)
-(get-v-id-with-actual-meas midb 2800)
-(get-v-id-with-actual-meas midb 3500)
-(get-v-id-with-actual-meas midb 5000)
-(get-channels-by-v-id midb 5000)
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ? limit 1;"
-"ca8e19bfb0fb0adfc4ecb7a360a6ff2f" 930])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ? limit 1;"
-"ca8e19bfb0fb0adfc4ecb7a360a6ff2f" 4])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ? limit 1;"
-"dbb06ec826a8023d5c30f2d43ff3ece7" 4])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels like ? limit 1;"
-"dbb06ec826a8023d5c30f2d43ff3ece7" 4])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? limit 1;"
-"dbb06ec826a8023d5c30f2d43ff3ece7" ])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? limit 1;"
-"75cac8cc694541bf8376b190797367b9" ])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ? limit 1;"
-"75cac8cc694541bf8376b190797367b9" 4])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join conditions c on v.conditions = c.id
-               inner join verification v on vm.v_id = v.id
-               where vm.hash = ? and v.channels = ?
-               order by c.date desc
-               limit 1;"
-"75cac8cc694541bf8376b190797367b9" 4])
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               inner join conditions c on v.conditions = c.id
-               where vm.hash = ? and v.channels = ?
-               order by c.date desc
-               limit 1;"
-"75cac8cc694541bf8376b190797367b9" 4])
-(defn get-v-id-with-actual-meas
-  ""
-  [db v-id]
-  (let [query "select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               inner join conditions c on v.conditions = c.id
-               where vm.hash = ? and v.channels = ?
-               order by c.date desc
-               limit 1;"
-        hash (get-metrology-hash db v-id)
-        ch (get-channels-by-v-id db v-id)]
-    (if (nil? hash)
-        v-id
-        (-> 
-          (jdbc/query db [query hash ch])
-          first
-          :v_id))))
-(get-v-id-with-actual-meas midb 5000)
-(get-v-id-with-actual-meas midb 1743)
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               inner join conditions c on v.conditions = c.id
-               where vm.hash = ? and v.channels = ?
-               order by c.date desc
-               limit 1;"
-"75cac8cc694541bf8376b190797367b9" 4])
-(get-metrology-hash midb 1743)
-(get-v-id-with-actual-meas midb 1743)
-(get-metrology-hash midb 1743)
-(jdbc/query midb ["select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               inner join conditions c on v.conditions = c.id
-               where vm.hash = ? and v.channels = ?
-               order by c.date desc
-               limit 1;"
-"75cac8cc694541bf8376b190797367b9" 4])
-(defn get-v-id-with-actual-meas
-  ""
-  [db v-id]
-  (let [query "select v.id
-               from view_v_metrology_hash vm
-               inner join verification v on vm.v_id = v.id
-               inner join conditions c on v.conditions = c.id
-               where vm.hash = ? and v.channels = ?
-               order by c.date desc
-               limit 1;"
-        hash (get-metrology-hash db v-id)
-        ch (get-channels-by-v-id db v-id)]
-    (if (nil? hash)
-        v-id
-        (-> 
-          (jdbc/query db [query hash ch])
-          first
-          :id))))
-(get-v-id-with-actual-meas midb 1743)
+;; #split#rename#scan#protocol
+(defn split-pdf
+  "author: Aleksandr Ermolaev
+  version: 2024-04-23
+  dependency: pdftk"
+  [scan-path f pages start-number]
+  (let [scan-pages (->
+                     (sh "identify" (str scan-path f))
+                     :out
+                     (string/split #"\n")
+                     count)
+        pages (read-string pages)
+        start-number (read-string start-number)]
+    (dotimes [i (/ scan-pages pages)]
+      (sh "pdftk"
+          (str scan-path f)
+          "cat"
+          (str (inc (* i pages)) "-" (+ (* i pages) pages))
+          "output"
+          (str scan-path "9-61-" (+ i start-number) "-2024.pdf")))
+    (sh "mv"
+          (str scan-path f)
+          (str scan-path "trash/"))))
+(defn move-backups ;; TODO:
+  []
+  (let [department 9
+        engineer-num 61
+        year 2024
+        scan-path "/media/sf_SCAN/"
+        local-path "./scans"]
+    ()))
+;; #split#rename#scan#protocol
+(defn protocol-backup
+  "author: Aleksandr Ermolaev
+  version: 2024-04-23"
+  []
+  (let [scan-path "/media/sf_SCAN/"
+      get-files-list
+        (fn []
+            (doall
+              (filter (fn [s]
+                          (re-matches #".*\.pdf" s))
+                      (->
+                        (sh "ls" scan-path)
+                        :out
+                        (string/split #"\n")))))]
+  ;; приводим имена сканов к общему виду {start_protocol}.{pages_per_protocol}.pdf
+  (dorun
+    (map (fn [f] 
+             (sh "mv" (str scan-path f)
+                      (->
+                        (str scan-path f)
+                        (string/replace #"Protokol" "")
+                        (string/replace #"\d{6}\.pdf" "pdf"))))
+         (get-files-list)))
+  ;; делим общий скан на протоколы и переименовываем их.
+  (dorun
+    (map (fn [f]
+             (let [[start-number pages _] (string/split f #"\.")]
+               (split-pdf scan-path f pages start-number)
+               (println "split-pdf" (str scan-path f) pages start-number)))
+         (doall
+           (filter (fn [f]
+                       (re-matches #"\d+\.\d\.pdf" f))
+                   (get-files-list)))))))
+(defn date-to-iso
+  [s]
+  (string/join "-"
+    (->
+      s
+      (string/split #"\.")
+      reverse)))
+(comment
+(dir string)
+(doc string/split)
+(jdbc/query
+  pmidb
+  "select 1 as value;")
+(jdbc/query
+  midb
+  "select * from characteristics")
+(require '[clojure.repl :refer :all])
+(require '[mapp.lib.midb-queries :as q] :reload)
+(require '[mapp.protocols.custom :as protocol] :reload)
+;; example table-rows пример функции создания строк таблицы
+(spit
+  (str midb-path "temp.html")
+    (html (table (mapp.protocols.custom/table-rows
+            (list
+              (list "Детектор" "Значение уровня шумов" "Значение дрейфа")
+              (list "действительное" "допускаемое" "ед. изм."
+                    "действительное" "допускаемое" "ед. изм."))
+            #_(list
+              (list [2 1] [1 3] [1 3])
+              (list [1 1] [1 1] [1 1] [1 1] [1 1] [1 1]))
+            #_th))))
+(require '[mapp.lib.metrology :as metr] :reload)
+(require '[mapp.utils.protocol :as pr] :reload)
+(require '[mapp.lib.gen-html :refer :all] :reload)
+(require '[mapp.lib.midb-queries :as q] :reload)
+(require '[mapp.lib.chemistry :as ch] :reload)
+(doc flatten)
+(doc assoc)
+)
+;;#scan#backup#protocol#split
+(protocol-backup)
