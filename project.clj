@@ -6,9 +6,9 @@
   :dependencies
     [[org.clojure/clojure "1.11.1"]
      [org.clojure/java.jdbc "0.7.12"]
-     [org.postgresql/postgresql "42.7.2"]
      [org.xerial/sqlite-jdbc "3.42.0.0"]
      [org.mariadb.jdbc/mariadb-java-client "1.1.5"]
+     ;;[digest "1.4.10"] ;; MD5 hash
      [incanter "1.9.3"]
      [enlive "1.1.6"]
      [hiccup "2.0.0-RC3"]

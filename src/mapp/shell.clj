@@ -1,11 +1,12 @@
 ;; #gs2000
 (require '[mapp.lib.gs2000 :as gs])
 (require '[clojure.java.shell :refer [sh]])
+(require '[clojure.pprint :refer [pprint]])
 
 (pprint (gs2000 2
-                "H2S"
-                51.1
-                (list 2.8 25) 
+                ;"H2S"
+                496
+                (list 9.5 50 95) 
                 #_(map #(ch/ppm->mg "H2S" %1)
                      (list 1.7 5.8))))
 
@@ -41,7 +42,7 @@
      '(4.9 7.8 40 70))
 
 (map #(/ %1 4.4 0.01)
-     '(0.944 1.096 1.806 2.15))
+     '(1.116 2.09))
 
 (map #(* % 30)
      '(0.05 0.5 0.95))

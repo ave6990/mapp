@@ -2,6 +2,7 @@
   (:require 
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as string]
+    ;;[digest]  ;; MD5 hash
     [incanter.core :refer [dataset]]
     [incanter.excel :refer [save-xls]]
     [mapp.lib.database :as db]
@@ -267,6 +268,67 @@
                 ;delete-v-operations!
                 delete-measurements! delete-verification!))))
 
+(defn get-metrology-hash
+  ""
+  [db v-id]
+  (->
+    (jdbc/query
+      db
+      ["select hash
+        from view_v_metrology_hash
+        where v_id like ?"
+       v-id])
+    first
+    :hash))
+
+(defn get-v-id-with-actual-refs
+  ""
+  [db v-id]
+  (let [hash (get-metrology-hash db v-id)
+        query "select v_id
+             from view_v_metrology_hash
+             where hash = ?
+             limit 1;"]
+    (if (nil? hash)
+        v-id
+        (->
+          (jdbc/query db [query hash])
+          first
+          :v_id))))
+
+(defn get-channels-by-v-id
+  ""
+  [db v-id]
+  (->
+    (jdbc/query
+      db
+      ["select channels
+        from verification
+        where id = ?
+        limit 1;"
+       v-id])
+    first
+    :channels))
+
+(defn get-v-id-with-actual-meas
+  ""
+  [db v-id]
+  (let [query "select v.id
+               from view_v_metrology_hash vm
+               inner join verification v on vm.v_id = v.id
+               inner join conditions c on v.conditions = c.id
+               where vm.hash = ? and v.channels = ?
+               order by c.date desc
+               limit 1;"
+        hash (get-metrology-hash db v-id)
+        ch (get-channels-by-v-id db v-id)]
+    (if (nil? hash)
+        v-id
+        (-> 
+          (jdbc/query db [query hash ch])
+          first
+          :id))))
+
 (defn copy-record!
   "Копировать запиь о поверке с данными о применяемых эталонах, операциях
    поверки и результатах измерений.
@@ -283,11 +345,13 @@
                 (let [id-to (:id (first (jdbc/query tx
                               "select id from verification
                                order by id desc
-                               limit 1;")))]
-                  (jdbc/execute! tx [q/copy-v-gso id-to id-from])
-                  (jdbc/execute! tx [q/copy-v-refs id-to id-from])
-                  (jdbc/execute! tx [q/copy-v-opt-refs id-to id-from])
-                  (jdbc/execute! tx [q/copy-measurements id-to id-from])))
+                               limit 1;")))
+                      refs-id-from (get-v-id-with-actual-refs tx id-from)
+                      meas-id-from (get-v-id-with-actual-meas tx id-from)]
+                  (jdbc/execute! tx [q/copy-v-gso id-to refs-id-from])
+                  (jdbc/execute! tx [q/copy-v-refs id-to refs-id-from])
+                  (jdbc/execute! tx [q/copy-v-opt-refs id-to refs-id-from])
+                  (jdbc/execute! tx [q/copy-measurements id-to meas-id-from])))
               #_(copy-verification! id-from)
               #_(dorun
                 (map (fn [f] (f id-from (list id-to)))
