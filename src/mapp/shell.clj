@@ -4,11 +4,11 @@
 (require '[clojure.pprint :refer [pprint]])
 
 (pprint (gs2000 2
-                ;"H2S"
+                "H2S"
                 496
-                (list 9.5 50 95) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
+                #_(list 7 29) 
+                (map #(ch/ppm->mg "H2S" %1)
+                     (list 5.4 27))))
 
 (* 0.25 14)
 

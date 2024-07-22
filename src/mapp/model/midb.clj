@@ -348,6 +348,7 @@
                                limit 1;")))
                       refs-id-from (get-v-id-with-actual-refs tx id-from)
                       meas-id-from (get-v-id-with-actual-meas tx id-from)]
+                  (println "refs_from: " refs-id-from "meas_from: " meas-id-from)
                   (jdbc/execute! tx [q/copy-v-gso id-to refs-id-from])
                   (jdbc/execute! tx [q/copy-v-refs id-to refs-id-from])
                   (jdbc/execute! tx [q/copy-v-opt-refs id-to refs-id-from])
