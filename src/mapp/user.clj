@@ -134,7 +134,7 @@
             (clojure.string/replace s "-" "_")
             " соответствующие заданному v_id.")
       [~id]
-      (jdbc/delete! midb 
+      (jdbc/delete! mmidb
                     ~(keyword (clojure.string/replace s "-" "_"))
                     ["v_id = ?" ~id]))))
 
@@ -160,7 +160,7 @@
         (map (fn [~id-to]
                  (map (fn [~f ~args] (~f ~args))
                       [~(symbol (str "mapp.user/delete-" s "!"))
-                        (partial jdbc/execute! midb)]
+                        (partial jdbc/execute! mmidb)]
                       [~id-to
                         [~(symbol (str "q/copy-" s))
                         ~id-to

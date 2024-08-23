@@ -63,7 +63,7 @@
                 (dilution-factor n coll))
             (range 1 1024))))
 
-(defn calculator
+(defn calculator ;; TODO: make an adjustment for h2s for small concentration value
   "Возвращает функцию расчета режима работы ГС-2000.
    В качестве аргумента передается паспорт генератора.
    Возвращаемая функция f принимает 3 или 4 аргумента:

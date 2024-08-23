@@ -1,60 +1,3 @@
-                  (string/join ", " coll)
-                  ")
-                  order by date desc, id desc"))
-        measurements (jdbc/query
-                      midb
-                      (str "select * from view_v_measurements
-                          where id in ("
-                          (string/join ", " coll)
-                          ")"))
-        operations (jdbc/query
-                    midb
-                    (str
-                      q/get-operations
-                      "("
-                      (string/join ", " coll)
-                      ")"))
-        refs (jdbc/query
-              midb
-              (str "select * from verification_refs
-                      where v_id in ("
-                      (string/join ", " coll)
-                      ")"))]
-    (map (fn [m]
-             (assoc-multi m
-                          {:measurements
-                           (doall (filter (fn [r]
-                                              (= (:id r) (:id m)))
-                                          measurements))
-                           :refs
-                           (doall (filter (fn [r]
-                                              (= (:v_id r) (:id m)))
-                                          refs))
-                           :operations
-                           (doall (filter (fn [r]
-                                              (= (:v_id r) (:id m)))
-                                          operations))}))
-         v-data)))
-(defn get-methodology-data
-  [coll]
-  (let [met-data
-         (jdbc/query
-           midb
-           (str "select * from methodology
-                 where id in ("
-                 (string/join
-                   ", "
-                   coll)
-                 ")"))
-        metrology-data
-          (jdbc/query
-            midb
-            (str "select * from view_metrology
-                  where id in ("
-                  (string/join
-                    ", "
-                    coll)
-                  ")"))
         operations-data
           (jdbc/query
             midb
@@ -436,65 +379,122 @@
 )
 ;;#scan#backup#protocol#split
 (protocol-backup)
-(map #(/ %1 4.4 0.01)
-     '(1.116 2.09))
-(pprint (gs2000 2
-                "H2S"
-                496
-                (list 20 34) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(get-metrology-hash 5437 midb)
-(ns mapp.model.midb
-  (:require 
-    [clojure.java.jdbc :as jdbc]
-    [clojure.string :as string]
-    ;;[digest]  ;; MD5 hash
-    [incanter.core :refer [dataset]]
-    [incanter.excel :refer [save-xls]]
-    [mapp.lib.database :as db]
-    [mapp.lib.chemistry :as ch]
-    [mapp.lib.gs2000 :as gs]
-    [mapp.lib.metrology :as metr]
-    [mapp.db.queries :as q]
-    #_[mapp.protocols.custom :as protocol]))
-(get-metrology-hash 5437 midb)
-(get-metrology-hash midb 5437)
-(get-v-id-with-actual-refs midb 5437)
-(pprint (gs2000 2
-                ;"H2S"
-                496
-                (list 7 30) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                496
-                (list 6.5 30) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                ;"H2S"
-                496
-                (list 7 29) 
-                #_(map #(ch/ppm->mg "H2S" %1)
-                     (list 1.7 5.8))))
-(pprint (gs2000 2
-                "H2S"
-                496
-                #_(list 7 29) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 2.1 6.3 7 29))))
-(pprint (gs2000 2
-                "H2S"
-                496
-                #_(list 7 29) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 5.84 29))))
-(pprint (gs2000 2
-                "H2S"
-                496
-                #_(list 7 29) 
-                (map #(ch/ppm->mg "H2S" %1)
-                     (list 5.4 27))))
+(list* 1 2 3 [4 5])
+(doc list)
+(doc list*)
+;;#scan#backup#protocol#split
+(protocol-backup)
+;;#scan#backup#protocol#split
+(protocol-backup)
+;; #cars
+;; #insert#order#auto
+(do
+  (jdbc/insert!
+    auto
+    :travel_order
+    {:auto_id 1
+     :count "9/000"
+     :date_departure "2024-08-20T09:00"
+     :date_arrive "2024-08-20T12:00"
+     :odometr_departure 248105
+     :fuel_departure 13.93
+     :odometr_arrive 248141
+     :fuel_add 0})
+  (pprint
+    (jdbc/query
+      auto
+      "select * from view_travel_order order by id desc limit 1;")))
+(Integer/toString 7 2)
+(map str *1)
+(read-string "(range 10)")
+*1
+(*1)
+(do *2)
+'(range 10)
+~('(range 10))
+(eval *2)
+;;#scan#backup#protocol#split
+(protocol-backup)
+;; #chemistry
+(ch/coefficient "CH3OH")
+;; #chemistry
+(ch/coefficient "CH4O")
+;; #chemistry
+(ch/coefficient "CH4O")
+;;#scan#backup#protocol#split
+(protocol-backup)
+;; Дата изменения скана протокола = дата поверки
+;; #set#date#scans
+(let [scan-path "/media/sf_Y_DRIVE/СКАНЫ РЕЗЕРВНОЕ КОПИРОВАНИЕ/2024/Ермолаев/"
+      data (jdbc/query
+             midb
+             "select
+                v.protocol_number,
+                c.date as date
+              from verification as v
+              inner join conditions as c
+                on c.id = v.conditions
+              where
+                c.date > '2024-01-01'
+                --v.protocol_number >= 2319
+                --and v.protocol_number  <= 2322")]
+  (map (fn [m]
+           (sh
+             "touch"
+             (str scan-path
+                  (str "9-61-" (:protocol_number m) "-2024.pdf"))
+             "-mad"
+             (str (:date m) "T17:30")))
+       data))
+(defmacro defn-delete
+  [s]
+  (let [id (gensym "id")]
+    `(defn ~(symbol (str "delete-" s "!"))
+      ~(str "Удалить строки таблицы "
+            (clojure.string/replace s "-" "_")
+            " соответствующие заданному v_id.")
+      [~id]
+      (jdbc/delete! mmidb
+                    ~(keyword (clojure.string/replace s "-" "_"))
+                    ["v_id = ?" ~id]))))
+(defn-delete v-gso)
+(defn-delete v-refs)
+(defn-delete v-opt-refs)
+(defn-delete v-operations)
+(defn-delete measurements)
+;; #copy#measurements
+(copy-measurements! 5805 (range 5806 5818))
+(defmacro defn-copy
+  [s]
+  (let [id-from (gensym "id-from")
+        ids-to (gensym "ids-to")
+        id-to (gensym "id-to")
+        f (gensym "f")
+        args (gensym "args")] 
+    `(defn ~(symbol (str "copy-" s "!"))
+      ~(str "Копировать строки таблицы "
+            s
+            " соответствующие заданному v_id.")
+      [~id-from ~ids-to]
+      (doall
+        (map (fn [~id-to]
+                 (map (fn [~f ~args] (~f ~args))
+                      [~(symbol (str "mapp.user/delete-" s "!"))
+                        (partial jdbc/execute! mmidb)]
+                      [~id-to
+                        [~(symbol (str "q/copy-" s))
+                        ~id-to
+                        ~id-from]]))
+          ~ids-to)))))
+(defn-copy v-gso)
+(defn-copy v-refs)
+(defn-copy v-opt-refs)
+(defn-copy v-operations)
+(defn-copy measurements)
+;; #copy#measurements
+(copy-measurements! 5805 (range 5806 5818))
+;; #copy#measurements
+(copy-measurements! 5805 (range 5806 5818))
+;;#scan#backup#protocol#split
+(protocol-backup)
 exit
