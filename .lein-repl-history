@@ -1,3 +1,62 @@
+<<<<<<< HEAD
+=======
+                  ")
+                  order by date desc, id desc"))
+        measurements (jdbc/query
+                      midb
+                      (str "select * from view_v_measurements
+                          where id in ("
+                          (string/join ", " coll)
+                          ")"))
+        operations (jdbc/query
+                    midb
+                    (str
+                      q/get-operations
+                      "("
+                      (string/join ", " coll)
+                      ")"))
+        refs (jdbc/query
+              midb
+              (str "select * from verification_refs
+                      where v_id in ("
+                      (string/join ", " coll)
+                      ")"))]
+    (map (fn [m]
+             (assoc-multi m
+                          {:measurements
+                           (doall (filter (fn [r]
+                                              (= (:id r) (:id m)))
+                                          measurements))
+                           :refs
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          refs))
+                           :operations
+                           (doall (filter (fn [r]
+                                              (= (:v_id r) (:id m)))
+                                          operations))}))
+         v-data)))
+(defn get-methodology-data
+  [coll]
+  (let [met-data
+         (jdbc/query
+           midb
+           (str "select * from methodology
+                 where id in ("
+                 (string/join
+                   ", "
+                   coll)
+                 ")"))
+        metrology-data
+          (jdbc/query
+            midb
+            (str "select * from view_metrology
+                  where id in ("
+                  (string/join
+                    ", "
+                    coll)
+                  ")"))
+>>>>>>> main
         operations-data
           (jdbc/query
             midb
@@ -498,3 +557,4 @@
 ;;#scan#backup#protocol#split
 (protocol-backup)
 exit
+(exit)

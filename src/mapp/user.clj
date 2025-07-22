@@ -26,7 +26,7 @@
   "mariaDB spec"
   {:dbtype "mysql"
    :dbname "midb"
-   :host "127.0.0.1"
+   :host "192.168.0.118"
    :port 3306
    :user "ave"
    :password "enter"})
