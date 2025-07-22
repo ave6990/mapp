@@ -18,7 +18,9 @@
      [ring/ring-json "0.5.1"]
      [ring/ring-defaults "0.3.2"]]
   :plugins [[lein-ring "0.12.5"]]
-  :ring {:handler mapp.handler/app}
+  :ring {:handler mapp.handler/app
+         :port 3000
+         :host "0.0.0.0"}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]}})

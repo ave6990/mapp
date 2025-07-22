@@ -34,6 +34,11 @@
         page-number (js/parseInt
                       (get-value "page-number"))]
     (println table-id query page-number)
+    (.log js/console (make-url
+                  (str table-id "/get")
+                  page-number
+                  query
+                  @cnfg/records-limit))
     (->
       (js/fetch (make-url
                   (str table-id "/get")
